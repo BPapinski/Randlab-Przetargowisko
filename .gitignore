@@ -1,0 +1,27 @@
+# Python
+venv/
+__pycache__/
+*.py[cod]
+*.sqlite3
+*.log
+
+# Django
+*.pot
+*.pyc
+db.sqlite3
+/media
+/staticfiles
+
+# VS Code
+.vscode/
+
+# macOS
+.DS_Store
+
+# React
+/frontend/node_modules/
+/frontend/build/
+/frontend/.env
+
+# Env files
+.env
