@@ -34,6 +34,9 @@ INSTALLED_APPS = [
     # user apps
     'users',
 
+    #additional apps
+    'jazzmin',
+
     # default apps
     "django.contrib.admin",
     "django.contrib.auth",

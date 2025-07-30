@@ -16,6 +16,16 @@ Full-stack web application using **Django (backend)** and **React (frontend)** w
 ## 🔧 Co zostało zrobione
 
 - Utworzenie i konfiguracja projektu
+- Utworzenie customowego modelu użytkownika
+
+
+## 🔧 Co zostało zrobione
+
+- Utworzenie i konfiguracja projektu
+
+- Wdrożenie niestandardowego modelu użytkownika
+
+- Usprawnienie panelu administracyjnego za pomocą Jazzmine
 
 
 ## 🚀 Jak uruchomić projekt lokalnie
