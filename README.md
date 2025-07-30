@@ -11,14 +11,6 @@ Full-stack web application using **Django (backend)** and **React (frontend)** w
 - **Baza danych**: Microsoft SQL Server (zarządzany przez SQL Server Management Studio)
 - **Inne**: `django-cors-headers`, `mssql-django`, ODBC Driver 17
 
----
-
-## 🔧 Co zostało zrobione
-
-- Utworzenie i konfiguracja projektu
-- Utworzenie customowego modelu użytkownika
-
-
 ## 🔧 Co zostało zrobione
 
 - Utworzenie i konfiguracja projektu
