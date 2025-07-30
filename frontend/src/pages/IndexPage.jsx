@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import "./styles/indexStyles.css";
-import RandlabLogo from '../icons/randlab-logo.png';
+import "./styles/indexStyles.css"; // Style CSS dla całej strony
+// Import komponentu Header
+import Header from "../components/Header";
+import TenderList from "../components/TenderList"; // Import komponentu TenderList
 
-// Import ikon z Font Awesome
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch, faGavel, faFileAlt, faCog, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
 
 export default function IndexPage() {
   const location = useLocation();
@@ -16,12 +15,12 @@ export default function IndexPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [tendersPerPage, setTendersPerPage] = useState(10); // Nowy stan dla liczby przetargów na stronę
+  const [tendersPerPage, setTendersPerPage] = useState(10);
 
   const fetchTenders = async () => {
     const params = new URLSearchParams(location.search);
     params.set("page", currentPage);
-    params.set("page_size", tendersPerPage); // Dodaj parametr page_size
+    params.set("page_size", tendersPerPage);
     if (searchTerm) {
       params.set("search", searchTerm);
     }
@@ -34,7 +33,6 @@ export default function IndexPage() {
 
       const data = await res.json();
       setTenders(data.results || []);
-      // Oblicz totalPages na podstawie data.count i tendersPerPage
       setTotalPages(Math.ceil(data.count / tendersPerPage));
       setError(null);
     } catch (err) {
@@ -45,7 +43,7 @@ export default function IndexPage() {
 
   useEffect(() => {
     fetchTenders();
-  }, [currentPage, tendersPerPage, location.search, searchTerm]); // Dodaj tendersPerPage do zależności
+  }, [currentPage, tendersPerPage, location.search, searchTerm]);
 
   const handlePageChange = (page) => {
     const params = new URLSearchParams(location.search);
@@ -60,60 +58,25 @@ export default function IndexPage() {
 
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
-    setCurrentPage(1); // Resetuj stronę przy nowym wyszukiwaniu
+    setCurrentPage(1);
   };
 
   const handleTendersPerPageChange = (event) => {
     setTendersPerPage(Number(event.target.value));
-    setCurrentPage(1); // Resetuj stronę do 1 po zmianie liczby elementów na stronę
+    setCurrentPage(1);
   };
 
   return (
     <>
-      <header className="main-header">
-        <div className="header-left">
-          <img src={RandlabLogo} alt="Randlab Logo" className="logo" />
-        </div>
-
-        <div className="header-center">
-          <div className="search-bar-wrapper">
-            <FontAwesomeIcon icon={faSearch} className="search-icon" />
-            <input
-              type="text"
-              placeholder="Szukaj przetargów..."
-              className="search-input"
-              value={searchTerm}
-              onChange={handleSearchChange}
-            />
-          </div>
-        </div>
-
-        <div className="header-right">
-          <button className="header-nav-button">
-            <FontAwesomeIcon icon={faGavel} />
-            <span>Przetargi</span>
-          </button>
-          <button className="header-nav-button">
-            <FontAwesomeIcon icon={faFileAlt} />
-            <span>Moje zgłoszenia</span>
-          </button>
-          <button className="header-nav-button">
-            <FontAwesomeIcon icon={faCog} />
-            <span>Ustawienia</span>
-          </button>
-          <button className="header-nav-button logout-button">
-            <FontAwesomeIcon icon={faSignOutAlt} />
-            <span>Wyloguj</span>
-          </button>
-        </div>
-      </header>
+      <Header
+        searchTerm={searchTerm}
+        onSearchChange={handleSearchChange}
+      />
 
       <div className="container">
         <h1 className="main-title">Lista Przetargów</h1>
 
-        {error && <p className="error">{error}</p>}
-
-        {/* Sekcja wyboru liczby przetargów na stronę */}
+        {/* Sekcja wyboru liczby przetargów na stronę (pozostaje w IndexPage, bo korzysta ze stanów paginacji) */}
         <div className="pagination-controls">
           <label htmlFor="tenders-per-page">Pokaż:</label>
           <select
@@ -130,67 +93,17 @@ export default function IndexPage() {
           <span>przetargów na stronę</span>
         </div>
 
-        {tenders.length === 0 && !error && (
-          <p className="no-results">Brak przetargów do wyświetlenia.</p>
-        )}
+        {/* Użycie komponentu TenderList */}
+        <TenderList tenders={tenders} error={error} />
 
-        {tenders.map((tender) => (
-          <div key={tender.id} className="tender-card">
-            <div className="tender-header">
-              <h2>{tender.name}</h2>
-              <p className="dates">
-                Utworzono: {new Date(tender.created_at).toLocaleString()} <br />
-                Zaktualizowano: {new Date(tender.updated_at).toLocaleString()}{" "}
-                <br />
-                <span className="total-value">
-                  Wartość całkowita:{" "}
-                  {parseFloat(tender.total_tender_value).toFixed(2)} zł
-                </span>
-              </p>
-            </div>
-
-            <h3 className="entries-title">Zgłoszenia:</h3>
-            <div className="entries">
-              {tender.entries.length === 0 && (
-                <p className="no-entries">Brak zgłoszeń dla tego przetargu.</p>
-              )}
-              {tender.entries.map((entry) => (
-                <div key={entry.id} className="entry-card">
-                  <div className="entry-info">
-                    <p>
-                      <strong>Stanowisko:</strong> {entry.position}
-                    </p>
-                    <p>
-                      <strong>Firma:</strong> {entry.company}
-                    </p>
-                    <p>
-                      <strong>Cena developera:</strong> {entry.developer_price}{" "}
-                      zł
-                    </p>
-                    <p>
-                      <strong>Marża:</strong> {entry.margin}%
-                    </p>
-                    <p>
-                      <strong>Cena końcowa:</strong> {entry.total_price} zł
-                    </p>
-                  </div>
-                  <div className="entry-actions">
-                    <button className="edit-btn">Edytuj</button>
-                    <button className="delete-btn">Usuń</button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        ))}
-
+        {/* Paginacja (pozostaje w IndexPage na razie, aby mieć dostęp do currentPage, totalPages, handlePageChange) */}
         <div className="pagination">
           {Array.from({ length: totalPages }, (_, i) => (
             <button
               key={i + 1}
               onClick={() => handlePageChange(i + 1)}
               disabled={currentPage === i + 1}
-              className={currentPage === i + 1 ? 'active' : ''} // Dodaj klasę 'active'
+              className={currentPage === i + 1 ? 'active' : ''}
             >
               {i + 1}
             </button>

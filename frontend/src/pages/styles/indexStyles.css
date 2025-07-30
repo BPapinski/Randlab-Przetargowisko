@@ -1,4 +1,4 @@
-/* indexStyles.css */
+/* src/styles/indexStyles.css */
 
 body {
   margin: 0;
@@ -13,210 +13,11 @@ body {
   padding: 2rem;
 }
 
-/* Header Styles */
-.main-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem 2rem;
-  background-color: #2C3E50;
-  color: #FFFFFF;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-  margin-bottom: 2rem;
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-}
-
-.header-left {
-  display: flex;
-  align-items: center;
-  gap: 1rem; /* Możesz zmniejszyć, np. do 0.5rem, jeśli logo ma dużo własnego miejsca */
-  flex-shrink: 0; /* Dodano: Zapobiega kurczeniu się tej sekcji */
-}
-
-.header-right {
-  display: flex;
-  align-items: center;
-  gap: 1rem; /* Możesz zmniejszyć, np. do 0.5rem */
-  flex-shrink: 0; /* Dodano: Zapobiega kurczeniu się tej sekcji */
-}
-
-.logo {
-  height: 40px;
-  width: auto;
-  object-fit: contain;
-}
-
-/* Wyszukiwarka */
-.search-bar-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-  flex-grow: 1; /* Allows the search bar to grow and take available space */
-  margin: 0 2rem;
-  min-width: 300px; /* Minimum width to ensure it’s wide enough */
-  max-width: 600px; /* Maximum width to prevent it from becoming too wide */
-  width: 100%; /* Ensures it takes full available width within constraints */
-}
-
-.search-input {
-  width: 100%;
-  padding: 0.75rem 1rem 0.75rem 3rem;
-  border: 1px solid #7F8C8D;
-  border-radius: 25px;
-  font-size: 1rem;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-  background-color: #FFFFFF;
-  color: #2C3E50;
-}
-
-.search-input::placeholder {
-  color: #95A5A6;
-}
-
-.search-input:focus {
-  outline: none;
-  border-color: #F39C12;
-  box-shadow: 0 0 0 3px rgba(243, 156, 18, 0.25);
-}
-
-.search-icon {
-  position: absolute;
-  left: 1rem;
-  color: #7F8C8D;
-  font-size: 1.1rem;
-}
-
-/* Przyciski nawigacyjne w nagłówku */
-.header-nav-button {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.6rem 1rem;
-  background-color: transparent;
-  color: #FFFFFF;
-  border: none;
-  border-radius: 6px;
-  font-weight: bold;
-  font-size: 0.95rem;
-  cursor: pointer;
-  transition: background-color 0.2s ease, transform 0.1s ease, color 0.2s ease;
-}
-
-.header-nav-button:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-  transform: translateY(-2px);
-  color: #F39C12;
-}
-
-.logout-button {
-  background-color: #E74C3C;
-  padding: 0.6rem 1.2rem;
-  border-radius: 25px;
-  margin-left: 1rem;
-}
-
-.logout-button:hover {
-  background-color: #C0392B;
-  color: white;
-}
-
-/* Standardowe style dla reszty komponentów */
+/* Standardowe style dla pozostałych elementów, np. paginacji */
 .main-title {
   text-align: center;
   margin-bottom: 2rem;
   color: #2C3E50;
-}
-
-.tender-card {
-  background: #fff;
-  border-radius: 12px;
-  padding: 1.5rem;
-  margin-bottom: 2rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-}
-
-.tender-header {
-  border-bottom: 1px solid #BDC3C7;
-  padding-bottom: 0.5rem;
-  margin-bottom: 1rem;
-}
-
-.tender-header h2 {
-  color: #2C3E50;
-}
-
-.dates {
-  color: #7F8C8D;
-  font-size: 0.9rem;
-}
-
-.entries-title {
-  margin-bottom: 1rem;
-  color: #2C3E50;
-}
-
-.entries {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.entry-card {
-  background-color: #F8F9FA;
-  border-radius: 8px;
-  padding: 1rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.03);
-  border: 1px solid #E0E6EB;
-}
-
-.entry-info p {
-  margin: 4px 0;
-  color: #34495E;
-}
-
-.entry-info strong {
-  color: #2C3E50;
-}
-
-.entry-actions {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.edit-btn,
-.delete-btn {
-  padding: 8px 16px;
-  border: none;
-  border-radius: 6px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.2s ease, transform 0.1s ease;
-}
-
-.edit-btn {
-  background-color: #3498DB;
-  color: white;
-}
-
-.edit-btn:hover {
-  background-color: #2980B9;
-  transform: translateY(-1px);
-}
-
-.delete-btn {
-  background-color: #E74C3C;
-  color: white;
-}
-
-.delete-btn:hover {
-  background-color: #C0392B;
-  transform: translateY(-1px);
 }
 
 .pagination {
@@ -252,66 +53,34 @@ body {
     color: white;
 }
 
-.error {
-  color: #E74C3C;
-  text-align: center;
-  margin-bottom: 1rem;
-  font-weight: bold;
-}
-
-.total-value {
-  display: inline-block;
-  margin-top: 0.5rem;
-  font-weight: bold;
-  color: #F39C12;
-  font-size: 1.1rem;
-}
-
-.no-results,
-.no-entries {
-  text-align: center;
-  color: #7F8C8D;
-  margin-top: 1rem;
-  padding: 1rem;
-  background-color: #ECEFF1;
-  border-radius: 8px;
-  border: 1px dashed #BDC3C7;
-}
-
 .pagination-controls {
   display: flex;
   align-items: center;
-  justify-content: flex-end; /* Wyrównaj do prawej */
-  margin-bottom: 1.5rem; /* Odstęp od listy przetargów */
-  gap: 0.5rem; /* Odstęp między elementami */
-  color: #34495E; /* Kolor tekstu */
+  justify-content: flex-end;
+  margin-bottom: 1.5rem;
+  gap: 0.5rem;
+  color: #34495E;
   font-size: 0.95rem;
 }
 
 .tenders-per-page-select {
-  padding: 0.5rem 0.75rem; /* Zachowaj obecny padding */
-  padding-right: 2.5rem; /* Zwiększ padding po prawej, aby zrobić miejsce dla strzałki */
+  padding: 0.5rem 0.75rem;
+  padding-right: 2.5rem;
   border: 1px solid #BDC3C7;
   border-radius: 6px;
   background-color: #FFFFFF;
   color: #2C3E50;
   font-size: 0.95rem;
   cursor: pointer;
-  appearance: none; /* Ukryj domyślną strzałkę przeglądarki */
-  background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%232C3E50%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13.6-6.4H18.9c-5%200-9.6%202-13.6%206.4-8.8%208.8-8.8%2023.2%200%2032l128%20128c4.8%204.8%2011.2%206.4%2017.6%206.4s12.8-1.6%2017.6-6.4l128-128c8.8-8.8%208.8-23.2%200-32z%22%2F%3E%3C%2Fsvg%3E'); /* Niestandardowa strzałka */
+  appearance: none;
+  background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%232C3E50%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13.6-6.4H18.9c-5%200-9.6%202-13.6%206.4-8.8%208.8-8.8%2023.2%200%2032l128%20128c4.8%204.8%2011.2%206.4%2017.6%206.4s12.8-1.6%2017.6-6.4l128-128c8.8-8.8%208.8-23.2%200-32z%22%2F%3E%3C%2Fsvg%3E');
   background-repeat: no-repeat;
-  background-position: right 0.75rem center; /* Zmieniona pozycja: 0.75rem od prawej, wyśrodkowana pionowo */
-  background-size: 0.7em auto; /* Lekko większa strzałka dla lepszej widoczności */
+  background-position: right 0.75rem center;
+  background-size: 0.7em auto;
 }
 
 .tenders-per-page-select:focus {
   outline: none;
   border-color: #3498DB;
   box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.25);
-}
-
-.header-center {
-  flex: 1; /* Makes header-center take up available space */
-  display: flex;
-  justify-content: center; /* Centers the search bar */
 }
