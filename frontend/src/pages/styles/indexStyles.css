@@ -1,15 +1,95 @@
+/* indexStyles.css */
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #ECF0F1; /* Jasny szary - tło całej strony */
+}
+
 .container {
   max-width: 1000px;
   margin: auto;
   padding: 2rem;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #f5f7fa;
+}
+
+/* Header Styles */
+.main-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background-color: #2C3E50; /* Głęboki błękit - tło nagłówka */
+  color: #FFFFFF; /* Biały tekst w nagłówku */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+}
+
+.header-left,
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem; /* Zwiększony odstęp między elementami w nagłówku */
+}
+
+.logo-placeholder {
+  width: 150px; /* Szerokość logo */
+  height: 40px; /* Wysokość logo */
+  background-color: #3498DB; /* Akcentowy błękit dla logo */
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  border-radius: 4px;
+  font-size: 1.2rem; /* Zwiększony rozmiar tekstu logo */
+}
+
+.search-bar {
+  width: 400px; /* Szerszy pasek wyszukiwania */
+  padding: 0.7rem 1rem;
+  border: 1px solid #7F8C8D; /* Ciemny szary dla obramowania */
+  border-radius: 25px; /* Bardziej zaokrąglone rogi */
+  font-size: 1rem;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  background-color: #FFFFFF; /* Białe tło paska wyszukiwania */
+  color: #2C3E50; /* Ciemny tekst w pasku wyszukiwania */
+}
+
+.search-bar::placeholder {
+    color: #95A5A6; /* Delikatny szary dla placeholderu */
+}
+
+.search-bar:focus {
+  outline: none;
+  border-color: #F39C12; /* Ochra/złoto na focus */
+  box-shadow: 0 0 0 3px rgba(243, 156, 18, 0.25);
+}
+
+.icon-placeholder {
+  width: 40px; /* Zwiększony rozmiar ikony */
+  height: 40px; /* Zwiększony rozmiar ikony */
+  background-color: #34495E; /* Ciemniejszy błękit dla ikon */
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  font-size: 1.5rem; /* Zwiększony rozmiar czcionki ikony */
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.icon-placeholder:hover {
+    background-color: #4A637F; /* Lekko jaśniejszy kolor na najechaniu */
+    transform: scale(1.05); /* Delikatne powiększenie na najechaniu */
 }
 
 .main-title {
   text-align: center;
   margin-bottom: 2rem;
-  color: #333;
+  color: #2C3E50; /* Główny błękit dla tytułu strony */
 }
 
 .tender-card {
@@ -17,23 +97,27 @@
   border-radius: 12px;
   padding: 1.5rem;
   margin-bottom: 2rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* Lekko mocniejszy cień */
 }
 
 .tender-header {
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid #BDC3C7; /* Średni szary dla separatora */
   padding-bottom: 0.5rem;
   margin-bottom: 1rem;
 }
 
+.tender-header h2 {
+  color: #2C3E50; /* Głęboki błękit dla nazwy przetargu */
+}
+
 .dates {
-  color: #666;
+  color: #7F8C8D; /* Ciemny szary dla dat */
   font-size: 0.9rem;
 }
 
 .entries-title {
   margin-bottom: 1rem;
-  color: #222;
+  color: #2C3E50; /* Głęboki błękit dla tytułu "Zgłoszenia" */
 }
 
 .entries {
@@ -43,17 +127,23 @@
 }
 
 .entry-card {
-  background-color: #f1f3f6;
+  background-color: #F8F9FA; /* Bardzo jasny szary/prawie biały dla karty zgłoszenia */
   border-radius: 8px;
   padding: 1rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.03); /* Delikatny cień wewnętrzny */
+  border: 1px solid #E0E6EB; /* Delikatna ramka */
 }
 
 .entry-info p {
   margin: 4px 0;
+  color: #34495E; /* Ciemniejszy błękit dla tekstu zgłoszeń */
+}
+
+.entry-info strong {
+  color: #2C3E50; /* Głęboki błękit dla pogrubionego tekstu */
 }
 
 .entry-actions {
@@ -63,30 +153,32 @@
 
 .edit-btn,
 .delete-btn {
-  padding: 6px 12px;
+  padding: 8px 16px; /* Większe paddingi dla przycisków */
   border: none;
-  border-radius: 4px;
+  border-radius: 6px; /* Bardziej zaokrąglone rogi przycisków */
   font-weight: bold;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: background-color 0.2s ease, transform 0.1s ease;
 }
 
 .edit-btn {
-  background-color: #007bff;
+  background-color: #3498DB; /* Akcentowy błękit */
   color: white;
 }
 
 .edit-btn:hover {
-  background-color: #0056b3;
+  background-color: #2980B9; /* Ciemniejszy odcień akcentowego błękitu */
+  transform: translateY(-1px);
 }
 
 .delete-btn {
-  background-color: #dc3545;
+  background-color: #E74C3C; /* Czerwony do usuwania */
   color: white;
 }
 
 .delete-btn:hover {
-  background-color: #a71d2a;
+  background-color: #C0392B; /* Ciemniejszy odcień czerwonego */
+  transform: translateY(-1px);
 }
 
 .pagination {
@@ -96,29 +188,54 @@
 
 .pagination button {
   margin: 0 6px;
-  padding: 8px 14px;
+  padding: 10px 16px; /* Większe przyciski paginacji */
   border-radius: 6px;
   border: none;
-  background-color: #e1e4e8;
+  background-color: #BDC3C7; /* Średni szary dla nieaktywnych przycisków */
+  color: #2C3E50; /* Ciemny tekst na przyciskach paginacji */
   cursor: pointer;
   font-weight: bold;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.pagination button:hover:not(:disabled) {
+  background-color: #95A5A6; /* Ciemniejszy szary na hover */
+  transform: translateY(-1px);
 }
 
 .pagination button:disabled {
-  background-color: #b0b0b0;
+  background-color: #7F8C8D; /* Ciemniejszy szary dla wyłączonych przycisków */
+  color: #ECF0F1; /* Jasny tekst na wyłączonych przyciskach */
   cursor: default;
 }
 
+.pagination button.active { /* Dodatkowy styl dla aktywnej strony */
+    background-color: #3498DB; /* Akcentowy błękit dla aktywnej strony */
+    color: white;
+}
+
 .error {
-  color: red;
+  color: #E74C3C; /* Czerwony dla błędów */
   text-align: center;
   margin-bottom: 1rem;
+  font-weight: bold;
 }
 
 .total-value {
   display: inline-block;
   margin-top: 0.5rem;
   font-weight: bold;
-  color: #2c3e50;
+  color: #F39C12; /* Ochra/złoto dla wartości całkowitej */
+  font-size: 1.1rem; /* Lekko większy rozmiar */
 }
 
+.no-results,
+.no-entries {
+  text-align: center;
+  color: #7F8C8D; /* Ciemny szary dla komunikatów "brak wyników" */
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: #ECEFF1; /* Bardzo jasny szary */
+  border-radius: 8px;
+  border: 1px dashed #BDC3C7; /* Przerywana ramka */
+}
