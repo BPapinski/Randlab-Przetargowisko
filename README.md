@@ -58,3 +58,5 @@ npm start
 - email: admin@email.com
 
 - haslo: admin
+
+<img width="1902" height="912" alt="image" src="https://github.com/user-attachments/assets/58611d24-50a3-40b1-a746-466b344ad776" />
