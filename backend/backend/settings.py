@@ -31,6 +31,10 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    # user apps
+    'users',
+
+    # default apps
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -41,9 +45,7 @@ INSTALLED_APPS = [
     # third-party apps
     'rest_framework',
     'corsheaders',
-    # user apps
-
-    'users',
+    
 ]
 
 MIDDLEWARE = [
@@ -147,3 +149,5 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.AllowAny',
     ]
 }
+
+AUTH_USER_MODEL = "users.User"

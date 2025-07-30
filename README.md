@@ -44,3 +44,9 @@ npm start
 - Panel admina
 
 - Integracja frontendu z REST API
+
+### Dane do logowania
+
+- email: admin@email.com
+
+- haslo: admin
