@@ -1,4 +1,3 @@
-
 from rest_framework import serializers
 from .models import Tender, TenderEntry
 
@@ -9,7 +8,12 @@ class TenderEntrySerializer(serializers.ModelSerializer):
 
 class TenderSerializer(serializers.ModelSerializer):
     entries = TenderEntrySerializer(many=True, read_only=True)
+    # 1. Add a SerializerMethodField for the total price
+    total_tender_value = serializers.SerializerMethodField()
 
     class Meta:
         model = Tender
-        fields = ['id', 'name', 'created_at', 'updated_at', 'entries']
+        fields = ['id', 'name', 'created_at', 'updated_at', 'entries', 'total_tender_value']
+
+    def get_total_tender_value(self, obj):
+        return obj.total_tender_price()
