@@ -24,6 +24,7 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     # user apps
     'users',
+    'tenders',
 
     #additional apps
     'jazzmin',
