@@ -1,224 +1,202 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import "./styles/indexStyles.css";
+import RandlabLogo from '../icons/randlab-logo.png';
+
+// Import ikon z Font Awesome
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSearch, faGavel, faFileAlt, faCog, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
 
 export default function IndexPage() {
-    const location = useLocation();
-    const navigate = useNavigate();
+  const location = useLocation();
+  const navigate = useNavigate();
 
-    const [tenders, setTenders] = useState([]);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(1);
-    const [error, setError] = useState(null);
-    const [searchTerm, setSearchTerm] = useState("");
-    const [pageSize, setPageSize] = useState(10);
+  const [tenders, setTenders] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [error, setError] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [tendersPerPage, setTendersPerPage] = useState(10); // Nowy stan dla liczby przetargów na stronę
 
-    const fetchTenders = async () => {
-        const params = new URLSearchParams(location.search);
-        params.set("page", currentPage);
-        params.set("page_size", pageSize);
-        if (searchTerm) {
-            params.set("search", searchTerm);
-        }
+  const fetchTenders = async () => {
+    const params = new URLSearchParams(location.search);
+    params.set("page", currentPage);
+    params.set("page_size", tendersPerPage); // Dodaj parametr page_size
+    if (searchTerm) {
+      params.set("search", searchTerm);
+    }
 
-        let apiUrl = "http://127.0.0.1:8000/api/tenders/?" + params.toString();
+    let apiUrl = "http://127.0.0.1:8000/api/tenders/?" + params.toString();
 
-        try {
-            const res = await fetch(apiUrl);
-            if (!res.ok) throw new Error("Error fetching tenders");
+    try {
+      const res = await fetch(apiUrl);
+      if (!res.ok) throw new Error("Error fetching tenders");
 
-            const data = await res.json();
-            setTenders(data.results || []);
-            setTotalPages(Math.ceil(data.count / pageSize));
-            setError(null);
-        } catch (err) {
-            console.error(err);
-            setError("Failed to fetch tenders");
-        }
-    };
+      const data = await res.json();
+      setTenders(data.results || []);
+      // Oblicz totalPages na podstawie data.count i tendersPerPage
+      setTotalPages(Math.ceil(data.count / tendersPerPage));
+      setError(null);
+    } catch (err) {
+      console.error(err);
+      setError("Failed to fetch tenders");
+    }
+  };
 
-    useEffect(() => {
-        fetchTenders();
-    }, [currentPage, location.search, searchTerm, pageSize]);
+  useEffect(() => {
+    fetchTenders();
+  }, [currentPage, tendersPerPage, location.search, searchTerm]); // Dodaj tendersPerPage do zależności
 
-    const handlePageChange = (page) => {
-        const params = new URLSearchParams(location.search);
-        params.set("page", page);
-        if (searchTerm) {
-            params.set("search", searchTerm);
-        }
-        navigate({ search: params.toString() });
-        setCurrentPage(page);
-    };
+  const handlePageChange = (page) => {
+    const params = new URLSearchParams(location.search);
+    params.set("page", page);
+    params.set("page_size", tendersPerPage);
+    if (searchTerm) {
+      params.set("search", searchTerm);
+    }
+    navigate({ search: params.toString() });
+    setCurrentPage(page);
+  };
 
-    const handleSearchChange = (event) => {
-        setSearchTerm(event.target.value);
-        setCurrentPage(1);
-    };
+  const handleSearchChange = (event) => {
+    setSearchTerm(event.target.value);
+    setCurrentPage(1); // Resetuj stronę przy nowym wyszukiwaniu
+  };
 
-    const handlePageSizeChange = (event) => {
-        setPageSize(parseInt(event.target.value));
-        setCurrentPage(1);
-    };
+  const handleTendersPerPageChange = (event) => {
+    setTendersPerPage(Number(event.target.value));
+    setCurrentPage(1); // Resetuj stronę do 1 po zmianie liczby elementów na stronę
+  };
 
-    const calculateAveragePrices = (tenders) => {
-        const positionPrices = {};
-        tenders.forEach((tender) => {
-            tender.entries.forEach((entry) => {
-                if (!positionPrices[entry.position]) {
-                    positionPrices[entry.position] = { total: 0, count: 0 };
-                }
-                positionPrices[entry.position].total += parseFloat(entry.total_price);
-                positionPrices[entry.position].count += 1;
-            });
-        });
+  return (
+    <>
+      <header className="main-header">
+        <div className="header-left">
+          <img src={RandlabLogo} alt="Randlab Logo" className="logo" />
+        </div>
 
-        return Object.keys(positionPrices).map((position) => ({
-            position,
-            averagePrice: (positionPrices[position].total / positionPrices[position].count).toFixed(2),
-        }));
-    };
+        <div className="header-center">
+          <div className="search-bar-wrapper">
+            <FontAwesomeIcon icon={faSearch} className="search-icon" />
+            <input
+              type="text"
+              placeholder="Szukaj przetargów..."
+              className="search-input"
+              value={searchTerm}
+              onChange={handleSearchChange}
+            />
+          </div>
+        </div>
 
-    useEffect(() => {
-        fetchTenders();
-    }, [currentPage, location.search, searchTerm, pageSize]);
+        <div className="header-right">
+          <button className="header-nav-button">
+            <FontAwesomeIcon icon={faGavel} />
+            <span>Przetargi</span>
+          </button>
+          <button className="header-nav-button">
+            <FontAwesomeIcon icon={faFileAlt} />
+            <span>Moje zgłoszenia</span>
+          </button>
+          <button className="header-nav-button">
+            <FontAwesomeIcon icon={faCog} />
+            <span>Ustawienia</span>
+          </button>
+          <button className="header-nav-button logout-button">
+            <FontAwesomeIcon icon={faSignOutAlt} />
+            <span>Wyloguj</span>
+          </button>
+        </div>
+      </header>
 
-    const averagePrices = calculateAveragePrices(tenders);
+      <div className="container">
+        <h1 className="main-title">Lista Przetargów</h1>
 
-    return (
-        <>
-            {/* Header - teraz poza głównym kontenerem */}
-            <header className="main-header">
-                <div className="header-left">
-                    <div className="logo-placeholder">Twoje Logo</div>
-                </div>
-                <nav className="header-nav">
-                    <button onClick={() => navigate("/tenders")} className="nav-btn">Przetargi</button>
-                    <button onClick={() => navigate("/aliases")} className="nav-btn">Słownik aliasów</button>
-                    <button onClick={() => navigate("/comparator")} className="nav-btn">Porównywarka</button>
-                </nav>
-                <div className="header-center">
-                    <input
-                        type="text"
-                        placeholder="Szukaj przetargów..."
-                        className="search-bar"
-                        value={searchTerm}
-                        onChange={handleSearchChange}
-                    />
-                </div>
-                <div className="header-right">
-                    <div className="icon-placeholder">
-                        <span role="img" aria-label="user">👤</span>
-                    </div>
-                    <div className="icon-placeholder">
-                        <span role="img" aria-label="settings">⚙️</span>
-                    </div>
-                    <div className="icon-placeholder">
-                        <span role="img" aria-label="bell">🔔</span>
-                    </div>
-                </div>
-            </header>
-            {/* Koniec Header */}
+        {error && <p className="error">{error}</p>}
 
-            <div className="container">
-                <div className="summary">
-                    <h2>Podsumowanie średnich cen</h2>
-                    {averagePrices.length > 0 ? (
-                        <ul className="summary-list">
-                            {averagePrices.map((item) => (
-                                <li key={item.position}>
-                                    {item.position}: {item.averagePrice} zł
-                                </li>
-                            ))}
-                        </ul>
-                    ) : (
-                        <p>Brak danych do wyświetlenia podsumowania.</p>
-                    )}
-                </div>
-                <h1 className="main-title">Lista Przetargów</h1>
-                <div className="page-size-selector">
-                    <label htmlFor="page-size">Przetargów na stronę: </label>
-                    <select
-                        id="page-size"
-                        value={pageSize}
-                        onChange={handlePageSizeChange}
-                    >
-                        <option value="5">5</option>
-                        <option value="10">10</option>
-                        <option value="20">20</option>
-                        <option value="50">50</option>
-                    </select>
-                </div>
+        {/* Sekcja wyboru liczby przetargów na stronę */}
+        <div className="pagination-controls">
+          <label htmlFor="tenders-per-page">Pokaż:</label>
+          <select
+            id="tenders-per-page"
+            value={tendersPerPage}
+            onChange={handleTendersPerPageChange}
+            className="tenders-per-page-select"
+          >
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="20">20</option>
+            <option value="50">50</option>
+          </select>
+          <span>przetargów na stronę</span>
+        </div>
 
+        {tenders.length === 0 && !error && (
+          <p className="no-results">Brak przetargów do wyświetlenia.</p>
+        )}
 
-                {error && <p className="error">{error}</p>}
-
-                {tenders.length === 0 && !error && (
-                    <p className="no-results">Brak przetargów do wyświetlenia.</p>
-                )}
-
-                {tenders.map((tender) => (
-                    <div key={tender.id} className="tender-card">
-                        <div className="tender-header">
-                            <h2>{tender.name}</h2>
-                            <p className="dates">
-                                Utworzono: {new Date(tender.created_at).toLocaleString()} <br />
-                                Zaktualizowano: {new Date(tender.updated_at).toLocaleString()}{" "}
-                                <br />
-                                <span className="total-value">
-                                    Wartość całkowita:{" "}
-                                    {parseFloat(tender.total_tender_value).toFixed(2)} zł
-                                </span>
-                            </p>
-                        </div>
-
-                        <h3 className="entries-title">Zgłoszenia:</h3>
-                        <div className="entries">
-                            {tender.entries.length === 0 && (
-                                <p className="no-entries">Brak zgłoszeń dla tego przetargu.</p>
-                            )}
-                            {tender.entries.map((entry) => (
-                                <div key={entry.id} className="entry-card">
-                                    <div className="entry-info">
-                                        <p>
-                                            <strong>Stanowisko:</strong> {entry.position}
-                                        </p>
-                                        <p>
-                                            <strong>Firma:</strong> {entry.company}
-                                        </p>
-                                        <p>
-                                            <strong>Cena developera:</strong> {entry.developer_price}{" "}
-                                            zł
-                                        </p>
-                                        <p>
-                                            <strong>Marża:</strong> {entry.margin}%
-                                        </p>
-                                        <p>
-                                            <strong>Cena końcowa:</strong> {entry.total_price} zł
-                                        </p>
-                                    </div>
-                                    <div className="entry-actions">
-                                        <button className="edit-btn">Edytuj</button>
-                                        <button className="delete-btn">Usuń</button>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                ))}
-
-                <div className="pagination">
-                    {Array.from({ length: totalPages }, (_, i) => (
-                        <button
-                            key={i + 1}
-                            onClick={() => handlePageChange(i + 1)}
-                            disabled={currentPage === i + 1}
-                        >
-                            {i + 1}
-                        </button>
-                    ))}
-                </div>
+        {tenders.map((tender) => (
+          <div key={tender.id} className="tender-card">
+            <div className="tender-header">
+              <h2>{tender.name}</h2>
+              <p className="dates">
+                Utworzono: {new Date(tender.created_at).toLocaleString()} <br />
+                Zaktualizowano: {new Date(tender.updated_at).toLocaleString()}{" "}
+                <br />
+                <span className="total-value">
+                  Wartość całkowita:{" "}
+                  {parseFloat(tender.total_tender_value).toFixed(2)} zł
+                </span>
+              </p>
             </div>
-        </>
-    );
+
+            <h3 className="entries-title">Zgłoszenia:</h3>
+            <div className="entries">
+              {tender.entries.length === 0 && (
+                <p className="no-entries">Brak zgłoszeń dla tego przetargu.</p>
+              )}
+              {tender.entries.map((entry) => (
+                <div key={entry.id} className="entry-card">
+                  <div className="entry-info">
+                    <p>
+                      <strong>Stanowisko:</strong> {entry.position}
+                    </p>
+                    <p>
+                      <strong>Firma:</strong> {entry.company}
+                    </p>
+                    <p>
+                      <strong>Cena developera:</strong> {entry.developer_price}{" "}
+                      zł
+                    </p>
+                    <p>
+                      <strong>Marża:</strong> {entry.margin}%
+                    </p>
+                    <p>
+                      <strong>Cena końcowa:</strong> {entry.total_price} zł
+                    </p>
+                  </div>
+                  <div className="entry-actions">
+                    <button className="edit-btn">Edytuj</button>
+                    <button className="delete-btn">Usuń</button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+
+        <div className="pagination">
+          {Array.from({ length: totalPages }, (_, i) => (
+            <button
+              key={i + 1}
+              onClick={() => handlePageChange(i + 1)}
+              disabled={currentPage === i + 1}
+              className={currentPage === i + 1 ? 'active' : ''} // Dodaj klasę 'active'
+            >
+              {i + 1}
+            </button>
+          ))}
+        </div>
+      </div>
+    </>
+  );
 }
