@@ -247,3 +247,46 @@ body {
   gap: 0.5rem;
   font-size: 0.95rem;
 }
+
+.header-nav {
+  display: flex;
+  gap: 1rem;
+}
+
+.nav-btn {
+  padding: 0.5rem 1rem;
+  border: none;
+  background-color: #3498DB;
+  color: white;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.nav-btn:hover {
+  background-color: #2980B9;
+}
+
+.summary {
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background-color: #FFFFFF;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.summary h2 {
+  color: #2C3E50;
+  margin-bottom: 1rem;
+}
+
+.summary-list {
+  list-style: none;
+  padding: 0;
+}
+
+.summary-list li {
+  padding: 0.5rem 0;
+  color: #34495E;
+}

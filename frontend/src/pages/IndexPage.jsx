@@ -61,6 +61,30 @@ export default function IndexPage() {
         setCurrentPage(1);
     };
 
+    const calculateAveragePrices = (tenders) => {
+        const positionPrices = {};
+        tenders.forEach((tender) => {
+            tender.entries.forEach((entry) => {
+                if (!positionPrices[entry.position]) {
+                    positionPrices[entry.position] = { total: 0, count: 0 };
+                }
+                positionPrices[entry.position].total += parseFloat(entry.total_price);
+                positionPrices[entry.position].count += 1;
+            });
+        });
+
+        return Object.keys(positionPrices).map((position) => ({
+            position,
+            averagePrice: (positionPrices[position].total / positionPrices[position].count).toFixed(2),
+        }));
+    };
+
+    useEffect(() => {
+        fetchTenders();
+    }, [currentPage, location.search, searchTerm, pageSize]);
+
+    const averagePrices = calculateAveragePrices(tenders);
+
     return (
         <>
             {/* Header - teraz poza głównym kontenerem */}
@@ -68,6 +92,11 @@ export default function IndexPage() {
                 <div className="header-left">
                     <div className="logo-placeholder">Twoje Logo</div>
                 </div>
+                <nav className="header-nav">
+                    <button onClick={() => navigate("/tenders")} className="nav-btn">Przetargi</button>
+                    <button onClick={() => navigate("/aliases")} className="nav-btn">Słownik aliasów</button>
+                    <button onClick={() => navigate("/comparator")} className="nav-btn">Porównywarka</button>
+                </nav>
                 <div className="header-center">
                     <input
                         type="text"
@@ -78,7 +107,6 @@ export default function IndexPage() {
                     />
                 </div>
                 <div className="header-right">
-                    {/* Ikony placeholderów - możesz je zastąpić np. Font Awesome */}
                     <div className="icon-placeholder">
                         <span role="img" aria-label="user">👤</span>
                     </div>
@@ -93,6 +121,20 @@ export default function IndexPage() {
             {/* Koniec Header */}
 
             <div className="container">
+                <div className="summary">
+                    <h2>Podsumowanie średnich cen</h2>
+                    {averagePrices.length > 0 ? (
+                        <ul className="summary-list">
+                            {averagePrices.map((item) => (
+                                <li key={item.position}>
+                                    {item.position}: {item.averagePrice} zł
+                                </li>
+                            ))}
+                        </ul>
+                    ) : (
+                        <p>Brak danych do wyświetlenia podsumowania.</p>
+                    )}
+                </div>
                 <h1 className="main-title">Lista Przetargów</h1>
                 <div className="page-size-selector">
                     <label htmlFor="page-size">Przetargów na stronę: </label>
