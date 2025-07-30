@@ -46,9 +46,6 @@ class TenderAdmin(admin.ModelAdmin):
         ('Main Information', {
             'fields': ('name', 'total_tender_price_display')
         }),
-        ('Timestamps', {
-            'fields': ('created_at', 'updated_at'),
-        }),
     )
 
     def get_readonly_fields(self, request, obj=None):
