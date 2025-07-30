@@ -1,23 +1,31 @@
 # Randlab-Przetargowisko
 
-Full-stack web application using **Django (backend)** and **React (frontend)** with **Microsoft SQL Server (MSSQL)** as the database.
+Aplikacja webowa typu full-stack wykorzystująca **Django (backend)** oraz **React (frontend)** z bazą danych **Microsoft SQL Server (MSSQL)**.
 
 ---
 
 ## 🛠️ Stack technologiczny
 
-- **Backend**: Django, Django REST Framework
-- **Frontend**: React (Create React App)
-- **Baza danych**: Microsoft SQL Server (zarządzany przez SQL Server Management Studio)
-- **Inne**: `django-cors-headers`, `mssql-django`, ODBC Driver 17
+- **Backend**: Django, Django REST Framework  
+- **Frontend**: React (Create React App)  
+- **Baza danych**: Microsoft SQL Server (zarządzana przez SQL Server Management Studio)  
+- **Inne**:  
+  - `mssql-django` (obsługa MSSQL w Django)  
+  - `django-cors-headers` (obsługa CORS dla Reacta)  
+  - ODBC Driver 17 (sterownik do połączenia z MSSQL)
+
+---
 
 ## 🔧 Co zostało zrobione
 
-- Utworzenie i konfiguracja projektu
-
+- Utworzenie i konfiguracja projektu (backend + frontend)
 - Wdrożenie niestandardowego modelu użytkownika
-
-- Usprawnienie panelu administracyjnego za pomocą Jazzmine
+- Usprawnienie panelu administracyjnego za pomocą **Jazzmin**
+- Implementacja systemu przetargów z możliwością dodawania zgłoszeń
+- Stworzenie REST API w oparciu o Django REST Framework
+- Integracja frontendu z backendem
+- Implementacja paginacji z możliwością wyboru liczby elementów na stronę  
+  ✅ Dane odświeżają się natychmiast po zmianie liczby elementów
 
 
 ## 🚀 Jak uruchomić projekt lokalnie
@@ -39,13 +47,11 @@ npm start
 
 ### 🧩 W planach (TODO)
 
-- Uwierzytelnianie użytkowników
+- Formularze dodawania i edycji przetargów oraz zgłoszeń
 
-- Pierwsze modele i API
+- Filtrowanie i sortowanie danych
 
-- Panel admina
-
-- Integracja frontendu z REST API
+- funkcja słownika aliasów
 
 ### Dane do logowania
 
