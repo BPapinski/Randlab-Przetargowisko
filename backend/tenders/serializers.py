@@ -17,7 +17,7 @@ class TenderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Tender
-        fields = ['id', 'name', 'created_at', 'updated_at', 'entries', 'total_tender_value']
+        fields = ['id', 'name', 'created_at', 'updated_at', 'entries', 'total_tender_value', 'is_active']
 
     def get_total_tender_value(self, obj):
         return obj.total_tender_price()

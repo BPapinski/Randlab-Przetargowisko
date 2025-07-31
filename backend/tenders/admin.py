@@ -32,7 +32,7 @@ class TenderEntryInline(admin.TabularInline):
 class TenderAdmin(admin.ModelAdmin):
     inlines = [TenderEntryInline]
     readonly_fields = ['total_tender_price_display']
-    list_display = ('id', 'name', 'created_at', 'updated_at', 'total_tender_price')
+    list_display = ('id', 'name', 'created_at', 'updated_at', 'total_tender_price', 'is_active')
     list_display_links = ('name',)
     search_fields = ('name',)
 
@@ -44,7 +44,7 @@ class TenderAdmin(admin.ModelAdmin):
 
     fieldsets = (
         ('Main Information', {
-            'fields': ('name', 'total_tender_price_display')
+            'fields': ('name', 'is_active', 'total_tender_price_display')
         }),
     )
 
