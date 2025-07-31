@@ -11,18 +11,22 @@ import {
 import RandlabLogo from '../icons/randlab-logo.png';
 import { useNavigate } from 'react-router-dom';
 import styles from '../pages/styles/Header.module.css';
+import { useAuth } from '../utils/AuthContext';
+
 
 export default function Header({ searchTerm, onSearchChange }) {
     const navigate = useNavigate();
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const { isLoggedIn, logout } = useAuth(); 
+
+
 
     const handleLogin = () => {
         navigate('/login'); 
     };
 
     const handleLogout = () => {
-
-        setIsLoggedIn(false);
+        logout();
+        navigate('/login');
     };
 
     const handleLogoClick = () => {

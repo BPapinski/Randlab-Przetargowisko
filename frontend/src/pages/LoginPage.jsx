@@ -1,36 +1,35 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faLock, faEnvelope, faSpinner } from '@fortawesome/free-solid-svg-icons';
 import Header from "../components/Header";
-import "./styles/indexStyles.css"; // bazowe style
-import styles from "./styles/LoginPage.module.css"; // style specyficzne dla strony logowania
+import "./styles/indexStyles.css";
+import styles from "./styles/LoginPage.module.css";
+import { API_BASE_URL } from '../utils/config';
+import { useAuth } from "../utils/AuthContext";
 
 
 export default function LoginPage() {
     const navigate = useNavigate();
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
+    const { performLogin } = useAuth(); 
+
+    const [email, setEmail] = useState("admin@email.com");
+    const [password, setPassword] = useState("admin");
     const [error, setError] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setIsLoading(true);
+        setError("");
 
         try {
-            const response = await fetch("http://127.0.0.1:8000/api/login/", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ email, password }),
-            });
-
-            if (!response.ok) throw new Error("Nieprawidłowy email lub hasło");
-
-            const data = await response.json();
-            console.log("Zalogowano:", data);
-
+            await performLogin(email, password);
             navigate("/");
         } catch (err) {
             setError(err.message);
+        } finally {
+            setIsLoading(false);
         }
     };
 
