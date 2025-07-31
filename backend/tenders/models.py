@@ -5,6 +5,7 @@ class Tender(models.Model):
     name = models.CharField(max_length=255, verbose_name="Tender name")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Created at")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Updated at")
+    is_active = models.BooleanField(default=True, verbose_name="Is active")
 
     def __str__(self):
         return self.name

@@ -1,0 +1,118 @@
+/* FormStyles.module.css */
+
+.formContainer {
+  background-color: #FFFFFF;
+  border-radius: 8px;
+  padding: 2rem;
+  box-shadow: 0 2px 6px rgba(44, 62, 80, 0.1);
+  max-width: 1000px;
+  margin: auto;
+}
+
+.title {
+  color: #2C3E50;
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.fieldGroup {
+   margin-bottom: 1rem;
+}
+
+.label {
+  display: block;
+  font-weight: 600;
+  color: #2C3E50;
+  margin-bottom: 0.25rem;
+}
+
+.input {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #BDC3C7;
+  border-radius: 6px;
+  background-color: #ECF0F1;
+  color: #2C3E50;
+  box-sizing: border-box;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #3498DB;
+  background-color: #FFFFFF;
+}
+
+.entryBox {
+  background-color: #F9F9F9;
+  border: 1px solid #BDC3C7;
+  border-radius: 6px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.removeBtn {
+  background: none;
+  color: #E74C3C;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  width: fit-content; /* Przycisk dopasowuje się do swojej zawartości */
+  margin-left: auto; /* Przesuwa przycisk na samą prawą stronę */
+}
+
+
+.addBtn {
+  background-color: #3498DB;
+  color: white;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  margin-top: 1rem;
+}
+
+.submitBtn {
+  background-color: #2ECC71;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  display: block;
+  margin: 2rem auto 0;
+}
+
+.message {
+  text-align: center;
+  margin-top: 1.5rem;
+  font-weight: bold;
+  color: #2C3E50;
+}
+
+.entryFields {
+  display: grid; /* Zmieniamy Flexbox na Grid, co jest lepsze do układów kolumnowych */
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Równomierny podział na kolumny */
+  gap: 1rem; /* Zapewnia wyraźne odstępy między wszystkimi polami */
+  margin-bottom: 1rem; /* Dodatkowe odstępy od przycisku */
+}
+
+.entryFields .fieldGroup {
+  flex: 1 1 200px; 
+  min-width: 150px;
+ 
+}
+
+.removeBtn {
+  background: none;
+  color: #E74C3C;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  align-self: flex-end; 
+  margin-top: 0;
+  margin-right: 0;
+}

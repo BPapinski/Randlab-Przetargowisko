@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { API_BASE_URL } from '../utils/config';
 import {
     faSearch,
     faGavel,
@@ -16,22 +17,34 @@ import { useAuth } from '../utils/AuthContext';
 
 export default function Header({ searchTerm, onSearchChange }) {
     const navigate = useNavigate();
-    const { isLoggedIn, logout } = useAuth(); 
+    const { isLoggedIn, logout } = useAuth();
 
 
 
     const handleLogin = () => {
-        navigate('/login'); 
+        navigate('/login');
     };
 
     const handleLogout = async () => {
-        await logout(); 
+        await logout();
         navigate('/login');
     };
 
     const handleLogoClick = () => {
-        navigate('/'); 
+        navigate('/');
     }
+
+    const goToTenders = () => {
+        navigate('/');
+    };
+
+    const goToTendersForm = () => {
+        navigate('/tenders/new');
+    };
+
+    const handleSettingsClick = () => {
+        window.location.href = `${API_BASE_URL}/admin/`;
+    };
 
     return (
         <header className={styles['main-header']}>
@@ -53,15 +66,22 @@ export default function Header({ searchTerm, onSearchChange }) {
             </div>
 
             <div className={styles['header-right']}>
-                <button className={styles['header-nav-button']}>
+                <button
+                    className={styles['header-nav-button']}
+                    onClick={goToTenders}
+                >
                     <FontAwesomeIcon icon={faGavel} />
                     <span>Przetargi</span>
                 </button>
-                <button className={styles['header-nav-button']}>
+                <button
+                    className={styles['header-nav-button']}
+                    onClick={goToTendersForm}
+                >
                     <FontAwesomeIcon icon={faFileAlt} />
-                    <span>Moje zgłoszenia</span>
+                    <span>Dodaj przetarg</span>
                 </button>
-                <button className={styles['header-nav-button']}>
+                <button className={styles['header-nav-button']}
+                    onClick={handleSettingsClick}>
                     <FontAwesomeIcon icon={faCog} />
                     <span>Ustawienia</span>
                 </button>
