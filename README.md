@@ -28,8 +28,10 @@ Aplikacja webowa typu full-stack wykorzystująca **Django (backend)** oraz **Rea
   ✅ Dane odświeżają się natychmiast po zmianie liczby elementów
 - Implementacja systemu uwierzytelniania JWT:
   ✅ Logowanie za pomocą tokenów dostępu i odświeżania.
-  ✅ Bezpieczne wylogowywanie poprzez unieważnianie tokenu (dodawanie do czarnej listy).
-
+  ✅ Bezpieczne wylogowywanie poprzez unieważnianie tokenu (dodawanie do czarnej listy)  
+  ✅ Automatyczne odświeżanie access tokena przy wygaśnięciu, jeśli refresh token jest nadal ważny  
+  ✅ Obsługa czarnej listy refresh tokenów — użytkownik zostaje automatycznie wylogowany po wygaśnięciu access tokena, jeśli jego refresh token został unieważniony  
+  ✅ Ochrona przeglądania przetargów — dostęp mają tylko uwierzytelnieni użytkownicy z ważnym access tokenem
 
 ## 🚀 Jak uruchomić projekt lokalnie
 
