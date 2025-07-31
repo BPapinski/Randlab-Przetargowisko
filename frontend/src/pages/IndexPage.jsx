@@ -4,6 +4,7 @@ import "./styles/indexStyles.css"; // Style CSS dla całej strony
 // Import komponentu Header
 import Header from "../components/Header";
 import TenderList from "../components/TenderList"; // Import komponentu TenderList
+import { AuthFetch } from "../utils/AuthFetch";
 
 
 export default function IndexPage() {
@@ -16,6 +17,7 @@ export default function IndexPage() {
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [tendersPerPage, setTendersPerPage] = useState(10);
+  
 
   const fetchTenders = async () => {
     const params = new URLSearchParams(location.search);
@@ -25,10 +27,14 @@ export default function IndexPage() {
       params.set("search", searchTerm);
     }
 
-    let apiUrl = "http://127.0.0.1:8000/api/tenders/?" + params.toString();
+    let apiUrl = "/api/tenders/?" + params.toString();
 
     try {
-      const res = await fetch(apiUrl);
+      const res = await AuthFetch(apiUrl);
+      if (res.status === 401) {
+        navigate("/login");
+        return;
+      }
       if (!res.ok) throw new Error("Error fetching tenders");
 
       const data = await res.json();
