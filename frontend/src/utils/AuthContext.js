@@ -13,6 +13,8 @@ export const AuthProvider = ({ children }) => {
         }
     }, []);
 
+
+        
     const login = (accessToken, refreshToken) => {
         localStorage.setItem('access_token', accessToken);
         localStorage.setItem('refresh_token', refreshToken);
@@ -30,14 +32,13 @@ export const AuthProvider = ({ children }) => {
             });
 
             if (!response.ok) {
-                // Wyrzucamy wyjątek, który będzie obsłużony w komponencie
                 throw new Error("Nieprawidłowy email lub hasło.");
             }
 
             const data = await response.json();
             login(data.access, data.refresh);
         } catch (err) {
-            throw err; // Przekazujemy błąd dalej
+            throw err; 
         }
     };
 
@@ -68,7 +69,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ isLoggedIn, login, logout, performLogin  }}>
+        <AuthContext.Provider value={{ isLoggedIn, performLogin, logout}}>
             {children}
         </AuthContext.Provider>
     );

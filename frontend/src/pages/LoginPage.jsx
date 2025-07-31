@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLock, faEnvelope, faSpinner } from '@fortawesome/free-solid-svg-icons';
@@ -12,12 +12,18 @@ import { useAuth } from "../utils/AuthContext";
 
 export default function LoginPage() {
     const navigate = useNavigate();
-    const { performLogin } = useAuth(); 
+    const { performLogin, isLoggedIn } = useAuth();
 
     const [email, setEmail] = useState("admin@email.com");
     const [password, setPassword] = useState("admin");
     const [error, setError] = useState("");
     const [isLoading, setIsLoading] = useState(false);
+
+    useEffect(() => {
+        if (isLoggedIn) {
+            navigate("/"); // lub inna strona główna aplikacji
+        }
+    }, [isLoggedIn, navigate]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();

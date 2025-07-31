@@ -24,8 +24,8 @@ export default function Header({ searchTerm, onSearchChange }) {
         navigate('/login'); 
     };
 
-    const handleLogout = () => {
-        logout();
+    const handleLogout = async () => {
+        await logout(); 
         navigate('/login');
     };
 
