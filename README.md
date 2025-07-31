@@ -26,6 +26,9 @@ Aplikacja webowa typu full-stack wykorzystująca **Django (backend)** oraz **Rea
 - Integracja frontendu z backendem
 - Implementacja paginacji z możliwością wyboru liczby elementów na stronę  
   ✅ Dane odświeżają się natychmiast po zmianie liczby elementów
+- Implementacja systemu uwierzytelniania JWT:
+  ✅ Logowanie za pomocą tokenów dostępu i odświeżania.
+  ✅ Bezpieczne wylogowywanie poprzez unieważnianie tokenu (dodawanie do czarnej listy).
 
 
 ## 🚀 Jak uruchomić projekt lokalnie
