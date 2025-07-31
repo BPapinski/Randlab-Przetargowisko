@@ -76,7 +76,7 @@ export default function IndexPage() {
       <div className="container">
         <h1 className="main-title">Lista Przetargów</h1>
 
-        {/* Sekcja wyboru liczby przetargów na stronę (pozostaje w IndexPage, bo korzysta ze stanów paginacji) */}
+
         <div className="pagination-controls">
           <label htmlFor="tenders-per-page">Pokaż:</label>
           <select
@@ -93,10 +93,8 @@ export default function IndexPage() {
           <span>przetargów na stronę</span>
         </div>
 
-        {/* Użycie komponentu TenderList */}
         <TenderList tenders={tenders} error={error} />
 
-        {/* Paginacja (pozostaje w IndexPage na razie, aby mieć dostęp do currentPage, totalPages, handlePageChange) */}
         <div className="pagination">
           {Array.from({ length: totalPages }, (_, i) => (
             <button

@@ -1,0 +1,109 @@
+/* LoginPage.module.css */
+
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    padding: 20px;
+    background-color: #f0f2f5;
+    box-sizing: border-box;
+}
+
+.loginFormCard {
+    background-color: #ffffff;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    animation: fadeIn 0.8s ease-in-out;
+    margin-top: 10vh;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.mainTitle {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #333333;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.loginForm {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.errorMessage {
+    background-color: #ffebee;
+    color: #d32f2f;
+    border-radius: 8px;
+    padding: 15px;
+    text-align: center;
+    font-weight: 500;
+}
+
+.formGroup {
+    display: flex;
+    flex-direction: column;
+}
+
+.formGroup label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #555555;
+    margin-bottom: 8px;
+}
+
+.formGroup input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.formGroup input:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+}
+
+.loginButton {
+    width: 100%;
+    padding: 15px;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #ffffff;
+    background-color: #007bff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+    margin-top: 10px;
+}
+
+.loginButton:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px);
+}
+
+.loginForm * {
+  box-sizing: border-box;
+}
