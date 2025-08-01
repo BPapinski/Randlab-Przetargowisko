@@ -25,6 +25,7 @@ INSTALLED_APPS = [
     # user apps
     'users',
     'tenders',
+    'aliases',
 
     #additional apps
     'jazzmin',

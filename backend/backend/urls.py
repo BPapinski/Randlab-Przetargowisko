@@ -16,5 +16,6 @@ urlpatterns = [
     path('api/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
     path('api/', include('users.urls')),
     path('api/', include('tenders.urls')),
+    path('api/aliases/', include('aliases.urls')),
     
 ]
