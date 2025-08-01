@@ -1,0 +1,40 @@
+/* src/pages/AliasFilterPage.module.css */
+
+.cardGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.card {
+  background-color: #ffffff;
+  border: 1px solid #dfe6e9;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 8px rgba(44, 62, 80, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 16px rgba(44, 62, 80, 0.12);
+}
+
+.cardTitle {
+  font-size: 1.25rem;
+  color: #2C3E50;
+  margin-bottom: 0.75rem;
+}
+
+.card p {
+  margin: 0.25rem 0;
+  font-size: 0.95rem;
+  color: #34495E;
+}
+
+.timestamp {
+  margin-top: 1rem;
+  font-size: 0.85rem;
+  color: #7f8c8d;
+}

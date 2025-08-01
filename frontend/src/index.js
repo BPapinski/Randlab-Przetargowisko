@@ -5,6 +5,7 @@ import { AuthProvider } from './utils/AuthContext'; // Pamiętaj o poprawnej śc
 import IndexPage from './pages/IndexPage';
 import LoginPage from './pages/LoginPage';
 import TenderFormPage from './pages/TenderFormPage';
+import AliasFilterPage from './pages/AliasFilterPage';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
@@ -16,6 +17,7 @@ root.render(
           <Route path="/" element={<IndexPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/tenders/new" element={<TenderFormPage />} />
+          <Route path="/alias-filter" element={<AliasFilterPage />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

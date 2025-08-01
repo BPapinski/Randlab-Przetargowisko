@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from .utils import get_tender_entries_for_alias_group
 from tenders.serializers import TenderEntrySerializer
+from .models import AliasGroup
 
 @api_view(['GET'])
 def tender_entries_by_standard_position(request):
@@ -15,3 +16,8 @@ def tender_entries_by_standard_position(request):
     print(f"Found {entries.count()} entries for position: {position}")
     serializer = TenderEntrySerializer(entries, many=True)
     return Response(serializer.data)
+
+@api_view(['GET'])
+def alias_group_list(request):
+    groups = AliasGroup.objects.all().values_list('name', flat=True)
+    return Response(groups)

@@ -8,6 +8,7 @@ import {
     faCog,
     faSignOutAlt,
     faSignInAlt,
+    faFilter,
 } from '@fortawesome/free-solid-svg-icons';
 import RandlabLogo from '../icons/randlab-logo.png';
 import { useNavigate } from 'react-router-dom';
@@ -44,6 +45,10 @@ export default function Header({ searchTerm, onSearchChange }) {
 
     const handleSettingsClick = () => {
         window.location.href = `${API_BASE_URL}/admin/`;
+    };
+
+    const goToAliasFilter = () => {
+        navigate('/alias-filter');
     };
 
     return (
@@ -85,6 +90,14 @@ export default function Header({ searchTerm, onSearchChange }) {
                     <FontAwesomeIcon icon={faCog} />
                     <span>Ustawienia</span>
                 </button>
+                <button
+                    className={styles['header-nav-button']}
+                    onClick={goToAliasFilter}
+                >
+                    <FontAwesomeIcon icon={faFilter} />
+                    <span>Filtruj stanowiska</span>
+                </button>
+
 
                 {isLoggedIn ? (
                     <button
