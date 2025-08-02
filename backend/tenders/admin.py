@@ -7,7 +7,7 @@ from .models import Tender, TenderEntry
 class TenderEntryInlineForm(forms.ModelForm):
     class Meta:
         model = TenderEntry
-        exclude = ['total_price']  # hide total_price – it will be calculated automatically
+        exclude = ['total_price']
 
     def save(self, commit=True):
         instance = super().save(commit=False)
@@ -52,3 +52,11 @@ class TenderAdmin(admin.ModelAdmin):
         if obj:
             return self.readonly_fields + ['created_at', 'updated_at']
         return self.readonly_fields
+
+
+@admin.register(TenderEntry)
+class TenderEntryAdmin(admin.ModelAdmin):
+    readonly_fields = ['total_price']
+    list_display = ('id', 'tender', 'position', 'company', 'developer_price', 'margin', 'total_price')
+    list_filter = ('company', 'tender')
+    search_fields = ('position', 'company__name', 'tender__name')
