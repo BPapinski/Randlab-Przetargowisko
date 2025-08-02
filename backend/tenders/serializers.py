@@ -14,10 +14,11 @@ class TenderSerializer(serializers.ModelSerializer):
     entries = TenderEntrySerializer(many=True, read_only=True)
     # 1. Add a SerializerMethodField for the total price
     total_tender_value = serializers.SerializerMethodField()
+    price = serializers.FloatField(read_only=True)
 
     class Meta:
         model = Tender
-        fields = ['id', 'name', 'created_at', 'updated_at', 'entries', 'total_tender_value', 'is_active']
+        fields = ['id', 'name', 'created_at', 'updated_at', 'entries', 'total_tender_value', 'is_active', 'price']
 
     def get_total_tender_value(self, obj):
         return obj.total_tender_price()

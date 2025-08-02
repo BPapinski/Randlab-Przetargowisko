@@ -14,32 +14,19 @@ export default function IndexPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const [tendersPerPage, setTendersPerPage] = useState(10);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [sortOrder, setSortOrder] = useState("");
+  // 🔁 Brak stanu currentPage, searchTerm itd.
+  // Wszystko czytane dynamicznie z URL
 
   const fetchTenders = useCallback(async () => {
     setIsLoading(true);
     setError(null);
 
     const params = new URLSearchParams(location.search);
-    params.set("page", currentPage);
-    params.set("page_size", tendersPerPage);
 
-    if (searchTerm) {
-      params.set("search", searchTerm);
-    }
-
-    if (sortOrder) {
-      const sortMap = {
-        date_asc: "date",
-        date_desc: "-date",
-        price_asc: "price",
-        price_desc: "-price",
-      };
-      params.set("ordering", sortMap[sortOrder]);
-    }
+    const currentPage = parseInt(params.get("page"), 10) || 1;
+    const tendersPerPage = parseInt(params.get("page_size"), 10) || 10;
+    const searchTerm = params.get("search") || "";
+    let ordering = params.get("ordering") || "-date"; // ✅ domyślne sortowanie
 
     const apiUrl = `/api/tenders/?${params.toString()}`;
 
@@ -62,36 +49,33 @@ export default function IndexPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [currentPage, tendersPerPage, searchTerm, sortOrder, navigate, location.search]);
+  }, [location.search, navigate]);
 
   useEffect(() => {
     fetchTenders();
   }, [fetchTenders]);
 
-  useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    const page = parseInt(params.get("page"), 10) || 1;
-    const pageSize = parseInt(params.get("page_size"), 10) || 10;
-    const search = params.get("search") || "";
-    const order = params.get("ordering") || "";
+  // 🔁 Mapping z parametrów do stanu tylko do prezentacji (nie do logiki fetchowania)
+  const params = new URLSearchParams(location.search);
+  const currentPage = parseInt(params.get("page"), 10) || 1;
+  const tendersPerPage = parseInt(params.get("page_size"), 10) || 10;
+  const searchTerm = params.get("search") || "";
+  const ordering = params.get("ordering") || "-date";
 
-    setCurrentPage(page);
-    setTendersPerPage(pageSize);
-    setSearchTerm(search);
-
-    const reverseSortMap = {
-      "date": "date_asc",
-      "-date": "date_desc",
-      "price": "price_asc",
-      "-price": "price_desc",
-    };
-    setSortOrder(reverseSortMap[order] || "");
-  }, [location.search]);
+  const reverseSortMap = {
+    created_at: "date_asc",
+    "-created_at": "date_desc",
+    updated_at: "updated_asc",
+    "-updated_at": "updated_desc",
+    price: "price_asc",
+    "-price": "price_desc",
+  };
+  const sortOrder = reverseSortMap[ordering] || "";
 
   const updateUrl = (newParams) => {
     const params = new URLSearchParams(location.search);
     Object.entries(newParams).forEach(([key, value]) => {
-      if (value) {
+      if (value !== undefined && value !== null && value !== "") {
         params.set(key, value);
       } else {
         params.delete(key);
@@ -106,26 +90,22 @@ export default function IndexPage() {
 
   const handleSearchChange = (event) => {
     const newSearchTerm = event.target.value;
-    setSearchTerm(newSearchTerm);
-    setCurrentPage(1);
     updateUrl({ search: newSearchTerm, page: 1, page_size: tendersPerPage });
   };
 
   const handleTendersPerPageChange = (event) => {
     const newPageSize = Number(event.target.value);
-    setTendersPerPage(newPageSize);
-    setCurrentPage(1);
     updateUrl({ page: 1, page_size: newPageSize });
   };
 
   const handleSortChange = (event) => {
     const newSortOrder = event.target.value;
-    setSortOrder(newSortOrder);
-    setCurrentPage(1);
     const sortMap = {
-      date_asc: "date",
-      date_desc: "-date",
-      price_asc: "price",
+      date_asc: "created_at",
+      date_desc: "-created_at",
+      updated_asc: "updated_at",
+      updated_desc: "-updated_at",
+      price_asc: "price",        // jeśli masz takie pole
       price_desc: "-price",
     };
     updateUrl({ ordering: sortMap[newSortOrder], page: 1 });
@@ -136,14 +116,15 @@ export default function IndexPage() {
       <Header searchTerm={searchTerm} onSearchChange={handleSearchChange} />
 
       <div className="container">
-
         <div className="content-wrapper">
           <aside className="sidebar left-sidebar">
             <h3>Sortuj według</h3>
             <select value={sortOrder} onChange={handleSortChange}>
               <option value="">Domyślnie</option>
-              <option value="date_asc">Data rosnąco</option>
-              <option value="date_desc">Data malejąco</option>
+              <option value="date_asc">Data utworzenia rosnąco</option>
+              <option value="date_desc">Data utworzenia malejąco</option>
+              <option value="updated_asc">Data aktualizacji rosnąco</option>     {/* NOWE */}
+              <option value="updated_desc">Data aktualizacji malejąco</option>   {/* NOWE */}
               <option value="price_asc">Cena rosnąco</option>
               <option value="price_desc">Cena malejąco</option>
             </select>
@@ -168,7 +149,6 @@ export default function IndexPage() {
           </aside>
 
           <main className="tender-content">
-            
             <div className="pagination-controls">
               <label htmlFor="tenders-per-page">Pokaż:</label>
               <select
