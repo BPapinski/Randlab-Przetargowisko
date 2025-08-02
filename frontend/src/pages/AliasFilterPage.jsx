@@ -241,9 +241,7 @@ export default function AliasFilterPage() {
                                                             {showSuggestions === entry.id && (
                                                                 <ul className={styles.suggestionsList}>
                                                                     {aliasGroups
-                                                                        .filter(alias =>
-                                                                            alias.toLowerCase().includes((aliasInput[entry.id] || '').toLowerCase())
-                                                                        )
+                                                                        .filter(alias => alias.toLowerCase().includes((aliasInput[entry.id] || '').toLowerCase()))
                                                                         .map(alias => (
                                                                             <li
                                                                                 key={alias}

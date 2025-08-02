@@ -4,55 +4,100 @@ body {
   margin: 0;
   padding: 0;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #ECF0F1; /* Jasny szary - tło całej strony */
+  background-color: #ECF0F1;
+  color: #2C3E50;
 }
 
+/* Główny kontener - wyśrodkowuje całą zawartość i ogranicza jej szerokość */
 .container {
-  max-width: 1000px;
-  margin: auto;
+  max-width: 1400px; /* Maksymalna szerokość kontenera */
+  margin: 0 auto;
   padding: 2rem;
 }
 
-/* Standardowe style dla pozostałych elementów, np. paginacji */
+/* Nagłówek główny strony */
 .main-title {
   text-align: center;
   margin-bottom: 2rem;
   color: #2C3E50;
 }
 
-.pagination {
-  text-align: center;
-  margin-top: 2rem;
+/* Kontener dla sidebarów i głównej treści */
+.content-wrapper {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between; /* Rozsuwa elementy na boki */
+  align-items: stretch;
+  gap: 2rem;
 }
 
-.pagination button {
-  margin: 0 6px;
-  padding: 10px 16px;
+/* Style dla bocznych pasków */
+.sidebar {
+  width: 260px; /* Stała szerokość sidebara */
+  background-color: #f9f9f9;
+  padding: 1.5rem;
+  border: 1px solid #dcdcdc;
+  border-radius: 8px;
+  box-sizing: border-box;
+  height: auto;
+}
+
+.sidebar h3,
+.sidebar h4 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+  color: #34495e;
+}
+
+.sidebar h4 {
+  font-size: 1rem;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.sidebar input[type="number"],
+.sidebar select {
+  width: 100%;
+  padding: 0.75rem;
   border-radius: 6px;
-  border: none;
-  background-color: #BDC3C7;
-  color: #2C3E50;
+  border: 1px solid #bdc3c7;
+  background-color: white;
+  color: #2c3e50;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+.sidebar select {
   cursor: pointer;
-  font-weight: bold;
-  transition: background-color 0.2s ease, transform 0.1s ease;
+  appearance: none;
+  background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%232C3E50%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13.6-6.4H18.9c-5%200-9.6%202-13.6%206.4-8.8%208.8-8.8%2023.2%200%2032l128%20128c4.8%204.8%2011.2%206.4%2017.6%206.4s12.8-1.6%2017.6-6.4l128-128c8.8-8.8%208.8-23.2%200-32z%22%2F%3E%3C%2Fsvg%3E');
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 0.7em auto;
 }
 
-.pagination button:hover:not(:disabled) {
-  background-color: #95A5A6;
-  transform: translateY(-1px);
+.sidebar select:focus,
+.sidebar input:focus {
+  outline: none;
+  border-color: #3498DB;
+  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.25);
 }
 
-.pagination button:disabled {
-  background-color: #7F8C8D;
-  color: #ECF0F1;
-  cursor: default;
+.range-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
 }
 
-.pagination button.active {
-    background-color: #3498DB;
-    color: white;
+/* Główna część strony (lista przetargów) */
+.tender-content {
+  flex: 1; /* Pozwala na rozciąganie się do dostępnej przestrzeni */
+  min-width: 0;
 }
 
+/* Sterowanie paginacją (ilość elementów na stronę) */
 .pagination-controls {
   display: flex;
   align-items: center;
@@ -83,4 +128,38 @@ body {
   outline: none;
   border-color: #3498DB;
   box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.25);
+}
+
+/* Paginacja */
+.pagination {
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.pagination button {
+  margin: 0 6px;
+  padding: 10px 16px;
+  border-radius: 6px;
+  border: none;
+  background-color: #BDC3C7;
+  color: #2C3E50;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.pagination button:hover:not(:disabled) {
+  background-color: #95A5A6;
+  transform: translateY(-1px);
+}
+
+.pagination button:disabled {
+  background-color: #7F8C8D;
+  color: #ECF0F1;
+  cursor: default;
+}
+
+.pagination button.active {
+  background-color: #3498DB;
+  color: white;
 }
