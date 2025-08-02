@@ -11,6 +11,8 @@ export default function AliasFilterPage() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
+    const [unknownPositionsCount, setUnknownPositionsCount] = useState(0);
+
     // Fetch available alias groups
     useEffect(() => {
         const fetchGroups = async () => {
@@ -30,27 +32,55 @@ export default function AliasFilterPage() {
     useEffect(() => {
         const fetchEntries = async () => {
             if (!selectedGroup) return;
+
             setLoading(true);
+            setError(null);
+
+            const positionParam = selectedGroup === "Nieznane" ? "None" : encodeURIComponent(selectedGroup);
+            const url = `/api/aliases/tender-entries/?position=${positionParam}`;
+
             try {
-                const res = await AuthFetch(`/api/aliases/tender-entries/?position=${encodeURIComponent(selectedGroup)}`);
+                const res = await AuthFetch(url);
                 if (!res.ok) throw new Error("Failed to fetch tender entries");
                 const data = await res.json();
                 setTenderEntries(data);
-                setError(null);
             } catch (err) {
                 setError("Błąd przy pobieraniu przetargów.");
             } finally {
                 setLoading(false);
             }
         };
+
         fetchEntries();
     }, [selectedGroup]);
+
+    useEffect(() => {
+        const fetchUnknownPositions = async () => {
+            try {
+                const res = await AuthFetch("/api/aliases/tender-entries/?position=None");
+                if (!res.ok) throw new Error("Failed to fetch unknown positions");
+                const data = await res.json();
+                setUnknownPositionsCount(data.length);  // 👈 tutaj ustawiasz długość
+            } catch (err) {
+                console.error("Błąd przy pobieraniu nieznanych stanowisk:", err);
+                setUnknownPositionsCount(0); // lub zostaw poprzednią wartość
+            }
+        };
+
+        fetchUnknownPositions();
+    }, []);
 
     return (
         <>
             <Header />
             <div className="container">
                 <h1 className="main-title">Filtruj przetargi według stanowiska</h1>
+
+                {unknownPositionsCount > 0 && (
+                    <p style={{ color: "#b65c00", marginTop: "0.5rem" }}>
+                        Uwaga: <strong>{unknownPositionsCount}</strong> pozycji nie pasuje do żadnego filtra — znajdziesz je, wybierając stanowisko <em>"Nieznane"</em>.
+                    </p>
+                )}
 
                 <div className="pagination-controls">
                     <label htmlFor="alias-group-select">Wybierz stanowisko:</label>
@@ -66,6 +96,9 @@ export default function AliasFilterPage() {
                                 {name}
                             </option>
                         ))}
+                        <option key={"Nieznane"} value={"Nieznane"}>
+                            {"Nieznane"}
+                        </option>
                     </select>
                 </div>
 
