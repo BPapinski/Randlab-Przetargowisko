@@ -1,6 +1,17 @@
 import React, { useState } from 'react';
 import { AuthFetch } from '../utils/AuthFetch';
-import styles from '../pages/styles/FormStyles.module.css'; // opcjonalne style
+import styles from '../pages/styles/FormStyles.module.css';
+
+// Komponent z ikoną Excela w formacie SVG
+const ExcelIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={styles.excelIcon}>
+        <path d="M14 2H6a2 2 0 0 0-2 2v16c0 1.1.9 2 2 2h12a2 2 0 0 0 2-2V8l-6-6z" />
+        <path d="M14 2v6h6" />
+        <path d="M10 12h4" />
+        <path d="M10 16h4" />
+        <path d="M12 20h2" />
+    </svg>
+);
 
 function TenderForm() {
     const [name, setName] = useState('');
@@ -25,6 +36,10 @@ function TenderForm() {
     const removeEntry = (index) => {
         const updated = entries.filter((_, i) => i !== index);
         setEntries(updated);
+    };
+
+    const handleImportFromExcel = () => {
+        alert("Funkcjonalność importu z Excela zostanie dodana wkrótce!");
     };
 
     const handleSubmit = async (e) => {
@@ -76,7 +91,6 @@ function TenderForm() {
 
                 {entries.map((entry, index) => (
                     <div key={index} className={styles.entryBox}>
-                        {/* Nowy kontener dla pól formularza */}
                         <div className={styles.entryFields}>
                             <div className={styles.fieldGroup}>
                                 <label className={styles.label}>Pozycja:</label>
@@ -128,14 +142,22 @@ function TenderForm() {
                         </button>
                     </div>
                 ))}
-
-                <button type="button" onClick={addEntry} className={styles.addBtn}>
-                    Dodaj pozycję
-                </button>
-
-                <button type="submit" className={styles.submitBtn}>
-                    Zapisz przetarg
-                </button>
+                
+                <div className={styles.formActions}>
+                    <button type="button" onClick={addEntry} className={styles.addBtn}>
+                        Dodaj pozycję
+                    </button>
+                </div>
+                
+                <div className={styles.submitActions}>
+                    <button type="submit" className={styles.submitBtn}>
+                        Zapisz przetarg
+                    </button>
+                    <button type="button" onClick={handleImportFromExcel} className={styles.importBtn}>
+                         <ExcelIcon />
+                        Importuj z Excela
+                    </button>
+                </div>
 
                 {message && <div className={styles.message}>{message}</div>}
             </form>
