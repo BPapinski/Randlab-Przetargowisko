@@ -134,3 +134,12 @@
 .aliasButton:active {
   transform: translateY(1px);
 }
+
+.errorBox {
+    border: 1px solid #f44336;
+    background-color: #fdecea;
+    color: #b71c1c;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-top: 1rem;
+}

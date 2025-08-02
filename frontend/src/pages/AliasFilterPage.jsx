@@ -17,8 +17,6 @@ export default function AliasFilterPage() {
 
     const [aliasInput, setAliasInput] = useState({});
 
-
-
     const handleAliasInputChange = (entryId, value) => {
         setAliasInput(prev => ({
             ...prev,
@@ -30,10 +28,9 @@ export default function AliasFilterPage() {
         e.preventDefault();
         const aliasGroupName = aliasInput[entryId];
         if (!aliasGroupName) {
-            alert('Nazwa aliasu nie może być pusta!');
+            setError('Nazwa aliasu nie może być pusta!');
             return;
         }
-
         try {
             const response = await AuthFetch('/api/aliases/create/', {
                 method: 'POST',
@@ -49,20 +46,14 @@ export default function AliasFilterPage() {
             const data = await response.json();
 
             if (response.ok) {
-                alert(`Sukces: ${data.success}`);
-                alert(`Stanowiska o nazwie "${entryPosition}" zostały przypisane do grupy aliasów "${aliasGroupName}".`);
-
-                // ❌ Usuń WSZYSTKIE tenderEntries z tą samą nazwą pozycji
                 setTenderEntries(prevEntries =>
                     prevEntries.filter(entry => entry.position !== entryPosition)
                 );
 
-                // 🔢 Zmniejsz licznik o liczbę usuniętych
                 setUnknownPositionsCount(prevCount =>
                     Math.max(prevCount - tenderEntries.filter(entry => entry.position === entryPosition).length, 0)
                 );
 
-                // ➕ Dodaj nowy aliasGroup jeśli jeszcze go nie ma
                 setAliasGroups(prevGroups => {
                     if (!prevGroups.includes(aliasGroupName)) {
                         return [...prevGroups, aliasGroupName];
@@ -70,7 +61,6 @@ export default function AliasFilterPage() {
                     return prevGroups;
                 });
 
-                // 🧼 Wyczyść wpisy aliasInput dla wszystkich pozycji o tej samej nazwie
                 setAliasInput(prevInput => {
                     const newInput = { ...prevInput };
                     for (const entry of tenderEntries) {
@@ -82,18 +72,14 @@ export default function AliasFilterPage() {
                 });
 
             } else {
-                alert(`Błąd: ${data.error}`);
+                setError(`Błąd: ${data.error}`);
             }
         } catch (error) {
-            alert('Wystąpił błąd podczas komunikacji z serwerem.');
+            setError('Wystąpił błąd podczas komunikacji z serwerem.');
             console.error('API Error:', error);
         }
     };
 
-
-
-
-    // Fetch available alias groups
     useEffect(() => {
         const fetchGroups = async () => {
             try {
@@ -117,7 +103,6 @@ export default function AliasFilterPage() {
                 const data = await res.json();
                 setAliases(data);
             } catch (err) {
-                alert("Błąd przy pobieraniu aliasów: " + err.message);
                 setError("Błąd przy pobieraniu grup aliasów.");
             }
         };
@@ -165,6 +150,18 @@ export default function AliasFilterPage() {
         fetchUnknownPositions();
     }, []);
 
+    useEffect(() => {
+        if (error) {
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            const timer = setTimeout(() => {
+                setError(null);
+            }, 3000);
+
+            return () => clearTimeout(timer);
+        }
+    }, [error]);
+    
     return (
         <>
             <Header />
@@ -198,7 +195,7 @@ export default function AliasFilterPage() {
                 </div>
 
                 {loading && <p>Ładowanie wyników...</p>}
-                {error && <p style={{ color: "red" }}>{error}</p>}
+                {error && <div className={styles.errorBox}>{error}</div>}
 
                 {!loading && selectedGroup && (
                     <div>
@@ -224,7 +221,6 @@ export default function AliasFilterPage() {
                                                 <p>
                                                     Ta pozycja jest oznaczona jako "Nieznana". Przypisz ją do aliasu:
                                                 </p>
-                                                {/* Zmodyfikowana linijka - przekazanie entry.position */}
                                                 <form onSubmit={(e) => handleAliasSubmit(e, entry.id, entry.position)} className={styles.aliasForm}>
                                                     <input
                                                         type="text"
