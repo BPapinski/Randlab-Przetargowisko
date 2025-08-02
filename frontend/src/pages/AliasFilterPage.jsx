@@ -12,6 +12,7 @@ export default function AliasFilterPage() {
     const [tenderEntries, setTenderEntries] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [showSuggestions, setShowSuggestions] = useState(null);
 
     const [unknownPositionsCount, setUnknownPositionsCount] = useState(0);
 
@@ -161,7 +162,7 @@ export default function AliasFilterPage() {
             return () => clearTimeout(timer);
         }
     }, [error]);
-    
+
     return (
         <>
             <Header />
@@ -221,22 +222,46 @@ export default function AliasFilterPage() {
                                                 <p>
                                                     Ta pozycja jest oznaczona jako "Nieznana". Przypisz ją do aliasu:
                                                 </p>
-                                                <form onSubmit={(e) => handleAliasSubmit(e, entry.id, entry.position)} className={styles.aliasForm}>
-                                                    <input
-                                                        type="text"
-                                                        value={aliasInput[entry.id] || ''}
-                                                        onChange={(e) => handleAliasInputChange(entry.id, e.target.value)}
-                                                        placeholder="Wpisz lub wybierz nazwę aliasu"
-                                                        list={`alias-options-${entry.id}`}
-                                                        className={styles.aliasInput}
-                                                    />
-                                                    <datalist id={`alias-options-${entry.id}`}>
-                                                        {aliasGroups.map(alias => (
-                                                            <option key={alias} value={alias} />
-                                                        ))}
-                                                    </datalist>
-                                                    <button type="submit" className={styles.aliasButton}>Zapisz</button>
-                                                </form>
+                                                <div className={styles.aliasWrapper}>
+                                                    <form
+                                                        onSubmit={(e) => handleAliasSubmit(e, entry.id, entry.position)}
+                                                        className={styles.aliasForm}
+                                                    >
+                                                        <div className={styles.inputWrapper}>
+                                                            <input
+                                                                type="text"
+                                                                value={aliasInput[entry.id] || ''}
+                                                                onChange={(e) => handleAliasInputChange(entry.id, e.target.value)}
+                                                                placeholder="Wpisz lub wybierz nazwę aliasu"
+                                                                className={styles.aliasInput}
+                                                                onFocus={() => setShowSuggestions(entry.id)}
+                                                                onBlur={() => setTimeout(() => setShowSuggestions(null), 150)}
+                                                            />
+
+                                                            {showSuggestions === entry.id && (
+                                                                <ul className={styles.suggestionsList}>
+                                                                    {aliasGroups
+                                                                        .filter(alias =>
+                                                                            alias.toLowerCase().includes((aliasInput[entry.id] || '').toLowerCase())
+                                                                        )
+                                                                        .map(alias => (
+                                                                            <li
+                                                                                key={alias}
+                                                                                className={styles.suggestionItem}
+                                                                                onMouseDown={() => handleAliasInputChange(entry.id, alias)}
+                                                                            >
+                                                                                {alias}
+                                                                            </li>
+                                                                        ))}
+                                                                </ul>
+                                                            )}
+                                                        </div>
+
+                                                        <button type="submit" className={styles.aliasButton}>Zapisz</button>
+                                                    </form>
+
+                                                </div>
+
                                             </div>
                                         ) : null}
                                     </div>
