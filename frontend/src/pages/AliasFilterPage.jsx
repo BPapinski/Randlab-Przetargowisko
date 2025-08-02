@@ -209,7 +209,8 @@ export default function AliasFilterPage() {
                             <div className={styles.cardGrid}>
                                 {tenderEntries.map((entry) => (
                                     <div key={entry.id} className={styles.card}>
-                                        <h3 className={styles.cardTitle}>{entry.position}</h3>
+                                        <h2 className={styles.cardTitle}>{entry.position}</h2>
+                                        <p><strong>Przetarg:</strong> {entry.tender.name}</p>
                                         <p><strong>Firma:</strong> {entry.company}</p>
                                         <p><strong>Cena deweloperska:</strong> {entry.developer_price} zł</p>
                                         <p><strong>Marża:</strong> {entry.margin}%</p>

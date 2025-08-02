@@ -73,7 +73,7 @@ export default function TenderList({ tenders, error, onTenderUpdate }) {
               </button>
             </div>
           </div>
-          <h3 className="entries-title">Zgłoszenia:</h3>
+          <h3 className="entries-title">Developerzy:</h3>
           <div className="entries">
             {tender.entries.length === 0 ? (
               <p className="no-entries">Brak zgłoszeń dla tego przetargu.</p>
