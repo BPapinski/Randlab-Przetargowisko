@@ -1,5 +1,7 @@
 from tenders.models import TenderEntry
-from .models import AliasGroup, Alias
+
+from .models import AliasGroup
+
 
 def get_tender_entries_for_alias_group(alias_group_name):
     try:
@@ -8,10 +10,9 @@ def get_tender_entries_for_alias_group(alias_group_name):
     except AliasGroup.DoesNotExist:
         return TenderEntry.objects.none()
 
-    aliases = list(group.aliases.values_list('alias_name', flat=True))
+    aliases = list(group.aliases.values_list("alias_name", flat=True))
     print(f"Aliases found for group '{group.name}': {aliases}")  # Debugging line
     entries = TenderEntry.objects.filter(position__in=[group.name] + aliases)
 
     print(f"Tender entries found: {entries.first()}")
     return entries
-
