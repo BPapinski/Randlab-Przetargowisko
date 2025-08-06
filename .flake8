@@ -1,5 +1,5 @@
 [flake8]
-max-line-length = 88
+max-line-length = 120
 exclude =
     .venv/,
     venv/,
@@ -7,4 +7,5 @@ exclude =
     frontend/,
     migrations/,
     static/,
-    site-packages/ 
+    site-packages/ ,
+    backend/users/migrations/,

@@ -28,9 +28,7 @@ class Migration(migrations.Migration):
                 ("password", models.CharField(max_length=128, verbose_name="password")),
                 (
                     "last_login",
-                    models.DateTimeField(
-                        blank=True, null=True, verbose_name="last login"
-                    ),
+                    models.DateTimeField(blank=True, null=True, verbose_name="last login"),
                 ),
                 (
                     "is_superuser",
@@ -42,9 +40,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "email",
-                    models.EmailField(
-                        max_length=254, unique=True, verbose_name="email address"
-                    ),
+                    models.EmailField(max_length=254, unique=True, verbose_name="email address"),
                 ),
                 ("is_staff", models.BooleanField(default=False)),
                 ("is_active", models.BooleanField(default=True)),
@@ -56,7 +52,8 @@ class Migration(migrations.Migration):
                     "groups",
                     models.ManyToManyField(
                         blank=True,
-                        help_text="The groups this user belongs to. A user will get all permissions granted to each of their groups.",
+                        help_text="The groups this user belongs to. A user"
+                        " will get all permissions granted to each of their groups.",
                         related_name="user_set",
                         related_query_name="user",
                         to="auth.group",

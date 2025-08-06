@@ -34,9 +34,7 @@ def tender_entries_by_standard_position(request):
             )
 
     else:
-        return Response(
-            {"error": "Missing position parameter."}, status=status.HTTP_400_BAD_REQUEST
-        )
+        return Response({"error": "Missing position parameter."}, status=status.HTTP_400_BAD_REQUEST)
 
     serializer = TenderEntrySerializer(entries, many=True)
     return Response(serializer.data)
@@ -61,17 +59,20 @@ class TenderEntryList(generics.ListAPIView):
     serializer_class = TenderEntrySerializer
 
     def get_queryset(self):
-        position_name = self.request.query_params.get("position", None)
-        if position_name == "None":
-            # Szukaj pozycji, które nie są aliasami
-            alias_names = Alias.objects.values_list("alias_name", flat=True)
-            return TenderEntry.objects.exclude(position__in=alias_names)
-        elif position_name:
-            # Szukaj aliasów i ich pozycji
-            group = AliasGroup.objects.filter(name=position_name).first()
-            if group:
-                aliases = group.aliases.values_list("alias_name", flat=True)
-                return TenderEntry.objects.filter(position__in=aliases)
+        position_param = self.request.query_params.get("position", None)
+
+        all_alias_names = Alias.objects.values_list("alias_name", flat=True)
+
+        if position_param == "None":
+            return TenderEntry.objects.exclude(position__in=all_alias_names)
+        elif position_param:
+            try:
+                alias_group = AliasGroup.objects.get(name=position_param)
+                aliases_in_group = alias_group.aliases.values_list("alias_name", flat=True)
+                return TenderEntry.objects.filter(position__in=aliases_in_group)
+            except AliasGroup.DoesNotExist:
+                return TenderEntry.objects.none()
+
         return TenderEntry.objects.none()
 
 
@@ -95,35 +96,6 @@ class AliasCreate(generics.CreateAPIView):
     serializer_class = AliasSerializer
 
 
-class TenderEntryList(generics.ListAPIView):
-    """
-    Lista wpisów przetargów, z możliwością filtrowania po nazwie grupy aliasów.
-    Obsługuje również pozycje 'nieznane'.
-    Endpoint: /api/aliases/tender-entries/
-    """
-
-    serializer_class = TenderEntrySerializer
-
-    def get_queryset(self):
-        position_param = self.request.query_params.get("position", None)
-
-        all_alias_names = Alias.objects.values_list("alias_name", flat=True)
-
-        if position_param == "None":
-            return TenderEntry.objects.exclude(position__in=all_alias_names)
-        elif position_param:
-            try:
-                alias_group = AliasGroup.objects.get(name=position_param)
-                aliases_in_group = alias_group.aliases.values_list(
-                    "alias_name", flat=True
-                )
-                return TenderEntry.objects.filter(position__in=aliases_in_group)
-            except AliasGroup.DoesNotExist:
-                return TenderEntry.objects.none()
-
-        return TenderEntry.objects.none()
-
-
 @api_view(["POST"])
 def create_alias_view(request):
     alias_group_name = request.data.get("alias_group_name")
@@ -131,9 +103,7 @@ def create_alias_view(request):
 
     if not alias_group_name or not entry_position:
         return Response(
-            {
-                "error": "Brak wymaganych danych: 'alias_group_name' lub 'entry_position'."
-            },
+            {"error": "Brak wymaganych danych: 'alias_group_name' lub 'entry_position'."},
             status=status.HTTP_400_BAD_REQUEST,
         )
 

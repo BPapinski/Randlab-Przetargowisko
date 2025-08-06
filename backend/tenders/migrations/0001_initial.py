@@ -50,21 +50,15 @@ class Migration(migrations.Migration):
                 ("company", models.CharField(max_length=255, verbose_name="Firma")),
                 (
                     "developer_price",
-                    models.DecimalField(
-                        decimal_places=2, max_digits=12, verbose_name="Cena developera"
-                    ),
+                    models.DecimalField(decimal_places=2, max_digits=12, verbose_name="Cena developera"),
                 ),
                 (
                     "margin",
-                    models.DecimalField(
-                        decimal_places=2, max_digits=6, verbose_name="Marża"
-                    ),
+                    models.DecimalField(decimal_places=2, max_digits=6, verbose_name="Marża"),
                 ),
                 (
                     "total_price",
-                    models.DecimalField(
-                        decimal_places=2, max_digits=12, verbose_name="Cena całkowita"
-                    ),
+                    models.DecimalField(decimal_places=2, max_digits=12, verbose_name="Cena całkowita"),
                 ),
                 ("created_at", models.DateTimeField(auto_now_add=True)),
                 ("updated_at", models.DateTimeField(auto_now=True)),

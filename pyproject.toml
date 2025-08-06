@@ -1,18 +1,14 @@
 [tool.black]
-line-length = 88
+line-length = 120
 target-version = ['py310']
 include = '\.pyi?$'
 exclude = '(\.venv|venv|node_modules|frontend|static|build|dist|migrations)/'
 
 [tool.isort]
 profile = "black"
-line_length = 88
+line_length = 120
 multi_line_output = 3
 include_trailing_comma = true
 known_first_party = ["backend", "users", "tenders", "aliases"]
 known_third_party = ["django", "rest_framework", "corsheaders", "jazzmin"]
 skip = [".venv", "venv", "node_modules", "frontend", "migrations", "static"]
-
-[tool.flake8]
-max-line-length = 88
-exclude = ".venv/,venv/,node_modules/,frontend/,migrations/,static/,site-packages/"

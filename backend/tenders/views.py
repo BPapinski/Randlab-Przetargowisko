@@ -24,9 +24,9 @@ class TenderListAPIView(generics.ListAPIView):
     ordering = ["-created_at"]  # domyślne
 
     def get_queryset(self):
-        return Tender.objects.annotate(
-            price=Sum("entries__total_price")  # ← alias: 'price'
-        ).prefetch_related("entries")
+        return Tender.objects.annotate(price=Sum("entries__total_price")).prefetch_related(  # ← alias: 'price'
+            "entries"
+        )
 
 
 class TenderCreateView(generics.CreateAPIView):

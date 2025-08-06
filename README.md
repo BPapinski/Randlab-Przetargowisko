@@ -17,7 +17,17 @@ Aplikacja webowa typu full-stack wykorzystująca Django (backend) oraz React (fr
 ---
 
 ## 🔧 Co zostało zrobione
+- Konfiguracja narzędzi wspierających jakość kodu:
 
+  - ✅ Zainstalowano i skonfigurowano flake8 do statycznej analizy kodu i wychwytywania błędów stylistycznych
+
+  - ✅ Zintegrowano isort w celu automatycznego sortowania importów
+
+  - ✅ Dodano black jako formatator kodu zgodny z ustalonym stylem
+
+  - ✅ Wszystkie narzędzia zostały zintegrowane z pre-commit, który uruchamia je automatycznie przed każdym commitem
+
+  - ✅ Zdefiniowano reguły w pliku pyproject.toml z uwzględnieniem struktur Django i folderów do pominięcia (np. venv, node_modules, frontend, migrations, static)
 - Utworzenie i konfiguracja projektu (backend + frontend)  
 - Wdrożenie niestandardowego modelu użytkownika  
 - Usprawnienie panelu administracyjnego za pomocą Jazzmin  
