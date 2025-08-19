@@ -4,7 +4,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from tenders.models import TenderEntry
-from tenders.serializers import TenderEntrySerializer
+from .serializers import TenderEntrySerializer
 
 from .models import Alias, AliasGroup
 from .serializers import AliasGroupSerializer, AliasSerializer

@@ -13,7 +13,7 @@ class TenderSerializer(serializers.ModelSerializer):
 
 class TenderEntrySerializer(serializers.ModelSerializer):
     # Zastąpienie domyślnego pola 'tender' zagnieżdżonym serializatorem
-    tender = TenderSerializer(read_only=True)
+    tender = TenderSerializer(  required=False)
 
     class Meta:
         model = TenderEntry

@@ -10,7 +10,6 @@ djangorestframework_simplejwt==5.5.1
 flake8==7.3.0
 isort==6.0.1
 mccabe==0.7.0
-mssql-django==1.5
 mypy_extensions==1.1.0
 packaging==25.0
 pathspec==0.12.1
@@ -18,7 +17,7 @@ platformdirs==4.3.8
 pycodestyle==2.14.0
 pyflakes==3.4.0
 PyJWT==2.10.1
-pyodbc==5.2.0
 pytz==2025.2
 sqlparse==0.5.3
 tzdata==2025.2
+psycopg2-binary==2.9.9

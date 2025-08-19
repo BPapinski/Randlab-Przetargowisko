@@ -1,6 +1,6 @@
 from datetime import timedelta
 from pathlib import Path
-
+import os
 from django.conf import settings
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -77,18 +77,16 @@ WSGI_APPLICATION = "backend.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "mssql",
-        "NAME": "RandlabDB",
-        "USER": "django_admin",
-        "PASSWORD": "silnehaslo123",
-        "HOST": "127.0.0.1",
-        "PORT": "50018",
-        "OPTIONS": {
-            "driver": "ODBC Driver 17 for SQL Server",
-            "extra_params": "TrustServerCertificate=yes;",
-        },
-    },
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "mydb",
+        "USER": "myuser",
+        "PASSWORD": "mypassword",
+        "HOST": "db",  # nazwa serwisu z docker-compose
+        "PORT": "5432",
+    }
 }
+
+
 
 
 # Password validation

@@ -124,7 +124,9 @@ export default function AliasFilterPage() {
                 const res = await AuthFetch(url);
                 if (!res.ok) throw new Error("Failed to fetch tender entries");
                 const data = await res.json();
-                setTenderEntries(data);
+                const validEntries = data.filter(entry => entry.tender && entry.tender.name);
+                setTenderEntries(validEntries);
+                alert(`Znaleziono ${data.length} przetargów dla pozycji: ${selectedGroup}`);
             } catch (err) {
                 setError("Błąd przy pobieraniu przetargów.");
             } finally {
@@ -210,7 +212,7 @@ export default function AliasFilterPage() {
                                 {tenderEntries.map((entry) => (
                                     <div key={entry.id} className={styles.card}>
                                         <h2 className={styles.cardTitle}>{entry.position}</h2>
-                                        <p><strong>Przetarg:</strong> {entry.tender.name}</p>
+                                        <p><strong>Przetarg:</strong> {entry.tender?.name || "Brak danych"}</p>
                                         <p><strong>Firma:</strong> {entry.company}</p>
                                         <p><strong>Cena deweloperska:</strong> {entry.developer_price} zł</p>
                                         <p><strong>Marża:</strong> {entry.margin}%</p>
