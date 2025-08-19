@@ -1,11 +1,11 @@
 [flake8]
 max-line-length = 120
 exclude =
-    .venv/,
-    venv/,
-    node_modules/,
-    frontend/,
-    migrations/,
-    static/,
-    site-packages/ ,
-    backend/users/migrations/,
+    .venv,
+    venv,
+    node_modules,
+    frontend,
+    migrations,
+    static,
+    site-packages,
+    backend/users/migrations

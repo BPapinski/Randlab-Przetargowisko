@@ -1,6 +1,6 @@
 # Randlab-Przetargowisko
 
-Aplikacja webowa typu full-stack wykorzystująca Django (backend) oraz React (frontend) z bazą danych Microsoft SQL Server (MSSQL).
+Aplikacja webowa typu full-stack wykorzystująca Django (backend) oraz React (frontend) z bazą danych PostgreSQL (wcześniej MSSQL).
 
 ---
 
@@ -8,93 +8,65 @@ Aplikacja webowa typu full-stack wykorzystująca Django (backend) oraz React (fr
 
 - **Backend:** Django, Django REST Framework  
 - **Frontend:** React (Create React App)  
-- **Baza danych:** Microsoft SQL Server (zarządzana przez SQL Server Management Studio)  
+- **Baza danych:** PostgreSQL (zarządzana w Dockerze)  
 - **Inne:**  
-  - mssql-django (obsługa MSSQL w Django)  
+  - psycopg2-binary (obsługa PostgreSQL w Django)  
   - django-cors-headers (obsługa CORS dla Reacta)  
-  - ODBC Driver 17 (sterownik do połączenia z MSSQL)  
+  - Jazzmin (usprawnienie panelu admina)  
 
 ---
 
 ## 🔧 Co zostało zrobione
+
 - Konfiguracja narzędzi wspierających jakość kodu:
-
-  - ✅ Zainstalowano i skonfigurowano flake8 do statycznej analizy kodu i wychwytywania błędów stylistycznych
-
-  - ✅ Zintegrowano isort w celu automatycznego sortowania importów
-
-  - ✅ Dodano black jako formatator kodu zgodny z ustalonym stylem
-
-  - ✅ Wszystkie narzędzia zostały zintegrowane z pre-commit, który uruchamia je automatycznie przed każdym commitem
-
-  - ✅ Zdefiniowano reguły w pliku pyproject.toml z uwzględnieniem struktur Django i folderów do pominięcia (np. venv, node_modules, frontend, migrations, static)
+  - ✅ flake8 do analizy kodu  
+  - ✅ isort do automatycznego sortowania importów  
+  - ✅ black jako formatator kodu  
+  - ✅ integracja z pre-commit  
+- Migracja z MSSQL do PostgreSQL  
+- Uruchomienie projektu w kontenerach Docker:  
+  - ✅ Backend Django  
+  - ✅ Frontend React  
+  - ✅ Baza PostgreSQL w kontenerze z wolumenem danych  
 - Utworzenie i konfiguracja projektu (backend + frontend)  
-- Wdrożenie niestandardowego modelu użytkownika  
-- Usprawnienie panelu administracyjnego za pomocą Jazzmin  
-- Implementacja systemu przetargów z możliwością dodawania zgłoszeń  
-- Stworzenie REST API w oparciu o Django REST Framework  
-- Integracja frontendu z backendem  
-- Implementacja paginacji z możliwością wyboru liczby elementów na stronę  
-  - ✅ Dane odświeżają się natychmiast po zmianie liczby elementów  
-- Implementacja systemu uwierzytelniania JWT:  
-  - ✅ Logowanie za pomocą tokenów dostępu i odświeżania.  
-  - ✅ Bezpieczne wylogowywanie poprzez unieważnianie tokenu (dodawanie do czarnej listy)  
-  - ✅ Automatyczne odświeżanie access tokena przy wygaśnięciu, jeśli refresh token jest nadal ważny  
-  - ✅ Obsługa czarnej listy refresh tokenów — użytkownik zostaje automatycznie wylogowany po wygaśnięciu access tokena, jeśli jego refresh token został unieważniony  
-  - ✅ Ochrona przeglądania przetargów — dostęp mają tylko uwierzytelnieni użytkownicy z ważnym access tokenem  
-- Implementacja funkcji słownika aliasów:  
-  - ✅ Stworzenie dedykowanej strony do filtrowania pozycji.  
-  - ✅ Grupowe aliasy pozwalają na przypisywanie różnych nazw stanowisk do wspólnej kategorii.  
-  - ✅ Możliwość identyfikacji i grupowania nieznanych pozycji, które nie pasują do żadnego istniejącego aliasu.  
-  - ✅ Interfejs do dodawania nowych aliasów i tworzenia nowych grup aliasów.  
-- **Rozszerzenie panelu administracyjnego:**  
-  - ✅ Dodano osobny widok w panelu admina umożliwiający przeglądanie, filtrowanie oraz edycję wszystkich dostępnych wpisów `TenderEntry` niezależnie od modelu `Tender`.  
-  - ✅ Pola `total_price` są automatycznie wyliczane i oznaczone jako tylko do odczytu.  
-  - ✅ W panelu admina dla `TenderEntry` dodano przydatne filtry oraz wyszukiwarkę ułatwiające zarządzanie wpisami.  
+- Niestandardowy model użytkownika i REST API w Django  
+- Implementacja paginacji, JWT, uwierzytelniania i czarnej listy tokenów  
+- System słownika aliasów w frontendzie i backendzie  
+- Rozszerzenie panelu administracyjnego dla `TenderEntry` i `Tender`  
 
 ---
 
-## 🚀 Jak uruchomić projekt lokalnie
+## 🚀 Jak uruchomić projekt lokalnie (Docker)
 
-### 1. Backend
-
+1. **Uruchomienie kontenerów**
 ```bash
-cd backend
-python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
-pip install -r requirements.txt
-python manage.py migrate
-python manage.py runserver
-
-### 2. frontend
-
-cd frontend
-npm install
-npm start
-
-## 🧩 W planach (TODO)
-
-### Formularze
-
-- Formularze umożliwiające dodawanie i edycję zgłoszeń do przetargów.  
-- Możliwość edycji danych przetargu.
-
-### Filtrowanie i sortowanie
-
-- Filtrowanie i sortowanie danych na liście zgłoszeń i przetargów.  
-- Możliwość filtrowania listy przetargów według firmy oraz według ceny.
-
-### Wyszukiwarka i aliasy
-
-- Rozbudowa wyszukiwarki o możliwość wyszukiwania po nazwie stanowiska (`position`) oraz nazwie firmy (`company`).  
-- Wyświetlanie średnich cen w wynikach wyszukiwania, w tym:
-  - średnia cena dla wyszukanych stanowisk,  
-  - średnia cena dla przetargów danej firmy.
-
-### Dane do logowania
-
-- email: admin@email.com
-
-- haslo: admin
-
-<img width="1902" height="912" alt="image" src="https://github.com/user-attachments/assets/58611d24-50a3-40b1-a746-466b344ad776" />
+docker-compose up -d
+```
+2. **Sprawdzenie logów**
+```bash
+docker-compose logs -f backend   # backend Django
+docker-compose logs -f frontend  # frontend React
+docker-compose logs -f db        # baza PostgreSQL
+```
+3. **Dostęp do aplikacji**
+Backend: http://localhost:8000/
+Frontend: http://localhost:3000/
+4. **Wejście do kontenerów (shell)**
+```bash
+docker-compose exec backend bash   # shell backend Django
+docker-compose exec frontend bash  # shell frontend React
+docker-compose exec db bash        # shell PostgreSQL
+```
+5. **Sprawdzenie połączenia Django z bazą**
+```bash
+docker-compose exec backend python manage.py dbshell
+```
+6. **Wykonanie migracji lub reset bazy**
+```bash
+docker-compose exec backend python manage.py migrate
+docker-compose down -v  # usuwa kontenery i wolumeny bazy danych
+```
+7. **Sprawdzenie działania frontend**
+```bash
+docker-compose exec frontend npm start
+```

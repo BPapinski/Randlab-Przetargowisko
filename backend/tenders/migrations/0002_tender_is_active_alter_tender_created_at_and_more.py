@@ -44,12 +44,16 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="tenderentry",
             name="developer_price",
-            field=models.DecimalField(decimal_places=2, max_digits=12, verbose_name="Developer price"),
+            field=models.DecimalField(
+                decimal_places=2, max_digits=12, verbose_name="Developer price"
+            ),
         ),
         migrations.AlterField(
             model_name="tenderentry",
             name="margin",
-            field=models.DecimalField(decimal_places=2, max_digits=6, verbose_name="Margin (%)"),
+            field=models.DecimalField(
+                decimal_places=2, max_digits=6, verbose_name="Margin (%)"
+            ),
         ),
         migrations.AlterField(
             model_name="tenderentry",
@@ -69,7 +73,9 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="tenderentry",
             name="total_price",
-            field=models.DecimalField(decimal_places=2, max_digits=12, verbose_name="Total price"),
+            field=models.DecimalField(
+                decimal_places=2, max_digits=12, verbose_name="Total price"
+            ),
         ),
         migrations.AlterField(
             model_name="tenderentry",

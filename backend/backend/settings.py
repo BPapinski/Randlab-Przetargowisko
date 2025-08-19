@@ -1,6 +1,6 @@
 from datetime import timedelta
 from pathlib import Path
-import os
+
 from django.conf import settings
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -85,8 +85,6 @@ DATABASES = {
         "PORT": "5432",
     }
 }
-
-
 
 
 # Password validation
