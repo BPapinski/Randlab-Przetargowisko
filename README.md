@@ -70,3 +70,8 @@ docker-compose down -v  # usuwa kontenery i wolumeny bazy danych
 ```bash
 docker-compose exec frontend npm start
 ```
+
+8. **Uruchamianie skryptu do wypełniania bazy**
+```bash
+docker exec -it django_app python populate.py
+```
