@@ -5,6 +5,7 @@ import Header from "../components/Header";
 import TenderList from "../components/TenderList";
 import { AuthFetch } from "../utils/AuthFetch";
 import {useDebounce} from "../hooks/useDebounce";
+import Pagination from '@mui/material/Pagination';  
 
 export default function IndexPage() {
   const location = useLocation();
@@ -45,7 +46,7 @@ export default function IndexPage() {
     if (debouncedSearch !== urlSearchTerm) {
       updateUrl({ search: debouncedSearch, page: 1, page_size: tendersPerPage });
     }
-  }, [debouncedSearch, urlSearchTerm, tendersPerPage]);
+  }, [debouncedSearch, urlSearchTerm,   ]);
 
   // Synchronizacja stanu filtrów z URL (przy wejściu na stronę lub zmianie URL)
   useEffect(() => {
@@ -260,19 +261,23 @@ export default function IndexPage() {
             )}
 
             {!isLoading && totalPages > 1 && (
-              <div className="pagination">
-                {Array.from({ length: totalPages }, (_, i) => (
-                  <button
-                    key={i + 1}
-                    onClick={() => handlePageChange(i + 1)}
-                    disabled={currentPage === i + 1}
-                    className={currentPage === i + 1 ? "active" : ""}
-                  >
-                    {i + 1}
-                  </button>
-                ))}
-              </div>
-            )}
+            <div className="pagination">
+              <Pagination
+            count={Number(totalPages)}
+            page={Number(currentPage)}
+            onChange={(e, page) => handlePageChange(page)}
+            showFirstButton
+            showLastButton
+            color="primary"
+            variant="outlined"
+            size="medium"
+            shape="rounded"
+            siblingCount={1}
+            boundaryCount={1}
+            sx={{ marginTop: '1rem' }}
+          />
+            </div>
+          )}
           </main>
 
           <aside className="sidebar right-sidebar">

@@ -181,3 +181,25 @@ body {
 .filters-submit-btn:hover {
   background-color: #0056b3; /* Przyciemniony niebieski kolor po najechaniu myszką */
 }
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.MuiPagination-ul {
+  display: flex;
+  justify-content: center;
+}
+
+.MuiPaginationItem-root {
+  font-size: 1rem;
+} 
+
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+
+body {
+  font-family: 'Roboto', sans-serif;
+}
+
