@@ -136,7 +136,6 @@ export default function AliasFilterPage() {
                 const data = await res.json();
                 const validEntries = data.filter(entry => entry.tender && entry.tender.name);
                 setTenderEntries(validEntries);
-                alert(`Znaleziono ${data.length} przetargów dla pozycji: ${selectedGroup}`);
             } catch (err) {
                 setError("Błąd przy pobieraniu przetargów.");
             } finally {

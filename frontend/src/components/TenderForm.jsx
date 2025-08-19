@@ -26,7 +26,7 @@ function TenderForm() {
     useEffect(() => {
         const checkAuth = async () => {
             try {
-                const token = localStorage.getItem('accessToken'); // Zakładam, że token jest w localStorage
+                const token = localStorage.getItem('access_token'); 
                 if (!token) {
                     console.log('No token found, redirecting to /login');
                     navigate('/login');

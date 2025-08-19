@@ -163,3 +163,21 @@ body {
   background-color: #3498DB;
   color: white;
 }
+
+
+.filters-submit-btn {
+  background-color: #007bff; /* Odpowiednik niebieskiego koloru, możesz użyć innego odcienia */
+  color: #fff; /* Biały kolor tekstu dla lepszej czytelności */
+  width: 100%; /* Ustawienie szerokości na 100% */
+  padding: 10px 15px; /* Dodanie wewnętrznego marginesu dla lepszego wyglądu */
+  border: none; /* Usunięcie domyślnej ramki */
+  border-radius: 5px; /* Zaokrąglenie rogów */
+  font-size: 16px; /* Zwiększenie rozmiaru czcionki dla czytelności */
+  cursor: pointer; /* Zmiana kursora na wskaźnik, aby zaznaczyć, że przycisk jest klikalny */
+  margin-top: 0.5rem; /* Zachowanie oryginalnego marginesu górnego */
+  transition: background-color 0.3s ease; /* Dodanie płynnego przejścia koloru tła */
+}
+
+.filters-submit-btn:hover {
+  background-color: #0056b3; /* Przyciemniony niebieski kolor po najechaniu myszką */
+}

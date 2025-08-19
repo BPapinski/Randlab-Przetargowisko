@@ -1,4 +1,4 @@
-from django.db.models import Sum
+from django.db.models import Sum, Q
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from rest_framework import generics, permissions
@@ -20,7 +20,9 @@ class TenderListAPIView(generics.ListAPIView):
     ordering = ["-created_at"]
 
     def get_queryset(self):
-        qs = Tender.objects.annotate(price=Sum("entries__total_price")).prefetch_related("entries")
+        qs = Tender.objects.annotate(
+            price=Sum("entries__total_price")
+        ).prefetch_related("entries")
 
         params = self.request.query_params
 
@@ -32,7 +34,7 @@ class TenderListAPIView(generics.ListAPIView):
         if price_to:
             qs = qs.filter(price__lte=price_to)
 
-        # filtracja po marży (na entry)
+        # filtracja po marży
         margin_from = params.get("margin_from")
         margin_to = params.get("margin_to")
         if margin_from:
@@ -44,6 +46,15 @@ class TenderListAPIView(generics.ListAPIView):
         company = params.get("company")
         if company:
             qs = qs.filter(entries__company__iexact=company)
+
+        # 🔍 filtracja po search (Tender.name, TenderEntry.position, TenderEntry.company)
+        search = params.get("search")
+        if search:
+            qs = qs.filter(
+                Q(name__icontains=search) |
+                Q(entries__position__icontains=search) |
+                Q(entries__company__icontains=search)
+            )
 
         return qs.distinct()
 

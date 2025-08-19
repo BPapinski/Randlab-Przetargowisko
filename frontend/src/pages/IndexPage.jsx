@@ -4,6 +4,7 @@ import "./styles/indexStyles.css";
 import Header from "../components/Header";
 import TenderList from "../components/TenderList";
 import { AuthFetch } from "../utils/AuthFetch";
+import {useDebounce} from "../hooks/useDebounce";
 
 export default function IndexPage() {
   const location = useLocation();
@@ -25,12 +26,26 @@ export default function IndexPage() {
   const [tempPriceTo, setTempPriceTo] = useState("");
 
 
+  
+
+
+
+
   // Parametry z URL
   const params = new URLSearchParams(location.search);
   const currentPage = parseInt(params.get("page"), 10) || 1;
   const tendersPerPage = parseInt(params.get("page_size"), 10) || 10;
-  const searchTerm = params.get("search") || "";
+  const urlSearchTerm = params.get("search") || "";
   const ordering = params.get("ordering") || "-date";
+
+  const [searchInput, setSearchInput] = useState(urlSearchTerm);
+  const debouncedSearch = useDebounce(searchInput, 500);
+
+  useEffect(() => {
+    if (debouncedSearch !== urlSearchTerm) {
+      updateUrl({ search: debouncedSearch, page: 1, page_size: tendersPerPage });
+    }
+  }, [debouncedSearch, urlSearchTerm, tendersPerPage]);
 
   // Synchronizacja stanu filtrów z URL (przy wejściu na stronę lub zmianie URL)
   useEffect(() => {
@@ -82,9 +97,8 @@ export default function IndexPage() {
   };
 
   const handleSearchChange = (event) => {
-    updateUrl({ search: event.target.value, page: 1, page_size: tendersPerPage });
+    setSearchInput(event.target.value);
   };
-
   const handleTendersPerPageChange = (event) => {
     updateUrl({ page: 1, page_size: Number(event.target.value) });
   };
@@ -167,7 +181,9 @@ export default function IndexPage() {
 
   return (
     <>
-      <Header searchTerm={searchTerm} onSearchChange={handleSearchChange} />
+
+      <Header searchTerm={searchInput} onSearchChange={handleSearchChange} />
+
 
       <div className="container">
         <div className="content-wrapper">
@@ -208,7 +224,7 @@ export default function IndexPage() {
                 </option>
               ))}
             </select>
-            <button onClick={handleSearchFilters} style={{ marginTop: "0.5rem" }}>
+            <button className="filters-submit-btn" onClick={handleSearchFilters} style={{ marginTop: "0.5rem" }}>
               Szukaj
             </button>
 
