@@ -1,14 +1,14 @@
 import os
-import django
 import random
 from decimal import Decimal
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "backend.settings") 
+import django
+
+from tenders.models import Tender, TenderEntry
+from users.models import User
+
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "backend.settings")
 django.setup()
-
-from tenders.models import Tender, TenderEntry 
-
-from users.models import User  
 
 admin_email = "admin@email.com"
 admin_password = "admin"
@@ -20,24 +20,48 @@ else:
     print(f"Użytkownik {admin_email} już istnieje")
 
 tender_names = [
-    "Construction of the School", "Road Renovation", "IT System Upgrade",
-    "Office Supplies Purchase", "Bridge Maintenance", "Hospital Equipment",
-    "Park Development", "Library Expansion", "Water Treatment Plant",
-    "Public Transport Modernization", "Energy Efficiency Project",
-    "Software Development", "Community Center Renovation",
-    "Road Safety Improvements", "Sports Complex Construction",
-    "Urban Lighting Upgrade", "Waste Management Upgrade",
-    "Fire Station Equipment", "Museum Renovation", "Airport Expansion"
+    "Construction of the School",
+    "Road Renovation",
+    "IT System Upgrade",
+    "Office Supplies Purchase",
+    "Bridge Maintenance",
+    "Hospital Equipment",
+    "Park Development",
+    "Library Expansion",
+    "Water Treatment Plant",
+    "Public Transport Modernization",
+    "Energy Efficiency Project",
+    "Software Development",
+    "Community Center Renovation",
+    "Road Safety Improvements",
+    "Sports Complex Construction",
+    "Urban Lighting Upgrade",
+    "Waste Management Upgrade",
+    "Fire Station Equipment",
+    "Museum Renovation",
+    "Airport Expansion",
 ]
 
-positions = [   
-    "Project Manager", "Senior Engineer", "Technician", "Consultant",
-    "Site Supervisor", "Designer", "Analyst", "Developer"
+positions = [
+    "Project Manager",
+    "Senior Engineer",
+    "Technician",
+    "Consultant",
+    "Site Supervisor",
+    "Designer",
+    "Analyst",
+    "Developer",
 ]
 
 companies = [
-    "AlphaCorp", "BetaSolutions", "GammaTech", "DeltaWorks",
-    "Epsilon Ltd", "Zeta Industries", "Theta Services", "Lambda Co"
+    "AlphaCorp",
+    "BetaSolutions",
+    "GammaTech",
+    "DeltaWorks",
+    "Epsilon Ltd",
+    "Zeta Industries",
+    "Theta Services",
+    "Lambda Co",
 ]
 
 for tender_name in tender_names:
@@ -53,5 +77,5 @@ for tender_name in tender_names:
             company=company,
             developer_price=dev_price,
             margin=margin,
-            total_price=dev_price * (1 + margin / 100)
+            total_price=dev_price * (1 + margin / 100),
         )

@@ -3,7 +3,7 @@ import { AuthFetch } from "../utils/AuthFetch";
 import Header from "../components/Header";
 import styles from "../pages/styles/AliasFilterPage.module.css"; // Adjust the path as necessary
 
-
+import {useNavigate} from "react-router-dom";
 
 export default function AliasFilterPage() {
     const [aliasGroups, setAliasGroups] = useState([]);
@@ -17,6 +17,8 @@ export default function AliasFilterPage() {
     const [unknownPositionsCount, setUnknownPositionsCount] = useState(0);
 
     const [aliasInput, setAliasInput] = useState({});
+
+    const navigate = useNavigate();
 
     const handleAliasInputChange = (entryId, value) => {
         setAliasInput(prev => ({
@@ -85,6 +87,10 @@ export default function AliasFilterPage() {
         const fetchGroups = async () => {
             try {
                 const res = await AuthFetch("/api/aliases/groups/");
+                if (res.status === 401) {
+                    navigate("/login");
+                    return;
+                }
                 if (!res.ok) throw new Error("Failed to fetch alias groups");
                 const data = await res.json();
                 setAliasGroups(data);
@@ -122,7 +128,11 @@ export default function AliasFilterPage() {
 
             try {
                 const res = await AuthFetch(url);
-                if (!res.ok) throw new Error("Failed to fetch tender entries");
+                if (res.status === 401) {
+                    navigate("/login");
+                    return;
+                }
+                if (!res.ok) throw new Error("Failed to fetch tender entries");   
                 const data = await res.json();
                 const validEntries = data.filter(entry => entry.tender && entry.tender.name);
                 setTenderEntries(validEntries);

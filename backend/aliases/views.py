@@ -1,7 +1,9 @@
 # W pliku views.py
-from rest_framework import generics, status
-from rest_framework.decorators import api_view
+from rest_framework import generics, permissions, status
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from tenders.models import TenderEntry
 
@@ -40,7 +42,9 @@ def tender_entries_by_standard_position(request):
 
 
 @api_view(["GET"])
-def alias_group_list(request):
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def alias_group_list_names(request):
     groups = AliasGroup.objects.all().values_list("name", flat=True)
     return Response(groups)
 
@@ -56,6 +60,7 @@ def AliasList(request):
 
 class TenderEntryList(generics.ListAPIView):
     serializer_class = TenderEntrySerializer
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         position_param = self.request.query_params.get("position", None)
@@ -76,11 +81,8 @@ class TenderEntryList(generics.ListAPIView):
 
 
 class AliasGroupList(generics.ListCreateAPIView):
-    """
-    Lista i tworzenie grup aliasów.
-    Endpoint: /api/aliases/groups/
-    """
 
+    permission_classes = [permissions.IsAuthenticated]
     queryset = AliasGroup.objects.all()
     serializer_class = AliasGroupSerializer
 

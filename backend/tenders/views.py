@@ -1,4 +1,4 @@
-from django.db.models import Sum, Q
+from django.db.models import Sum
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from rest_framework import generics, permissions
@@ -20,10 +20,7 @@ class TenderListAPIView(generics.ListAPIView):
     ordering = ["-created_at"]
 
     def get_queryset(self):
-        qs = (
-            Tender.objects.annotate(price=Sum("entries__total_price"))
-            .prefetch_related("entries")
-        )
+        qs = Tender.objects.annotate(price=Sum("entries__total_price")).prefetch_related("entries")
 
         params = self.request.query_params
 
@@ -49,7 +46,6 @@ class TenderListAPIView(generics.ListAPIView):
             qs = qs.filter(entries__company__iexact=company)
 
         return qs.distinct()
-
 
 
 class TenderCreateView(generics.CreateAPIView):
