@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { AuthFetch } from '../utils/AuthFetch';
 import styles from '../pages/styles/FormStyles.module.css';
+import { useNavigate } from 'react-router-dom';
+import {useEffect} from 'react';
 
 // Komponent z ikoną Excela w formacie SVG
 const ExcelIcon = () => (
@@ -19,6 +21,35 @@ function TenderForm() {
         { position: '', company: '', developer_price: '', margin: '' },
     ]);
     const [message, setMessage] = useState(null);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const checkAuth = async () => {
+            try {
+                const token = localStorage.getItem('accessToken'); // Zakładam, że token jest w localStorage
+                if (!token) {
+                    console.log('No token found, redirecting to /login');
+                    navigate('/login');
+                    return;
+                }
+
+                const response = await AuthFetch('/api/token/verify/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token }),
+                });
+
+                if (response.status === 401 || response.status === 400) {
+                    console.log('Invalid or missing token, redirecting to /login');
+                    navigate('/login');
+                }
+            } catch (error) {
+                console.error('Auth check error:', error);
+                navigate('/login');
+            }
+        };
+        checkAuth();
+    }, [navigate]);
 
     const handleEntryChange = (index, field, value) => {
         const updated = [...entries];
