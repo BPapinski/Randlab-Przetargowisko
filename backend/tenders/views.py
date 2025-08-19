@@ -1,32 +1,55 @@
-from django.db.models import Sum
+from django.db.models import Sum, Q
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from rest_framework import generics, permissions
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.filters import OrderingFilter
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
-from .models import Tender
+from .models import Tender, TenderEntry
 from .serializers import TenderCreateSerializer, TenderSerializer
 
 
 class TenderListAPIView(generics.ListAPIView):
-    queryset = Tender.objects.all().prefetch_related("entries")
     serializer_class = TenderSerializer
     permission_classes = [permissions.IsAuthenticated]
     filter_backends = [OrderingFilter]
-    ordering_fields = [
-        "created_at",
-        "updated_at",
-        "name",
-        "price",
-    ]  # ← zezwalasz na sortowanie
-    ordering = ["-created_at"]  # domyślne
+    ordering_fields = ["created_at", "updated_at", "name", "price"]
+    ordering = ["-created_at"]
 
     def get_queryset(self):
-        return Tender.objects.annotate(price=Sum("entries__total_price")).prefetch_related(  # ← alias: 'price'
-            "entries"
+        qs = (
+            Tender.objects.annotate(price=Sum("entries__total_price"))
+            .prefetch_related("entries")
         )
+
+        params = self.request.query_params
+
+        # filtracja po cenie
+        price_from = params.get("price_from")
+        price_to = params.get("price_to")
+        if price_from:
+            qs = qs.filter(price__gte=price_from)
+        if price_to:
+            qs = qs.filter(price__lte=price_to)
+
+        # filtracja po marży (na entry)
+        margin_from = params.get("margin_from")
+        margin_to = params.get("margin_to")
+        if margin_from:
+            qs = qs.filter(entries__margin__gte=margin_from)
+        if margin_to:
+            qs = qs.filter(entries__margin__lte=margin_to)
+
+        # filtracja po firmie
+        company = params.get("company")
+        if company:
+            qs = qs.filter(entries__company__iexact=company)
+
+        return qs.distinct()
+
 
 
 class TenderCreateView(generics.CreateAPIView):
@@ -50,3 +73,9 @@ def toggle_tender_active(request, tender_id):
         },
         status=200,
     )
+
+
+class CompanyListView(APIView):
+    def get(self, request):
+        companies = TenderEntry.objects.values_list("company", flat=True).distinct()
+        return Response(companies)

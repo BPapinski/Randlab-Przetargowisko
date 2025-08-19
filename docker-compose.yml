@@ -15,6 +15,10 @@ services:
   frontend:
     build: ./frontend
     container_name: react_app
+    command: ["npm", "start"]   # zamiast tylko build
+    volumes:
+      - ./frontend:/app         # montujesz kod źródłowy
+      - /app/node_modules       # żeby node_modules nie nadpisywało się
     ports:
       - "3000:3000"
     depends_on:

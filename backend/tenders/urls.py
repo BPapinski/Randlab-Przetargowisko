@@ -1,7 +1,7 @@
 # urls.py
 from django.urls import path
 
-from .views import TenderCreateView, TenderListAPIView, toggle_tender_active
+from .views import TenderCreateView, TenderListAPIView, toggle_tender_active, CompanyListView
 
 urlpatterns = [
     path("tenders/", TenderListAPIView.as_view(), name="tender-list"),
@@ -11,4 +11,5 @@ urlpatterns = [
         toggle_tender_active,
         name="toggle_tender_active",
     ),
+    path("companies/", CompanyListView.as_view(), name="company-list"),
 ]
