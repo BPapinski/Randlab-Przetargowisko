@@ -18,7 +18,7 @@ export default function TenderCard({ entry, selectedCompany, onToggleActive, onU
     const updatedEntries = localEntry.entries.map((e) =>
       e.id === updatedSubEntry.id ? updatedSubEntry : e
     );
-    const updatedLocalEntry = { ...localEntry, entries: updatedEntries };
+    const updatedLocalEntry = { ...localEntry, entries: updatedEntries, updated_at: updatedSubEntry.updated_at, };
     setLocalEntry(updatedLocalEntry);
 
     if (onUpdateEntry) onUpdateEntry(updatedSubEntry, localEntry.id);

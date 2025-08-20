@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 
 class Tender(models.Model):
@@ -29,6 +30,7 @@ class TenderEntry(models.Model):
     def save(self, *args, **kwargs):
         self.total_price = self.developer_price * (1 + self.margin / 100)
         super().save(*args, **kwargs)
+        Tender.objects.filter(id=self.tender_id).update(updated_at=timezone.now())
 
     def __str__(self):
         return f"{self.position} – {self.company} ({self.total_price:.2f} zł)"

@@ -24,26 +24,36 @@ export default function TenderCardEntry({ subEntry, selectedCompany, onUpdate })
   };
 
   const handleSave = async () => {
-    try {
-      const updatedEntry = {
-        ...subEntry,
-        ...formData,
-        total_price: totalPrice,
-      };
+  try {
+    const updatedEntry = {
+      ...subEntry,
+      ...formData,
+      total_price: totalPrice,
+    };
 
-      const res = await AuthFetch(`/api/tender-entries/${subEntry.id}/`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updatedEntry),
-      });
-      if (!res.ok) throw new Error("Błąd podczas zapisywania zmian");
+    // usuń updated_at z obiektu
+    delete updatedEntry.updated_at;
 
-      setIsEditing(false);
-      if (onUpdate) onUpdate(updatedEntry);
-    } catch (err) {
-      console.error(err);
-    }
-  };
+    const res = await AuthFetch(`/api/tender-entries/${subEntry.id}/`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(updatedEntry),
+    });
+
+    if (!res.ok) throw new Error("Błąd podczas zapisywania zmian");
+
+    setIsEditing(false);
+    if (onUpdate) onUpdate({ ...updatedEntry, updated_at: new Date().toISOString() });
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+
+
+
+
+
 
   return (
     <div
