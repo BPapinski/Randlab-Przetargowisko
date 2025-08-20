@@ -26,12 +26,6 @@ export default function IndexPage() {
   const [tempPriceFrom, setTempPriceFrom] = useState("");
   const [tempPriceTo, setTempPriceTo] = useState("");
 
-
-  
-
-
-
-
   // Parametry z URL
   const params = new URLSearchParams(location.search);
   const currentPage = parseInt(params.get("page"), 10) || 1;
