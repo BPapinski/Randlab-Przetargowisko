@@ -1,4 +1,5 @@
-from django.db.models import Q, Sum
+from django.db.models import DecimalField, Q, Sum, Value
+from django.db.models.functions import Coalesce
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from rest_framework import generics, permissions
@@ -20,8 +21,9 @@ class TenderListAPIView(generics.ListAPIView):
     ordering = ["-created_at"]
 
     def get_queryset(self):
-        qs = Tender.objects.annotate(price=Sum("entries__total_price")).prefetch_related("entries")
-
+        qs = Tender.objects.annotate(
+            price=Coalesce(Sum("entries__total_price"), Value(0, output_field=DecimalField()))
+        ).prefetch_related("entries")
         params = self.request.query_params
 
         # filtracja po cenie

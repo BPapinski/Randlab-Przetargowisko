@@ -5,7 +5,7 @@ import Header from "../components/Header";
 import TenderList from "../components/TenderList";
 import { AuthFetch } from "../utils/AuthFetch";
 import {useDebounce} from "../hooks/useDebounce";
-import Pagination from '@mui/material/Pagination';  
+  import Pagination from '@mui/material/Pagination';  
 
 export default function IndexPage() {
   const location = useLocation();
