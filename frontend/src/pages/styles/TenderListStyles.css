@@ -1,3 +1,4 @@
+/* Główne style dla karty przetargu */
 .tender-card {
   background: #fff;
   border-radius: 12px;
@@ -6,6 +7,7 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
+/* Sekcja nagłówka przetargu */
 .tender-header {
   border-bottom: 1px solid #BDC3C7;
   padding-bottom: 0.5rem;
@@ -15,6 +17,8 @@
 
 .tender-header h2 {
   color: #2C3E50;
+  margin: 0;
+  font-size: 1.5rem;
 }
 
 .dates {
@@ -22,21 +26,62 @@
   font-size: 0.9rem;
 }
 
+/* Kontener dla przycisków w nagłówku */
 .tender-actions {
   position: absolute;
   top: 0;
   right: 0;
+  display: flex;
+  gap: 0.5rem;
 }
 
-.delete-tender-btn {
+/* Wspólne style dla wszystkich przycisków akcji */
+.action-btn {
   padding: 8px 16px;
   border: none;
   border-radius: 6px;
   font-weight: bold;
   cursor: pointer;
   transition: background-color 0.2s ease, transform 0.1s ease;
+  color: white;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  letter-spacing: 0.5px;
+}
+
+.action-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Styl dla przycisku "Edytuj" */
+.action-btn--edit {
+  background-color: #3498DB;
+}
+
+.action-btn--edit:hover {
+  background-color: #2980B9;
+}
+
+/* Styl dla przycisku "Zapisz" */
+.action-btn--save {
+  background-color: #2ecc71;
+}
+
+.action-btn--save:hover {
+  background-color: #27ae60;
+}
+
+/* Styl dla przycisku "Usuń przetarg" */
+.delete-tender-btn {
   background-color: #E74C3C;
   color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
 }
 
 .delete-tender-btn:hover {
@@ -44,17 +89,38 @@
   transform: translateY(-1px);
 }
 
+/* Styl dla przycisku "Usuń" wewnątrz wpisów */
+.delete-btn {
+  background-color: #E74C3C;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.delete-btn:hover {
+  background-color: #C0392B;
+  transform: translateY(-1px);
+}
+
+/* Tytuł listy wpisów */
 .entries-title {
   margin-bottom: 1rem;
   color: #2C3E50;
+  font-size: 1.2rem;
 }
 
+/* Kontener dla listy wpisów */
 .entries {
   display: flex;
   flex-direction: column;
   gap: 1rem;
 }
 
+/* Pojedynczy wpis na liście */
 .entry-card {
   background-color: #F8F9FA;
   border-radius: 8px;
@@ -66,8 +132,15 @@
   border: 1px solid #E0E6EB;
 }
 
+/* Nowe style dla kontenera informacji, które ujednolicają odstępy */
+.entry-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px; /* Stały odstęp między wierszami */
+}
+
 .entry-info p {
-  margin: 4px 0;
+  margin: 0; /* Usunięcie domyślnych marginesów */
   color: #34495E;
 }
 
@@ -75,41 +148,31 @@
   color: #2C3E50;
 }
 
+/* Poprawione style dla input fieldów w trybie edycji */
+.entry-info input {
+  font-size: 1rem;
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid #BDC3C7;
+  width: 180px;
+  box-sizing: border-box;
+  margin-left: 8px;
+  transition: border-color 0.2s ease;
+}
+
+.entry-info input:focus {
+  outline: none;
+  border-color: #3498DB;
+  box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
+}
+
+/* Kontener dla przycisków wewnątrz wpisu */
 .entry-actions {
   display: flex;
   gap: 0.5rem;
 }
 
-.edit-btn,
-.delete-btn {
-  padding: 8px 16px;
-  border: none;
-  border-radius: 6px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.2s ease, transform 0.1s ease;
-}
-
-.edit-btn {
-  background-color: #3498DB;
-  color: white;
-}
-
-.edit-btn:hover {
-  background-color: #2980B9;
-  transform: translateY(-1px);
-}
-
-.delete-btn {
-  background-color: #E74C3C;
-  color: white;
-}
-
-.delete-btn:hover {
-  background-color: #C0392B;
-  transform: translateY(-1px);
-}
-
+/* Całkowita wartość */
 .total-value {
   display: inline-block;
   margin-top: 0.5rem;
@@ -118,6 +181,7 @@
   font-size: 1.1rem;
 }
 
+/* Wiadomości informacyjne */
 .no-results,
 .no-entries {
   text-align: center;
@@ -129,6 +193,7 @@
   border: 1px dashed #BDC3C7;
 }
 
+/* Komunikaty o błędach */
 .error {
   color: #E74C3C;
   text-align: center;
@@ -136,6 +201,7 @@
   font-weight: bold;
 }
 
+/* Podświetlenie firmy */
 .highlight-company {
   border: 2px solid #ff9800;
   background: #fffbe6;

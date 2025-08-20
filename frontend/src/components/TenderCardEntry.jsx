@@ -50,11 +50,6 @@ export default function TenderCardEntry({ subEntry, selectedCompany, onUpdate })
 };
 
 
-
-
-
-
-
   return (
     <div
       className={
@@ -121,14 +116,13 @@ export default function TenderCardEntry({ subEntry, selectedCompany, onUpdate })
       <div className="entry-actions">
         {isEditing ? (
           <button
-            className="save-btn"
-            style={{ background: "green", color: "white" }}
+            className="action-btn action-btn--save"
             onClick={handleSave}
           >
             Zapisz
           </button>
         ) : (
-          <button className="edit-btn" onClick={() => setIsEditing(true)}>
+          <button className="action-btn action-btn--edit" onClick={() => setIsEditing(true)}>
             Edytuj
           </button>
         )}
