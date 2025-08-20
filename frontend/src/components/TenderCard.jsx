@@ -1,9 +1,10 @@
 import React from "react";
+import TenderCardEntry from "./TenderCardEntry";
 
 export default function TenderCard({ entry, selectedCompany, onToggleActive }) {
   return (
     <div key={entry.id} className="tender-card">
-      <div className="t ender-header">
+      <div className="tender-header">
         <h2>{entry.name}</h2>
         <p className="dates">
           Utworzono: {new Date(entry.created_at).toLocaleString()} <br />
@@ -35,27 +36,11 @@ export default function TenderCard({ entry, selectedCompany, onToggleActive }) {
               return 0;
             })
             .map((subEntry) => (
-              <div
+              <TenderCardEntry
                 key={subEntry.id}
-                className={
-                  "entry-card" +
-                  (selectedCompany && subEntry.company === selectedCompany
-                    ? " highlight-company"
-                    : "")
-                }
-              >
-                <div className="entry-info">
-                  <p><strong>Stanowisko:</strong> {subEntry.position}</p>
-                  <p><strong>Firma:</strong> {subEntry.company}</p>
-                  <p><strong>Cena developera:</strong> {subEntry.developer_price} zł</p>
-                  <p><strong>Marża:</strong> {subEntry.margin}%</p>
-                  <p><strong>Cena końcowa:</strong> {subEntry.total_price} zł</p>
-                </div>
-                <div className="entry-actions">
-                  <button className="edit-btn">Edytuj</button>
-                  <button className="delete-btn">Usuń</button>
-                </div>
-              </div>
+                subEntry={subEntry}
+                selectedCompany={selectedCompany}
+              />
             ))
         )}
       </div>

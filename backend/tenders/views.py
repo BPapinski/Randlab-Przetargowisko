@@ -10,7 +10,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import Tender, TenderEntry
-from .serializers import TenderCreateSerializer, TenderSerializer
+from .serializers import TenderCreateSerializer, TenderSerializer, TenderEntrySerializer
 
 
 class TenderListAPIView(generics.ListAPIView):
@@ -63,6 +63,10 @@ class TenderCreateView(generics.CreateAPIView):
     queryset = Tender.objects.all()
     serializer_class = TenderCreateSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+class TenderEntryUpdateView(generics.UpdateAPIView):
+    queryset = TenderEntry.objects.all()
+    serializer_class = TenderEntrySerializer
 
 
 @permission_classes([IsAuthenticated])
