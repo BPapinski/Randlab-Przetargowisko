@@ -1,12 +1,7 @@
 # urls.py
 from django.urls import path
-from .views import (
-    CompanyListView,
-    TenderCreateView,
-    TenderListAPIView,
-    toggle_tender_active,
-    TenderEntryUpdateView,
-)
+
+from .views import CompanyListView, TenderCreateView, TenderEntryUpdateView, TenderListAPIView, toggle_tender_active
 
 urlpatterns = [
     path("tenders/", TenderListAPIView.as_view(), name="tender-list"),
@@ -20,5 +15,4 @@ urlpatterns = [
     # 👇 nowy endpoint do edycji TenderEntry
     # urls.py
     path("tender-entries/<int:pk>/", TenderEntryUpdateView.as_view(), name="tender-entry-update"),
-
 ]

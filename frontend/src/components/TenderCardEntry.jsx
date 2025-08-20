@@ -1,15 +1,22 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { AuthFetch } from "../utils/AuthFetch";
 
-export default function TenderCardEntry({ subEntry, selectedCompany }) {
+export default function TenderCardEntry({ subEntry, selectedCompany, onUpdate }) {
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     position: subEntry.position,
     company: subEntry.company,
     developer_price: subEntry.developer_price,
     margin: subEntry.margin,
-    total_price: subEntry.total_price,
   });
+  const [totalPrice, setTotalPrice] = useState(subEntry.total_price);
+
+  // Oblicz cenę końcową przy każdej zmianie developer_price lub margin
+  useEffect(() => {
+    const devPrice = parseFloat(formData.developer_price) || 0;
+    const margin = parseFloat(formData.margin) || 0;
+    setTotalPrice((devPrice * (1 + margin / 100)).toFixed(2));
+  }, [formData.developer_price, formData.margin]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -18,19 +25,25 @@ export default function TenderCardEntry({ subEntry, selectedCompany }) {
 
   const handleSave = async () => {
     try {
+      const updatedEntry = {
+        ...subEntry,
+        ...formData,
+        total_price: totalPrice,
+      };
+
       const res = await AuthFetch(`/api/tender-entries/${subEntry.id}/`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(updatedEntry),
       });
       if (!res.ok) throw new Error("Błąd podczas zapisywania zmian");
+
       setIsEditing(false);
-      // ewentualny callback aby odświeżyć dane listy po zapisie
+      if (onUpdate) onUpdate(updatedEntry);
     } catch (err) {
       console.error(err);
     }
   };
-
 
   return (
     <div
@@ -81,13 +94,7 @@ export default function TenderCardEntry({ subEntry, selectedCompany }) {
               />
             </p>
             <p>
-              <strong>Cena końcowa:</strong>{" "}
-              <input
-                type="number"
-                name="total_price"
-                value={formData.total_price}
-                onChange={handleChange}
-              />
+              <strong>Cena końcowa:</strong> {totalPrice} zł
             </p>
           </>
         ) : (
@@ -103,7 +110,11 @@ export default function TenderCardEntry({ subEntry, selectedCompany }) {
 
       <div className="entry-actions">
         {isEditing ? (
-          <button className="save-btn" style={{ background: "green", color: "white" }} onClick={handleSave}>
+          <button
+            className="save-btn"
+            style={{ background: "green", color: "white" }}
+            onClick={handleSave}
+          >
             Zapisz
           </button>
         ) : (
