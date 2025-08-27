@@ -56,6 +56,17 @@ export default function IndexPage() {
     }))
   ];
 
+  const clientOptions = [
+  { value: null, label: 'Wszyscy klienci' },
+  ...clients.map(client => ({
+    value: client,
+    label: client,
+  }))
+];
+
+
+
+
 
   // Synchronizacja stanu filtrów z URL (przy wejściu na stronę lub zmianie URL)
   useEffect(() => {
@@ -140,7 +151,7 @@ export default function IndexPage() {
 
 
 
-  const handleCompanyChangeMew = (selectedOption) => {
+  const handleCompanyChange = (selectedOption) => {
     if (!selectedOption) {
       setSelectedCompany(null);
       updateUrl({ company: null, page: 1 });
@@ -151,11 +162,17 @@ export default function IndexPage() {
     }
   };
 
+  const handleClientChange = (selectedOption) => {
+    if (!selectedOption) {
+      setSelectedClient(null);
+      updateUrl({ client: null, page: 1 });
+    }
+    else {
+      updateUrl({ client: selectedOption.value, page: 1 });
+      setSelectedClient(selectedOption ? selectedOption.value : null);
+    }
+  };
 
-  const handleClientChange = (e) => {
-    setSelectedClient(e.target.value);
-    updateUrl({ client: e.target.value, page: 1 });
-  }
 
 
   const handlePriceFromChange = (e) => {
@@ -255,19 +272,17 @@ export default function IndexPage() {
               />
             </div>
             <h4>Klient</h4>
-            <select value={selectedClient} onChange={handleClientChange}>
-              <option value="">Wybierz klienta</option>
-              {clients.map((client) => (
-                <option key={client} value={client}>
-                  {client}
-                </option>
-              ))}
-            </select>
+            <Select
+              options={clientOptions}
+              placeholder="Wybierz klienta..."
+              isClearable
+              onChange={handleClientChange} 
+            />
 
             <h4>Firma</h4>
             <Select
               options={companyOptions}
-              onChange={handleCompanyChangeMew} // Ta funkcja otrzyma obiekt { value, label }
+              onChange={handleCompanyChange}
               placeholder="Wybierz firmę..."
               isClearable // Dodaje przycisk do czyszczenia pola
             />
