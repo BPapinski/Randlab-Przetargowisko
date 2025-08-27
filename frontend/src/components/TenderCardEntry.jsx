@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { AuthFetch } from "../utils/AuthFetch";
+import styles from './styles/TenderCardEntry.module.css'
 
 export default function TenderCardEntry({ subEntry, selectedCompany, onUpdate }) {
+  const [expandedDescription, setExpandedDescription] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     position: subEntry.position,
@@ -27,30 +29,30 @@ export default function TenderCardEntry({ subEntry, selectedCompany, onUpdate })
   };
 
   const handleSave = async () => {
-  try {
-    const updatedEntry = {
-      ...subEntry,
-      ...formData,
-      total_price: totalPrice,
-    };
+    try {
+      const updatedEntry = {
+        ...subEntry,
+        ...formData,
+        total_price: totalPrice,
+      };
 
-    // usuń updated_at z obiektu
-    delete updatedEntry.updated_at;
+      // usuń updated_at z obiektu
+      delete updatedEntry.updated_at;
 
-    const res = await AuthFetch(`/api/tender-entries/${subEntry.id}/`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(updatedEntry),
-    });
+      const res = await AuthFetch(`/api/tender-entries/${subEntry.id}/`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatedEntry),
+      });
 
-    if (!res.ok) throw new Error("Błąd podczas zapisywania zmian");
+      if (!res.ok) throw new Error("Błąd podczas zapisywania zmian");
 
-    setIsEditing(false);
-    if (onUpdate) onUpdate({ ...updatedEntry, updated_at: new Date().toISOString() });
-  } catch (err) {
-    console.error(err);
-  }
-};
+      setIsEditing(false);
+      if (onUpdate) onUpdate({ ...updatedEntry, updated_at: new Date().toISOString() });
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
 
   return (
@@ -112,6 +114,35 @@ export default function TenderCardEntry({ subEntry, selectedCompany, onUpdate })
             <p><strong>Cena developera:</strong> {subEntry.developer_price} zł</p>
             <p><strong>Marża:</strong> {subEntry.margin}%</p>
             <p><strong>Cena końcowa:</strong> {subEntry.total_price} zł</p>
+            {expandedDescription ? (
+              <>
+                <strong>
+                  <span
+                    className={styles.linkButton}
+                    onClick={() => setExpandedDescription(false)}
+                  >
+                    Zwiń ▲
+                  </span>
+                </strong>
+
+                <p>{subEntry.description || "Brak dodatkowego opisu."}</p>
+              </>
+            ) : (
+              <>
+                <strong>
+                  <span
+                    className={styles.linkButton}
+                    onClick={() => setExpandedDescription(true)}
+                  >
+                    Opis stanowiska ▼
+                  </span>
+                </strong>
+                <p style={{ minHeight: "1em" }}></p>
+              </>
+            )}
+
+
+
           </>
         )}
       </div>

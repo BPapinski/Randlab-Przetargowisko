@@ -15,6 +15,7 @@ class TenderEntrySerializer(serializers.ModelSerializer):
             "total_price",
             "created_at",
             "updated_at",
+            "description",
         ]
         read_only_fields = ["id", "total_price", "created_at", "updated_at"]
 

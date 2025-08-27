@@ -86,6 +86,7 @@ class TenderEntryAdmin(admin.ModelAdmin):
         "developer_price",
         "margin",
         "total_price",
+        "description",
     )
     list_filter = ("company", "tender")
     search_fields = ("position", "company__name", "tender__name")

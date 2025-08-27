@@ -1,0 +1,14 @@
+.linkButton {
+  display: inline-block;  /* szerokość = tekst */
+  width: auto;
+  cursor: pointer;
+}
+.linkButton:hover {
+  color: #003366;
+}
+
+.linkButton strong {
+    display: inline-flex;
+    align-items: center; /* Opcjonalnie: wyrównuje tekst pionowo do środka */
+    justify-content: center; /* Opcjonalnie: wyrównuje tekst poziomo do środka */
+}

@@ -41,6 +41,7 @@ class TenderEntry(models.Model):
     total_price = models.DecimalField(max_digits=12, decimal_places=2, verbose_name="Total price")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Created at")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Updated at")
+    description = models.TextField(blank=True, null=True, verbose_name="Description")
 
     def save(self, *args, **kwargs):
         self.total_price = self.developer_price * (1 + self.margin / 100)
