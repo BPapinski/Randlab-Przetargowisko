@@ -11,19 +11,20 @@ services:
     depends_on:
       - db
 
-
   frontend:
     build: ./frontend
     container_name: react_app
-    command: ["npm", "start"]   # zamiast tylko build
+    command: ["npm", "start"]
     volumes:
-      - ./frontend:/app         # montujesz kod źródłowy
-      - /app/node_modules       # żeby node_modules nie nadpisywało się
+      - ./frontend:/app
+      - /app/node_modules
     ports:
       - "3000:3000"
+    environment:
+      - WATCHPACK_POLLING=true
+      - CHOKIDAR_USEPOLLING=true
     depends_on:
       - backend
-
 
   db:
     image: postgres:15
