@@ -13,6 +13,7 @@ export default function TenderCardEntry({ subEntry, selectedCompany, onUpdate })
     client: subEntry.client,
     status: subEntry.status,
     implementation_link: subEntry.implementation_link,
+    description: subEntry.description,
   });
   const [totalPrice, setTotalPrice] = useState(subEntry.total_price);
 
@@ -104,6 +105,16 @@ export default function TenderCardEntry({ subEntry, selectedCompany, onUpdate })
               />
             </p>
             <p>
+              <strong>Opis:</strong>
+              <textarea
+                name="description"
+                value={formData.description}
+                onChange={handleChange}
+                rows={3}
+                style={{ width: "100%", resize: "vertical" }}
+              />
+            </p>
+            <p>
               <strong>Cena końcowa:</strong> {totalPrice} zł
             </p>
           </>
@@ -140,9 +151,6 @@ export default function TenderCardEntry({ subEntry, selectedCompany, onUpdate })
                 <p style={{ minHeight: "1em" }}></p>
               </>
             )}
-
-
-
           </>
         )}
       </div>
