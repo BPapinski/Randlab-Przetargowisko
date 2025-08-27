@@ -6,6 +6,7 @@ import TenderList from "../components/TenderList";
 import { AuthFetch } from "../utils/AuthFetch";
 import { useDebounce } from "../hooks/useDebounce";
 import Pagination from '@mui/material/Pagination';
+import Select from 'react-select';
 
 export default function IndexPage() {
   const location = useLocation();
@@ -19,10 +20,12 @@ export default function IndexPage() {
   // Nowe stany dla filtrów
   const [companies, setCompanies] = useState([]);
   const [selectedCompany, setSelectedCompany] = useState("");
+  const [selectedClient, setSelectedClient] = useState("");
   const [priceFrom, setPriceFrom] = useState("");
   const [priceTo, setPriceTo] = useState("");
-  const [status, setStatus] = useState(""); 
-  const [client, setClient] = useState(""); 
+  const [status, setStatus] = useState("");
+  const [client, setClient] = useState("");
+  const [clients, setClients] = useState([]);
 
 
   const [tempPriceFrom, setTempPriceFrom] = useState("");
@@ -45,6 +48,15 @@ export default function IndexPage() {
     }
   }, [debouncedSearch, urlSearchTerm, tendersPerPage]);
 
+  const companyOptions = [
+    { value: null, label: 'Wszystkie firmy' },
+    ...companies.map(company => ({
+      value: company,
+      label: company,
+    }))
+  ];
+
+
   // Synchronizacja stanu filtrów z URL (przy wejściu na stronę lub zmianie URL)
   useEffect(() => {
     setSelectedCompany(params.get("company") || "");
@@ -57,18 +69,28 @@ export default function IndexPage() {
 
   // Pobieranie firm do selecta
   useEffect(() => {
-    const fetchCompanies = async () => {
+    const fetchData = async () => {
       try {
-        const res = await AuthFetch("/api/companies/");
-        if (!res.ok) throw new Error();
-        const data = await res.json();
-        setCompanies(data);
-      } catch {
+        const [companiesRes, clientsRes] = await Promise.all([
+          AuthFetch("/api/companies/"),
+          AuthFetch("/api/clients/"),
+        ]);
+        const companiesData = await companiesRes.json();
+        const clientsData = await clientsRes.json();
+        setCompanies(companiesData);
+        setClients(clientsData);
+
+      } catch (error) {
+        console.error("Failed to fetch data:", error);
         setCompanies([]);
+        setClients([]);
       }
     };
-    fetchCompanies();
+    fetchData();
   }, []);
+
+
+
 
   const reverseSortMap = {
     created_at: "date_asc",
@@ -115,11 +137,27 @@ export default function IndexPage() {
     updateUrl({ ordering: sortMap[event.target.value], page: 1 });
   };
 
-  // Obsługa zmiany filtrów
-  const handleCompanyChange = (e) => {
-    setSelectedCompany(e.target.value);
-    updateUrl({ company: e.target.value, page: 1 });
+
+
+
+  const handleCompanyChangeMew = (selectedOption) => {
+    if (!selectedOption) {
+      setSelectedCompany(null);
+      updateUrl({ company: null, page: 1 });
+    }
+    else {
+      updateUrl({ company: selectedOption.value, page: 1 });
+      setSelectedCompany(selectedOption ? selectedOption.value : null);
+    }
   };
+
+
+  const handleClientChange = (e) => {
+    setSelectedClient(e.target.value);
+    updateUrl({ client: e.target.value, page: 1 });
+  }
+
+
   const handlePriceFromChange = (e) => {
     setPriceFrom(e.target.value);
     updateUrl({ price_from: e.target.value, page: 1 });
@@ -128,9 +166,7 @@ export default function IndexPage() {
     setPriceTo(e.target.value);
     updateUrl({ price_to: e.target.value, page: 1 });
   };
-  const handleClientChange = (e) => {
-    setClient(e.target.value);
-  };
+
 
   // Synchronizacja temp z URL
   useEffect(() => {
@@ -139,7 +175,7 @@ export default function IndexPage() {
   }, [priceFrom, priceTo]);
 
 
-  
+
   const handleSearchFilters = () => {
     updateUrl({
       price_from: tempPriceFrom,
@@ -182,6 +218,7 @@ export default function IndexPage() {
     fetchTenders();
   }, [fetchTenders]);
 
+
   return (
     <>
 
@@ -217,23 +254,27 @@ export default function IndexPage() {
                 onChange={e => setTempPriceTo(e.target.value)}
               />
             </div>
-
-            <h4>Firma</h4>
-            <select value={selectedCompany} onChange={handleCompanyChange}>
-              <option value="">Wybierz firmę</option>
-              {companies.map((company) => (
-                <option key={company} value={company}>
-                  {company}
+            <h4>Klient</h4>
+            <select value={selectedClient} onChange={handleClientChange}>
+              <option value="">Wybierz klienta</option>
+              {clients.map((client) => (
+                <option key={client} value={client}>
+                  {client}
                 </option>
               ))}
             </select>
+
+            <h4>Firma</h4>
+            <Select
+              options={companyOptions}
+              onChange={handleCompanyChangeMew} // Ta funkcja otrzyma obiekt { value, label }
+              placeholder="Wybierz firmę..."
+              isClearable // Dodaje przycisk do czyszczenia pola
+            />
+
             <button className="filters-submit-btn" onClick={handleSearchFilters} style={{ marginTop: "0.5rem" }}>
               Szukaj
             </button>
-
-            note - nie ma sensu szukac po margin bo to jest rozne dla kazdego tenderEntry - mozna to zrobic w filtruj stanowiska
-            tak samo cena developera - bez sensu co jak np dam max 1000zl - kazdy developer ma miec cene ponizej 1000 czy jeden
-
           </aside>
 
           <main className="tender-content">

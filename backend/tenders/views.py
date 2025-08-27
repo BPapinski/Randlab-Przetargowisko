@@ -91,3 +91,9 @@ class CompanyListView(APIView):
     def get(self, request):
         companies = TenderEntry.objects.values_list("company", flat=True).distinct()
         return Response(companies)
+
+
+class UniqueClientListView(APIView):
+    def get(self, request):
+        clients = Tender.objects.values_list("client", flat=True).distinct()
+        return Response(clients)

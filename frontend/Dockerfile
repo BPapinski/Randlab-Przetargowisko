@@ -8,5 +8,10 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install
 
+
+COPY . .
+
+# Buduj aplikację (jeśli to produkcja)
+RUN npm run build
 # default command
 CMD ["npm", "start"]
