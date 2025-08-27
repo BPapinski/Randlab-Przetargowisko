@@ -24,10 +24,40 @@ export default function TenderCard({ entry, selectedCompany, onToggleActive, onU
     if (onUpdateEntry) onUpdateEntry(updatedSubEntry, localEntry.id);
   };
 
+   const getStatusClass = (status) => {
+      switch (status) {
+          case "won":
+              return "status-won";
+          case "lost":
+              return "status-lost";
+          case "unresolved":
+              return "status-unresolved";
+          default:
+              return "";
+      }
+  };
+
   return (
     <div key={localEntry.id} className="tender-card">
       <div className="tender-header">
         <h2>{localEntry.name}</h2>
+         <p>
+          <span className="info-label">Klient:</span> {localEntry.client}
+        </p>
+        <p>
+          <span className="info-label">Status: </span>
+          <span className={`status-label ${getStatusClass(localEntry.status)}`}>
+            {localEntry.status === "won" ? "Wygrany" : localEntry.status === "lost" ? "Przegrany" : "Nierozstrzygnięty"}
+          </span>
+        </p>
+         {localEntry.implementation_link && (
+            <p>
+                <span className="info-label">Link do realizacji: </span>
+                <a href={localEntry.implementation_link} target="_blank" rel="noopener noreferrer">
+                    Link
+                </a>
+            </p>
+        )}
         <p className="dates">
           Utworzono: {new Date(localEntry.created_at).toLocaleString()} <br />
           Zaktualizowano: {new Date(localEntry.updated_at).toLocaleString()} <br />

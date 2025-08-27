@@ -8,6 +8,9 @@ export default function TenderCardEntry({ subEntry, selectedCompany, onUpdate })
     company: subEntry.company,
     developer_price: subEntry.developer_price,
     margin: subEntry.margin,
+    client: subEntry.client,
+    status: subEntry.status,
+    implementation_link: subEntry.implementation_link,
   });
   const [totalPrice, setTotalPrice] = useState(subEntry.total_price);
 

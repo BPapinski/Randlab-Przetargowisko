@@ -4,8 +4,8 @@ import "./styles/indexStyles.css";
 import Header from "../components/Header";
 import TenderList from "../components/TenderList";
 import { AuthFetch } from "../utils/AuthFetch";
-import {useDebounce} from "../hooks/useDebounce";
-  import Pagination from '@mui/material/Pagination';  
+import { useDebounce } from "../hooks/useDebounce";
+import Pagination from '@mui/material/Pagination';
 
 export default function IndexPage() {
   const location = useLocation();
@@ -21,10 +21,13 @@ export default function IndexPage() {
   const [selectedCompany, setSelectedCompany] = useState("");
   const [priceFrom, setPriceFrom] = useState("");
   const [priceTo, setPriceTo] = useState("");
+  const [status, setStatus] = useState(""); 
+  const [client, setClient] = useState(""); 
 
 
   const [tempPriceFrom, setTempPriceFrom] = useState("");
   const [tempPriceTo, setTempPriceTo] = useState("");
+  const debouncedClient = useDebounce(client, 500);
 
   // Parametry z URL
   const params = new URLSearchParams(location.search);
@@ -40,13 +43,15 @@ export default function IndexPage() {
     if (debouncedSearch !== urlSearchTerm) {
       updateUrl({ search: debouncedSearch, page: 1, page_size: tendersPerPage });
     }
-  }, [debouncedSearch, urlSearchTerm,   ]);
+  }, [debouncedSearch, urlSearchTerm, tendersPerPage]);
 
   // Synchronizacja stanu filtrów z URL (przy wejściu na stronę lub zmianie URL)
   useEffect(() => {
     setSelectedCompany(params.get("company") || "");
     setPriceFrom(params.get("price_from") || "");
     setPriceTo(params.get("price_to") || "");
+    setStatus(params.get("status") || "");
+    setClient(params.get("client") || "");
 
   }, [location.search]);
 
@@ -123,15 +128,18 @@ export default function IndexPage() {
     setPriceTo(e.target.value);
     updateUrl({ price_to: e.target.value, page: 1 });
   };
-
+  const handleClientChange = (e) => {
+    setClient(e.target.value);
+  };
 
   // Synchronizacja temp z URL
   useEffect(() => {
     setTempPriceFrom(priceFrom);
     setTempPriceTo(priceTo);
-
   }, [priceFrom, priceTo]);
 
+
+  
   const handleSearchFilters = () => {
     updateUrl({
       price_from: tempPriceFrom,
@@ -209,7 +217,7 @@ export default function IndexPage() {
                 onChange={e => setTempPriceTo(e.target.value)}
               />
             </div>
-            
+
             <h4>Firma</h4>
             <select value={selectedCompany} onChange={handleCompanyChange}>
               <option value="">Wybierz firmę</option>
@@ -255,23 +263,23 @@ export default function IndexPage() {
             )}
 
             {!isLoading && totalPages > 1 && (
-            <div className="pagination">
-              <Pagination
-            count={Number(totalPages)}
-            page={Number(currentPage)}
-            onChange={(e, page) => handlePageChange(page)}
-            showFirstButton
-            showLastButton
-            color="primary"
-            variant="outlined"
-            size="medium"
-            shape="rounded"
-            siblingCount={1}
-            boundaryCount={1}
-            sx={{ marginTop: '1rem' }}
-          />
-            </div>
-          )}
+              <div className="pagination">
+                <Pagination
+                  count={Number(totalPages)}
+                  page={Number(currentPage)}
+                  onChange={(e, page) => handlePageChange(page)}
+                  showFirstButton
+                  showLastButton
+                  color="primary"
+                  variant="outlined"
+                  size="medium"
+                  shape="rounded"
+                  siblingCount={1}
+                  boundaryCount={1}
+                  sx={{ marginTop: '1rem' }}
+                />
+              </div>
+            )}
           </main>
 
           <aside className="sidebar right-sidebar">
