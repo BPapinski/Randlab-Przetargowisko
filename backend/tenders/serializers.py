@@ -33,6 +33,9 @@ class TenderSerializer(serializers.ModelSerializer):
             "entries",
             "is_active",
             "price",
+            "client",
+            "status",
+            "implementation_link",
         ]
 
 
@@ -41,7 +44,7 @@ class TenderCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Tender
-        fields = ["id", "name", "entries"]
+        fields = ["id", "name", "entries", "client", "status", "implementation_link"]
 
     def create(self, validated_data):
         entries_data = validated_data.pop("entries")

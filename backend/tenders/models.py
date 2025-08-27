@@ -3,7 +3,22 @@ from django.utils import timezone
 
 
 class Tender(models.Model):
+    STATUS_CHOICES = [
+        ("won", "Won"),
+        ("lost", "Lost"),
+        ("unresolved", "Unresolved"),
+    ]
+
+    status = models.CharField(max_length=12, choices=STATUS_CHOICES, default="unresolved", verbose_name="Status")
     name = models.CharField(max_length=255, verbose_name="Tender name")
+    client = models.CharField(
+        max_length=255, verbose_name="Client", default="Unknown"  # Wartość domyślna dla istniejących rekordów
+    )
+
+    implementation_link = models.URLField(
+        max_length=200, blank=True, null=True, default=""  # Wartość domyślna dla istniejących rekordów
+    )
+
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Created at")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Updated at")
     is_active = models.BooleanField(default=True, verbose_name="Is active")
