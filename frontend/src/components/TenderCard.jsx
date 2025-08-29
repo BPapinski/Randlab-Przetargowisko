@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import TenderCardEntry from "./TenderCardEntry";
+import styles from "./styles/TenderEntryForm.module.css";
 
 export default function TenderCard({ entry, selectedCompany, onToggleActive, onUpdateEntry }) {
   const [localEntry, setLocalEntry] = useState(entry);
@@ -12,7 +13,6 @@ export default function TenderCard({ entry, selectedCompany, onToggleActive, onU
     margin: "",
     description: ""
   });
-
 
   // Oblicz wartość całkowitą przy każdej zmianie wpisów
   useEffect(() => {
@@ -46,22 +46,51 @@ export default function TenderCard({ entry, selectedCompany, onToggleActive, onU
     }
   };
 
-
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const requestData = {
-      position: formData.position,
-      company: formData.company,
-      developer_price: parseFloat(formData.developer_price),
-      margin: parseFloat(formData.margin),
-      description: formData.description,
-    };
-    alert(`Symulacja wysyłania requestu do http://127.0.0.1:8000/api/tender/${localEntry.id}/entries/\nDane: ${JSON.stringify(requestData, null, 2)}`);
+    try {
+      const response = await fetch(`http://127.0.0.1:8000/api/tender/${localEntry.id}/entries/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          position: formData.position,
+          company: formData.company,
+          developer_price: parseFloat(formData.developer_price),
+          margin: parseFloat(formData.margin),
+          description: formData.description,
+        }),
+      });
+
+      if (response.ok) {
+        const newEntry = await response.json();
+        setLocalEntry({
+          ...localEntry,
+          entries: [...localEntry.entries, newEntry],
+          updated_at: new Date().toISOString(),
+        });
+        setFormData({
+          position: "",
+          company: "",
+          developer_price: "",
+          margin: "",
+          description: ""
+        });
+        setShowForm(false);
+      } else {
+        console.error("Failed to add new entry:", response.statusText);
+        alert("Błąd podczas dodawania wpisu: " + response.statusText);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Wystąpił błąd podczas wysyłania żądania: " + error.message);
+    }
   };
 
   return (
@@ -125,16 +154,18 @@ export default function TenderCard({ entry, selectedCompany, onToggleActive, onU
         )}
       </div>
 
-      <div className="add-entry-section">
+      <div className={styles.addEntryButtonContainer}>
         <button
-          className="add-entry-btn"
+          className={styles.addEntryBtn}
           onClick={() => setShowForm(!showForm)}
         >
-          {showForm ? "Anuluj" : "Dodaj nowy wpis"}
+          {showForm ? "Anuluj" : "Nowa pozycja"}
         </button>
-        {showForm && (
-          <form onSubmit={handleSubmit} className="add-entry-form">
-            <div className="form-group">
+      </div>
+      {showForm && (
+        <div className={styles.addEntrySection}>
+          <form onSubmit={handleSubmit} className={styles.addEntryForm}>
+            <div className={styles.formGroup}>
               <label>Pozycja:</label>
               <input
                 type="text"
@@ -144,7 +175,7 @@ export default function TenderCard({ entry, selectedCompany, onToggleActive, onU
                 required
               />
             </div>
-            <div className="form-group">
+            <div className={styles.formGroup}>
               <label>Firma:</label>
               <input
                 type="text"
@@ -154,7 +185,7 @@ export default function TenderCard({ entry, selectedCompany, onToggleActive, onU
                 required
               />
             </div>
-            <div className="form-group">
+            <div className={styles.formGroup}>
               <label>Cena developera:</label>
               <input
                 type="number"
@@ -166,7 +197,7 @@ export default function TenderCard({ entry, selectedCompany, onToggleActive, onU
                 step="0.01"
               />
             </div>
-            <div className="form-group">
+            <div className={styles.formGroup}>
               <label>Marża (%):</label>
               <input
                 type="number"
@@ -178,7 +209,7 @@ export default function TenderCard({ entry, selectedCompany, onToggleActive, onU
                 step="0.01"
               />
             </div>
-            <div className="form-group">
+            <div className={styles.formGroup}>
               <label>Opis:</label>
               <textarea
                 name="description"
@@ -187,12 +218,12 @@ export default function TenderCard({ entry, selectedCompany, onToggleActive, onU
                 required
               />
             </div>
-            <button type="submit" className="submit-entry-btn">
-              Dodaj wpis
+            <button type="submit" className={styles.submitEntryBtn}>
+              Nowa pozycja
             </button>
           </form>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }
