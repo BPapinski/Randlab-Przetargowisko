@@ -3,7 +3,7 @@ import { AuthFetch } from '../utils/AuthFetch';
 import '../pages/styles/TenderListStyles.css';
 import TenderCard from './TenderCard';
 
-export default function TenderList({ tenders, error, onTenderUpdate, selectedCompany }) {
+export default function TenderList({ tenders, error, onTenderUpdate, selectedCompany, companies }) {
   const [localTenders, setLocalTenders] = useState(tenders);
 
   useEffect(() => {
@@ -67,6 +67,7 @@ export default function TenderList({ tenders, error, onTenderUpdate, selectedCom
           selectedCompany={selectedCompany}
           onToggleActive={handleToggleActive}
           onUpdateEntry={handleUpdateEntry} // <- przekazujemy callback
+          companies={companies}
         />
       ))}
     </>

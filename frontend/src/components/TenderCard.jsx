@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import TenderCardEntry from "./TenderCardEntry";
 import styles from "./styles/TenderEntryForm.module.css";
 
-export default function TenderCard({ entry, selectedCompany, onToggleActive, onUpdateEntry }) {
+export default function TenderCard({ entry, selectedCompany, onToggleActive, onUpdateEntry, companies }) {
   const [localEntry, setLocalEntry] = useState(entry);
   const [totalValue, setTotalValue] = useState(entry.price);
   const [showForm, setShowForm] = useState(false);
@@ -13,6 +13,8 @@ export default function TenderCard({ entry, selectedCompany, onToggleActive, onU
     margin: "",
     description: ""
   });
+  const [companySuggestions, setCompanySuggestions] = useState([]);
+  const [isSuggestionsVisible, setIsSuggestionsVisible] = useState(false);
 
   // Oblicz wartość całkowitą przy każdej zmianie wpisów
   useEffect(() => {
@@ -49,6 +51,41 @@ export default function TenderCard({ entry, selectedCompany, onToggleActive, onU
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+
+    if (name === "company") {
+      console.log("Company input value:", value); // Debug log
+      console.log("Available companies:", companies); // Debug log
+      if (!value.trim()) {
+        console.log("Empty input, setting suggestions to all companies");
+        setCompanySuggestions(companies.filter(company => typeof company === 'string')); // Show all valid companies
+        setIsSuggestionsVisible(true);
+      } else {
+        const filtered = companies.filter((company) =>
+          typeof company === 'string' && company.toLowerCase().includes(value.toLowerCase().trim())
+        );
+        console.log("Filtered suggestions:", filtered); // Debug log
+        setCompanySuggestions(filtered);
+        setIsSuggestionsVisible(true);
+      }
+    }
+  };
+
+  const handleCompanySelect = (company) => {
+    console.log("Selected company:", company); // Debug log
+    setFormData((prev) => ({ ...prev, company }));
+    setCompanySuggestions([]);
+    setIsSuggestionsVisible(false);
+  };
+
+  const handleInputFocus = () => {
+    console.log("Input focused, companies:", companies); // Debug log
+    setCompanySuggestions(companies.filter(company => typeof company === 'string')); // Show all valid companies
+    setIsSuggestionsVisible(true);
+  };
+
+  const handleInputBlur = () => {
+    console.log("Input blurred, hiding suggestions"); // Debug log
+    setTimeout(() => setIsSuggestionsVisible(false), 200);
   };
 
   const handleSubmit = async (e) => {
@@ -82,6 +119,8 @@ export default function TenderCard({ entry, selectedCompany, onToggleActive, onU
           margin: "",
           description: ""
         });
+        setCompanySuggestions([]);
+        setIsSuggestionsVisible(false);
         setShowForm(false);
       } else {
         console.error("Failed to add new entry:", response.statusText);
@@ -159,7 +198,7 @@ export default function TenderCard({ entry, selectedCompany, onToggleActive, onU
           className={styles.addEntryBtn}
           onClick={() => setShowForm(!showForm)}
         >
-          {showForm ? "Anuluj" : "Nowa pozycja"}
+          {showForm ? "Anuluj" : "Dodaj nowy wpis"}
         </button>
       </div>
       {showForm && (
@@ -177,13 +216,34 @@ export default function TenderCard({ entry, selectedCompany, onToggleActive, onU
             </div>
             <div className={styles.formGroup}>
               <label>Firma:</label>
-              <input
-                type="text"
-                name="company"
-                value={formData.company}
-                onChange={handleInputChange}
-                required
-              />
+              <div className={styles.companyInputWrapper}>
+                <input
+                  type="text"
+                  name="company"
+                  value={formData.company}
+                  onChange={handleInputChange}
+                  onFocus={handleInputFocus}
+                  onBlur={handleInputBlur}
+                  required
+                />
+                {isSuggestionsVisible && (
+                  <ul className={styles.suggestionsList}>
+                    {companySuggestions.length > 0 ? (
+                      companySuggestions.map((company) => (
+                        <li
+                          key={company}
+                          className={styles.suggestionItem}
+                          onClick={() => handleCompanySelect(company)}
+                        >
+                          {company}
+                        </li>
+                      ))
+                    ) : (
+                      <li className={styles.suggestionItem}>Brak pasujących firm</li>
+                    )}
+                  </ul>
+                )}
+              </div>
             </div>
             <div className={styles.formGroup}>
               <label>Cena developera:</label>
@@ -219,7 +279,7 @@ export default function TenderCard({ entry, selectedCompany, onToggleActive, onU
               />
             </div>
             <button type="submit" className={styles.submitEntryBtn}>
-              Nowa pozycja
+              Dodaj wpis
             </button>
           </form>
         </div>

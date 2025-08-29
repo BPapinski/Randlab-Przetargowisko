@@ -315,6 +315,7 @@ export default function IndexPage() {
                 tenders={tenders}
                 error={error}
                 selectedCompany={selectedCompany}
+                companies={companies}
               />
             )}
 
