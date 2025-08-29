@@ -2,7 +2,7 @@ from django.db.models import DecimalField, Q, Sum, Value
 from django.db.models.functions import Coalesce
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
-from rest_framework import generics, permissions
+from rest_framework import generics, permissions, status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.filters import OrderingFilter
 from rest_framework.permissions import IsAuthenticated
@@ -97,3 +97,17 @@ class UniqueClientListView(APIView):
     def get(self, request):
         clients = Tender.objects.values_list("client", flat=True).distinct()
         return Response(clients)
+
+
+@api_view(["POST"])
+def add_tender_entry(request, tender_id):
+    """
+    Tworzy nowe TenderEntry przypisane do konkretnego Tender.
+    """
+    tender = get_object_or_404(Tender, id=tender_id)
+
+    serializer = TenderEntrySerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save(tender=tender)  # tender przekazujemy ręcznie
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

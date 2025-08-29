@@ -7,6 +7,7 @@ from .views import (
     TenderEntryUpdateView,
     TenderListAPIView,
     UniqueClientListView,
+    add_tender_entry,
     toggle_tender_active,
 )
 
@@ -21,4 +22,5 @@ urlpatterns = [
     path("companies/", CompanyListView.as_view(), name="company-list"),
     path("clients/", UniqueClientListView.as_view(), name="client-list"),
     path("tender-entries/<int:pk>/", TenderEntryUpdateView.as_view(), name="tender-entry-update"),
+    path("tender/<int:tender_id>/entries/", add_tender_entry, name="add-tender-entry"),
 ]
