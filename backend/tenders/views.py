@@ -26,6 +26,10 @@ class TenderListAPIView(generics.ListAPIView):
         ).prefetch_related("entries")
         params = self.request.query_params
 
+        client = params.get("client")
+        if client:
+            qs = qs.filter(client__iexact=client)
+
         # filtracja po cenie
         price_from = params.get("price_from")
         price_to = params.get("price_to")
