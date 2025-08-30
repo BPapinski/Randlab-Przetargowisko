@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { AuthFetch } from '../utils/AuthFetch';
 import styles from '../pages/styles/FormStyles.module.css';
 import { useNavigate } from 'react-router-dom';
-import {useEffect} from 'react';
+import { useEffect } from 'react';
 
 // Komponent z ikoną Excela w formacie SVG
 const ExcelIcon = () => (
@@ -16,6 +16,9 @@ const ExcelIcon = () => (
 );
 
 function TenderForm() {
+    const [status, setStatus] = useState('unresolved'); // domyślny status
+    const [client, setClient] = useState('');
+    const [implementationLink, setImplementationLink] = useState('');
     const [name, setName] = useState('');
     const [entries, setEntries] = useState([
         { position: '', company: '', developer_price: '', margin: '' },
@@ -26,7 +29,7 @@ function TenderForm() {
     useEffect(() => {
         const checkAuth = async () => {
             try {
-                const token = localStorage.getItem('access_token'); 
+                const token = localStorage.getItem('access_token');
                 if (!token) {
                     console.log('No token found, redirecting to /login');
                     navigate('/login');
@@ -78,6 +81,9 @@ function TenderForm() {
         try {
             const payload = {
                 name,
+                status,
+                client,
+                implementation_link: implementationLink,
                 entries: entries.map((entry) => ({
                     ...entry,
                     developer_price: parseFloat(entry.developer_price),
@@ -117,6 +123,39 @@ function TenderForm() {
                         onChange={(e) => setName(e.target.value)}
                         className={styles.input}
                         required
+                    />
+                </div>
+                <div className={styles.fieldGroup}>
+                    <label className={styles.label}>Status:</label>
+                    <select
+                        value={status}
+                        onChange={(e) => setStatus(e.target.value)}
+                        className={styles.input}
+                        required
+                    >
+                        <option value="unresolved">Unresolved</option>
+                        <option value="won">Won</option>
+                        <option value="lost">Lost</option>
+                    </select>
+                </div>
+
+                <div className={styles.fieldGroup}>
+                    <label className={styles.label}>Klient:</label>
+                    <input
+                        type="text"
+                        value={client}
+                        onChange={(e) => setClient(e.target.value)}
+                        className={styles.input}
+                    />
+                </div>
+
+                <div className={styles.fieldGroup}>
+                    <label className={styles.label}>Link do implementacji (opcjonalny):</label>
+                    <input
+                        type="url"
+                        value={implementationLink}
+                        onChange={(e) => setImplementationLink(e.target.value)}
+                        className={styles.input}
                     />
                 </div>
 
@@ -173,19 +212,19 @@ function TenderForm() {
                         </button>
                     </div>
                 ))}
-                
+
                 <div className={styles.formActions}>
                     <button type="button" onClick={addEntry} className={styles.addBtn}>
                         Dodaj pozycję
                     </button>
                 </div>
-                
+
                 <div className={styles.submitActions}>
                     <button type="submit" className={styles.submitBtn}>
                         Zapisz przetarg
                     </button>
                     <button type="button" onClick={handleImportFromExcel} className={styles.importBtn}>
-                         <ExcelIcon />
+                        <ExcelIcon />
                         Importuj z Excela
                     </button>
                 </div>
