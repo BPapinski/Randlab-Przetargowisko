@@ -4,7 +4,7 @@ from django.urls import path
 from .views import (
     CompanyListView,
     TenderCreateView,
-    TenderEntryUpdateView,
+    TenderEntryRetrieveUpdateDestroyView,
     TenderListAPIView,
     UniqueClientListView,
     add_tender_entry,
@@ -21,6 +21,10 @@ urlpatterns = [
     ),
     path("companies/", CompanyListView.as_view(), name="company-list"),
     path("clients/", UniqueClientListView.as_view(), name="client-list"),
-    path("tender-entries/<int:pk>/", TenderEntryUpdateView.as_view(), name="tender-entry-update"),
+    path(
+        "tender-entries/<int:pk>/",
+        TenderEntryRetrieveUpdateDestroyView.as_view(),
+        name="tender-entry-detail",
+    ),
     path("tender/<int:tender_id>/entries/", add_tender_entry, name="add-tender-entry"),
 ]

@@ -9,14 +9,24 @@ class Tender(models.Model):
         ("unresolved", "Unresolved"),
     ]
 
-    status = models.CharField(max_length=12, choices=STATUS_CHOICES, default="unresolved", verbose_name="Status")
+    status = models.CharField(
+        max_length=12,
+        choices=STATUS_CHOICES,
+        default="unresolved",
+        verbose_name="Status",
+    )
     name = models.CharField(max_length=255, verbose_name="Tender name")
     client = models.CharField(
-        max_length=255, verbose_name="Client", default="Unknown"  # Wartość domyślna dla istniejących rekordów
+        max_length=255,
+        verbose_name="Client",
+        default="Unknown",  # Wartość domyślna dla istniejących rekordów
     )
 
     implementation_link = models.URLField(
-        max_length=200, blank=True, null=True, default=""  # Wartość domyślna dla istniejących rekordów
+        max_length=200,
+        blank=True,
+        null=True,
+        default="",  # Wartość domyślna dla istniejących rekordów
     )
 
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Created at")

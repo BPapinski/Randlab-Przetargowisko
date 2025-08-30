@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { AuthFetch } from "../utils/AuthFetch";
-import styles from './styles/TenderCardEntry.module.css'
+import styles from './styles/TenderCardEntry.module.css';
 
 export default function TenderCardEntry({ subEntry, selectedCompany, onUpdate }) {
   const [expandedDescription, setExpandedDescription] = useState(false);
@@ -17,7 +17,6 @@ export default function TenderCardEntry({ subEntry, selectedCompany, onUpdate })
   });
   const [totalPrice, setTotalPrice] = useState(subEntry.total_price);
 
-  // Oblicz cenę końcową przy każdej zmianie developer_price lub margin
   useEffect(() => {
     const devPrice = parseFloat(formData.developer_price) || 0;
     const margin = parseFloat(formData.margin) || 0;
@@ -37,7 +36,6 @@ export default function TenderCardEntry({ subEntry, selectedCompany, onUpdate })
         total_price: totalPrice,
       };
 
-      // usuń updated_at z obiektu
       delete updatedEntry.updated_at;
 
       const res = await AuthFetch(`/api/tender-entries/${subEntry.id}/`, {
@@ -55,6 +53,40 @@ export default function TenderCardEntry({ subEntry, selectedCompany, onUpdate })
     }
   };
 
+  const handleEntryDelete = async (entryId) => {
+    if (window.confirm("Czy na pewno chcesz usunąć ten wpis?")) {
+      try {
+        const res = await AuthFetch(`/api/tender-entries/${entryId}/`, {
+          method: "DELETE",
+        });
+
+        // 💡 Sprawdzaj, czy odpowiedź jest poprawna (status 204 No Content lub 200 OK), a następnie wywołaj onUpdate
+        if (res.ok) {
+          if (onUpdate) {
+            onUpdate({ id: entryId, deleted: true });
+          }
+        } else {
+          throw new Error("Błąd podczas usuwania wpisu");
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+  };
+
+  const handleCancel = () => {
+    setIsEditing(false);
+    setFormData({
+      position: subEntry.position,
+      company: subEntry.company,
+      developer_price: subEntry.developer_price,
+      margin: subEntry.margin,
+      client: subEntry.client,
+      status: subEntry.status,
+      implementation_link: subEntry.implementation_link,
+      description: subEntry.description,
+    });
+  };
 
   return (
     <div
@@ -135,7 +167,6 @@ export default function TenderCardEntry({ subEntry, selectedCompany, onUpdate })
                     Zwiń ▲
                   </span>
                 </strong>
-
                 <p>{subEntry.description || "Brak dodatkowego opisu."}</p>
               </>
             ) : (
@@ -168,7 +199,15 @@ export default function TenderCardEntry({ subEntry, selectedCompany, onUpdate })
             Edytuj
           </button>
         )}
-        <button className="delete-btn">Usuń</button>
+        {isEditing ? (
+          <button className="canceledit-btn action-btn " onClick={handleCancel}>
+            Anuluj
+          </button>
+        ) : (
+          <button className="delete-btn action-btn" onClick={() => handleEntryDelete(subEntry.id)}>
+            Usuń
+          </button>
+        )}
       </div>
     </div>
   );

@@ -69,7 +69,7 @@ class TenderCreateView(generics.CreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
 
-class TenderEntryUpdateView(generics.UpdateAPIView):
+class TenderEntryRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     queryset = TenderEntry.objects.all()
     serializer_class = TenderEntrySerializer
 

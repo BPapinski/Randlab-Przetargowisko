@@ -15,8 +15,7 @@ export default function TenderCard({ entry, selectedCompany, onToggleActive, onU
   });
   const [companySuggestions, setCompanySuggestions] = useState([]);
   const [isSuggestionsVisible, setIsSuggestionsVisible] = useState(false);
-
-  // Oblicz wartość całkowitą przy każdej zmianie wpisów
+  
   useEffect(() => {
     const sum = localEntry.entries.reduce(
       (acc, e) => acc + parseFloat(e.total_price || 0),
@@ -26,13 +25,26 @@ export default function TenderCard({ entry, selectedCompany, onToggleActive, onU
   }, [localEntry.entries]);
 
   const handleUpdateEntry = (updatedSubEntry) => {
-    const updatedEntries = localEntry.entries.map((e) =>
-      e.id === updatedSubEntry.id ? updatedSubEntry : e
-    );
-    const updatedLocalEntry = { ...localEntry, entries: updatedEntries, updated_at: updatedSubEntry.updated_at };
-    setLocalEntry(updatedLocalEntry);
+    if (updatedSubEntry.deleted) {
+      // delete
+      const updatedEntries = localEntry.entries.filter((e) => e.id !== updatedSubEntry.id);
+      setLocalEntry({
+        ...localEntry,
+        entries: updatedEntries,
+        updated_at: new Date().toISOString(),
+      });
+    } else {
+      //  update
+      const updatedEntries = localEntry.entries.map((e) =>
+        e.id === updatedSubEntry.id ? updatedSubEntry : e
+      );
+      const updatedLocalEntry = { ...localEntry, entries: updatedEntries, updated_at: updatedSubEntry.updated_at };
+      setLocalEntry(updatedLocalEntry);
+    }
 
-    if (onUpdateEntry) onUpdateEntry(updatedSubEntry, localEntry.id);
+    if (onUpdateEntry && !updatedSubEntry.deleted) {
+      onUpdateEntry(updatedSubEntry, localEntry.id);
+    }
   };
 
   const getStatusClass = (status) => {
@@ -53,17 +65,13 @@ export default function TenderCard({ entry, selectedCompany, onToggleActive, onU
     setFormData((prev) => ({ ...prev, [name]: value }));
 
     if (name === "company") {
-      console.log("Company input value:", value); // Debug log
-      console.log("Available companies:", companies); // Debug log
       if (!value.trim()) {
-        console.log("Empty input, setting suggestions to all companies");
-        setCompanySuggestions(companies.filter(company => typeof company === 'string')); // Show all valid companies
+        setCompanySuggestions(companies.filter(company => typeof company === 'string')); 
         setIsSuggestionsVisible(true);
       } else {
         const filtered = companies.filter((company) =>
           typeof company === 'string' && company.toLowerCase().includes(value.toLowerCase().trim())
         );
-        console.log("Filtered suggestions:", filtered); // Debug log
         setCompanySuggestions(filtered);
         setIsSuggestionsVisible(true);
       }
@@ -71,20 +79,17 @@ export default function TenderCard({ entry, selectedCompany, onToggleActive, onU
   };
 
   const handleCompanySelect = (company) => {
-    console.log("Selected company:", company); // Debug log
     setFormData((prev) => ({ ...prev, company }));
     setCompanySuggestions([]);
     setIsSuggestionsVisible(false);
   };
 
   const handleInputFocus = () => {
-    console.log("Input focused, companies:", companies); // Debug log
     setCompanySuggestions(companies.filter(company => typeof company === 'string')); // Show all valid companies
     setIsSuggestionsVisible(true);
   };
 
   const handleInputBlur = () => {
-    console.log("Input blurred, hiding suggestions"); // Debug log
     setTimeout(() => setIsSuggestionsVisible(false), 200);
   };
 
@@ -124,7 +129,7 @@ export default function TenderCard({ entry, selectedCompany, onToggleActive, onU
         setShowForm(false);
       } else {
         console.error("Failed to add new entry:", response.statusText);
-        alert("Błąd podczas dodawania wpisu: " + response.statusText);
+        alert("Błąd podczas dodawania developera: " + response.statusText);
       }
     } catch (error) {
       console.error("Error:", error);
@@ -162,7 +167,7 @@ export default function TenderCard({ entry, selectedCompany, onToggleActive, onU
         </p>
         <div className="tender-actions">
           <button
-            className="delete-tender-btn"
+            className="delete-tender-btn action-btn"
             onClick={() => onToggleActive(localEntry.id)}
           >
             Usuń przetarg
@@ -198,7 +203,7 @@ export default function TenderCard({ entry, selectedCompany, onToggleActive, onU
           className={styles.addEntryBtn}
           onClick={() => setShowForm(!showForm)}
         >
-          {showForm ? "Anuluj" : "Dodaj nowy wpis"}
+          {showForm ? "Anuluj" : "Dodaj nowego developera"}
         </button>
       </div>
       {showForm && (
@@ -279,7 +284,7 @@ export default function TenderCard({ entry, selectedCompany, onToggleActive, onU
               />
             </div>
             <button type="submit" className={styles.submitEntryBtn}>
-              Dodaj wpis
+              Dodaj developera
             </button>
           </form>
         </div>
