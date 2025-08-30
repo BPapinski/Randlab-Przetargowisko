@@ -64,10 +64,6 @@ export default function IndexPage() {
   }))
 ];
 
-
-
-
-
   // Synchronizacja stanu filtrów z URL (przy wejściu na stronę lub zmianie URL)
   useEffect(() => {
     setSelectedCompany(params.get("company") || "");

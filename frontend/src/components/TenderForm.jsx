@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react'; // Dodajemy useRef
 import { AuthFetch } from '../utils/AuthFetch';
 import styles from '../pages/styles/FormStyles.module.css';
 import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
+import CreatableSelect from 'react-select/creatable';
+
 
 // Komponent z ikoną Excela w formacie SVG
 const ExcelIcon = () => (
@@ -20,11 +22,55 @@ function TenderForm() {
     const [client, setClient] = useState('');
     const [implementationLink, setImplementationLink] = useState('');
     const [name, setName] = useState('');
+    const [companies, setCompanies] = useState([]);
+    const [clients, setClients] = useState([]);
     const [entries, setEntries] = useState([
-        { position: '', company: '', developer_price: '', margin: '' },
+        { position: '', company: '', developer_price: '', margin: '', description: '' }, // Dodajemy 'description'
     ]);
     const [message, setMessage] = useState(null);
     const navigate = useNavigate();
+    const [company, setCompany] = useState(null); // Nowy stan dla firmy
+
+    // Refy dla textarea, aby móc dynamicznie zmieniać ich wysokość
+    const textareaRefs = useRef([]);
+
+
+    const clientOptions = [
+    { value: null, label: 'Wszyscy klienci' },
+    ...clients.map(client => ({
+        value: client,
+        label: client,
+    }))
+    ];
+
+    const companyOptions = [
+    ...companies.map(company => ({
+        value: company,
+        label: company,
+    }))
+    ];
+
+    useEffect(() => {
+        const fetchData = async () => {
+          try {
+            const [companiesRes, clientsRes] = await Promise.all([
+              AuthFetch("/api/companies/"),
+              AuthFetch("/api/clients/"),
+            ]);
+            const companiesData = await companiesRes.json();
+            const clientsData = await clientsRes.json();
+            setCompanies(companiesData);
+            setClients(clientsData);
+    
+          } catch (error) {
+            console.error("Failed to fetch data:", error);
+            setCompanies([]);
+            setClients([]);
+          }
+        };
+        fetchData();
+    }, []);
+
 
     useEffect(() => {
         const checkAuth = async () => {
@@ -45,6 +91,7 @@ function TenderForm() {
                 if (response.status === 401 || response.status === 400) {
                     console.log('Invalid or missing token, redirecting to /login');
                     navigate('/login');
+                    // return; // Niepotrzebne, navigate już przekierowuje
                 }
             } catch (error) {
                 console.error('Auth check error:', error);
@@ -53,23 +100,56 @@ function TenderForm() {
         };
         checkAuth();
     }, [navigate]);
+    const adjustTextareaHeight = (textarea) => {
+        if (textarea) {
+            textarea.style.height = 'auto'; 
+            textarea.style.height = textarea.scrollHeight + 'px';
+        }
+    };
 
     const handleEntryChange = (index, field, value) => {
         const updated = [...entries];
         updated[index][field] = value;
         setEntries(updated);
+        if (field === 'description') {
+            adjustTextareaHeight(textareaRefs.current[index]);
+        }
+    };
+
+    const handleCompanyChange = (selectedOption) => {
+        if (selectedOption) {
+            setCompany(selectedOption.value);
+        } else {
+            setCompany(null);
+        }
     };
 
     const addEntry = () => {
         setEntries([
             ...entries,
-            { position: '', company: '', developer_price: '', margin: '' },
+            { position: '', company: '', developer_price: '', margin: '', description: '' }, 
         ]);
+        setTimeout(() => {
+            const lastTextarea = textareaRefs.current[textareaRefs.current.length - 1];
+            if (lastTextarea) {
+                lastTextarea.focus();
+                adjustTextareaHeight(lastTextarea); 
+            }
+        }, 0);
     };
 
     const removeEntry = (index) => {
         const updated = entries.filter((_, i) => i !== index);
         setEntries(updated);
+        textareaRefs.current.splice(index, 1);
+    };
+
+    const handleClientChange = (selectedOption) => {
+        if (selectedOption) {
+        setClient(selectedOption.value);
+        } else {
+        setClient(null);
+        }
     };
 
     const handleImportFromExcel = () => {
@@ -100,7 +180,11 @@ function TenderForm() {
             if (response.ok) {
                 setMessage('Przetarg został utworzony!');
                 setName('');
-                setEntries([{ position: '', company: '', developer_price: '', margin: '' }]);
+                setClient('');
+                setImplementationLink(''); 
+                setStatus('unresolved');
+                setEntries([{ position: '', company: '', developer_price: '', margin: '', description: '' }]);
+                textareaRefs.current = [];
             } else {
                 const data = await response.json();
                 setMessage(`Błąd: ${data.detail || 'Nie udało się zapisać przetargu.'}`);
@@ -126,6 +210,16 @@ function TenderForm() {
                     />
                 </div>
                 <div className={styles.fieldGroup}>
+                    <label className={styles.label}>Klient:</label>
+                    <CreatableSelect
+                        options={clientOptions}
+                        placeholder="Wybierz lub wpisz klienta..."
+                        isClearable
+                        onChange={handleClientChange}
+                        value={client ? { value: client, label: client } : null}
+                    />
+                </div>
+                <div className={styles.fieldGroup}>
                     <label className={styles.label}>Status:</label>
                     <select
                         value={status}
@@ -133,22 +227,13 @@ function TenderForm() {
                         className={styles.input}
                         required
                     >
-                        <option value="unresolved">Unresolved</option>
-                        <option value="won">Won</option>
-                        <option value="lost">Lost</option>
+                        <option value="unresolved">Nierozstrzygnięty</option>
+                        <option value="won">Wygrany</option>
+                        <option value="lost">Przegrany</option>
                     </select>
                 </div>
 
-                <div className={styles.fieldGroup}>
-                    <label className={styles.label}>Klient:</label>
-                    <input
-                        type="text"
-                        value={client}
-                        onChange={(e) => setClient(e.target.value)}
-                        className={styles.input}
-                    />
-                </div>
-
+            
                 <div className={styles.fieldGroup}>
                     <label className={styles.label}>Link do implementacji (opcjonalny):</label>
                     <input
@@ -174,13 +259,15 @@ function TenderForm() {
                             </div>
                             <div className={styles.fieldGroup}>
                                 <label className={styles.label}>Firma:</label>
-                                <input
-                                    type="text"
-                                    value={entry.company}
-                                    onChange={(e) => handleEntryChange(index, 'company', e.target.value)}
-                                    className={styles.input}
-                                    required
+                                
+                                <CreatableSelect
+                                    options={companyOptions}
+                                    placeholder="Wybierz/wpisz firme..."
+                                    isClearable
+                                    onChange={handleCompanyChange}
+                                    value={entry.company ? { value: entry.company, label: entry.company } : null}
                                 />
+                                
                             </div>
                             <div className={styles.fieldGroup}>
                                 <label className={styles.label}>Cena dewelopera:</label>
@@ -199,6 +286,17 @@ function TenderForm() {
                                     value={entry.margin}
                                     onChange={(e) => handleEntryChange(index, 'margin', e.target.value)}
                                     className={styles.input}
+                                    required
+                                />
+                            </div>
+                            <div className={`${styles.fieldGroup} ${styles.descriptionField}`}> 
+                                <label className={styles.label}>Opis stanowiska:</label>
+                                <textarea
+                                    ref={el => (textareaRefs.current[index] = el)} 
+                                    value={entry.description} 
+                                    onChange={(e) => handleEntryChange(index, 'description', e.target.value)}
+                                    className={styles.textareaAutosize} 
+                                    rows="1" 
                                     required
                                 />
                             </div>

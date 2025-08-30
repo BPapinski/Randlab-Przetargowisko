@@ -44,6 +44,27 @@
   background-color: #FFFFFF;
 }
 
+/* Nowy styl dla textarea, który będzie automatycznie dopasowywał wysokość */
+.textareaAutosize {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #BDC3C7;
+  border-radius: 6px;
+  background-color: #ECF0F1;
+  color: #2C3E50;
+  box-sizing: border-box;
+  resize: none; /* Wyłączamy domyślne resize */
+  overflow: hidden; /* Ukrywamy scrollbar */
+  min-height: 50px; /* Minimalna wysokość, aby była większa niż input */
+  line-height: 1.5; /* Dla lepszego czytania */
+}
+
+.textareaAutosize:focus {
+  outline: none;
+  border-color: #3498DB;
+  background-color: #FFFFFF;
+}
+
 .entryBox {
   background-color: #F9F9F9;
   border: 1px solid #BDC3C7;
@@ -96,6 +117,11 @@
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 1rem;
   margin-bottom: 1rem;
+}
+
+/* Dodajemy ten styl, aby pole opisu zajmowało więcej miejsca */
+.descriptionField {
+    grid-column: 1 / -1; /* Rozciągnij na całą szerokość siatki */
 }
 
 .entryFields .fieldGroup {
@@ -151,3 +177,4 @@
     width: 20px;
     height: 20px;
 }
+
