@@ -193,16 +193,6 @@ export default function IndexPage() {
     }
   };
 
-  const handlePriceFromChange = (e) => {
-    setPriceFrom(e.target.value);
-    updateUrl({ price_from: e.target.value, page: 1 });
-  };
-
-  const handlePriceToChange = (e) => {
-    setPriceTo(e.target.value);
-    updateUrl({ price_to: e.target.value, page: 1 });
-  };
-
   useEffect(() => {
     updateUrl({
       price_from: debouncedPriceFrom,
@@ -215,14 +205,6 @@ export default function IndexPage() {
     setTempPriceFrom(priceFrom);
     setTempPriceTo(priceTo);
   }, [priceFrom, priceTo]);
-
-  const handleSearchFilters = () => {
-    updateUrl({
-      price_from: tempPriceFrom,
-      price_to: tempPriceTo,
-      page: 1,
-    });
-  };
 
   const handleStatusChange = (event) => {
     setStatusFilter(event.target.value);

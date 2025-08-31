@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
 import TenderCardEntry from "./TenderCardEntry";
 import styles from "./styles/TenderEntryForm.module.css";
+import headerStyles from "./styles/TenderCardStyles/TenderCardHeader.module.css"
 
 export default function TenderCard({ entry, selectedCompany, onToggleActive, onUpdateEntry, companies }) {
-  const [localEntry, setLocalEntry] = useState(entry);
+  const [localTender, setlocalTender] = useState(entry);
   const [totalValue, setTotalValue] = useState(entry.price);
   const [showForm, setShowForm] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     position: "",
     company: "",
@@ -15,35 +17,62 @@ export default function TenderCard({ entry, selectedCompany, onToggleActive, onU
   });
   const [companySuggestions, setCompanySuggestions] = useState([]);
   const [isSuggestionsVisible, setIsSuggestionsVisible] = useState(false);
-  
+
+  const onEditClick = (id) => {
+    setIsEditing(true);    
+    const entryToEdit = localTender.entries.find((e) => e.id === id);
+    if (entryToEdit) {
+      setFormData({
+        position: entryToEdit.position,
+        company: entryToEdit.company,
+        developer_price: entryToEdit.developer_price,
+        margin: entryToEdit.margin,
+        description: entryToEdit.description
+      });
+    }
+  };
+
+  const onCancelEdit = () => {
+    setIsEditing(false);
+    setFormData({
+      position: "",
+      company: "",
+      developer_price: "",
+      margin: "",
+      description: ""
+    });
+  };
+
+
+
   useEffect(() => {
-    const sum = localEntry.entries.reduce(
+    const sum = localTender.entries.reduce(
       (acc, e) => acc + parseFloat(e.total_price || 0),
       0
     );
     setTotalValue(sum.toFixed(2));
-  }, [localEntry.entries]);
+  }, [localTender.entries]);
 
   const handleUpdateEntry = (updatedSubEntry) => {
     if (updatedSubEntry.deleted) {
       // delete
-      const updatedEntries = localEntry.entries.filter((e) => e.id !== updatedSubEntry.id);
-      setLocalEntry({
-        ...localEntry,
+      const updatedEntries = localTender.entries.filter((e) => e.id !== updatedSubEntry.id);
+      setlocalTender({
+        ...localTender,
         entries: updatedEntries,
         updated_at: new Date().toISOString(),
       });
     } else {
       //  update
-      const updatedEntries = localEntry.entries.map((e) =>
+      const updatedEntries = localTender.entries.map((e) =>
         e.id === updatedSubEntry.id ? updatedSubEntry : e
       );
-      const updatedLocalEntry = { ...localEntry, entries: updatedEntries, updated_at: updatedSubEntry.updated_at };
-      setLocalEntry(updatedLocalEntry);
+      const updatedlocalTender = { ...localTender, entries: updatedEntries, updated_at: updatedSubEntry.updated_at };
+      setlocalTender(updatedlocalTender);
     }
 
     if (onUpdateEntry && !updatedSubEntry.deleted) {
-      onUpdateEntry(updatedSubEntry, localEntry.id);
+      onUpdateEntry(updatedSubEntry, localTender.id);
     }
   };
 
@@ -66,7 +95,7 @@ export default function TenderCard({ entry, selectedCompany, onToggleActive, onU
 
     if (name === "company") {
       if (!value.trim()) {
-        setCompanySuggestions(companies.filter(company => typeof company === 'string')); 
+        setCompanySuggestions(companies.filter(company => typeof company === 'string'));
         setIsSuggestionsVisible(true);
       } else {
         const filtered = companies.filter((company) =>
@@ -96,7 +125,7 @@ export default function TenderCard({ entry, selectedCompany, onToggleActive, onU
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(`http://127.0.0.1:8000/api/tender/${localEntry.id}/entries/`, {
+      const response = await fetch(`http://127.0.0.1:8000/api/tender/${localTender.id}/entries/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -112,9 +141,9 @@ export default function TenderCard({ entry, selectedCompany, onToggleActive, onU
 
       if (response.ok) {
         const newEntry = await response.json();
-        setLocalEntry({
-          ...localEntry,
-          entries: [...localEntry.entries, newEntry],
+        setlocalTender({
+          ...localTender,
+          entries: [...localTender.entries, newEntry],
           updated_at: new Date().toISOString(),
         });
         setFormData({
@@ -137,50 +166,157 @@ export default function TenderCard({ entry, selectedCompany, onToggleActive, onU
     }
   };
 
+  const onSave = (localTender) => {
+    alert("Zapisano zmiany");
+    alert(localTender.client)
+    setIsEditing(false);
+
+  };
+
   return (
-    <div key={localEntry.id} className="tender-card">
-      <div className="tender-header">
-        <h2>{localEntry.name}</h2>
-        <p>
-          <span className="info-label">Klient:</span> {localEntry.client}
-        </p>
-        <p>
-          <span className="info-label">Status: </span>
-          <span className={`status-label ${getStatusClass(localEntry.status)}`}>
-            {localEntry.status === "won" ? "Wygrany" : localEntry.status === "lost" ? "Przegrany" : "Nierozstrzygnięty"}
-          </span>
-        </p>
-        {localEntry.implementation_link && (
-          <p>
-            <span className="info-label">Link do realizacji: </span>
-            <a href={localEntry.implementation_link} target="_blank" rel="noopener noreferrer">
-              Link
-            </a>
-          </p>
+    <div key={localTender.id} className="tender-card">
+      <div className={headerStyles['tender-header']}>
+        {isEditing ? (
+          <div className={headerStyles['edit-tender-form']}>
+            <p>
+              <span className="info-label">Nazwa przetargu:</span>
+              <input
+                type="text"
+                value={localTender.name}
+                onChange={e =>
+                  setlocalTender({ ...localTender, name: e.target.value })
+                }
+                className={headerStyles['edit-input']}
+              />
+            </p>
+
+            <p>
+              <span className="info-label">Klient:</span>
+              <input
+                type="text"
+                value={localTender.client}
+                onChange={e =>
+                  setlocalTender({ ...localTender, client: e.target.value })
+                }
+                className={headerStyles['edit-input']}
+              />
+            </p>
+
+            <p>
+              <span className="info-label">Status:</span>
+              <select
+                value={localTender.status}
+                onChange={e =>
+                  setlocalTender({ ...localTender, status: e.target.value })
+                }
+                className={headerStyles['edit-input']}
+              >
+                <option value="won">Wygrany</option>
+                <option value="lost">Przegrany</option>
+                <option value="unresolved">Nierozstrzygnięty</option>
+              </select>
+            </p>
+
+            {localTender.implementation_link && (
+              <p>
+                <span className="info-label">Link do realizacji:</span>
+                <input
+                  type="text"
+                  value={localTender.implementation_link || ""}
+                  onChange={e =>
+                    setlocalTender({
+                      ...localTender,
+                      implementation_link: e.target.value
+                    })
+                  }
+                  className={headerStyles['edit-input']}
+                />
+              </p>
+            )}
+
+            <p className={headerStyles.dates}>
+              Utworzono: {new Date(localTender.created_at).toLocaleString()} <br />
+              Zaktualizowano: {new Date(localTender.updated_at).toLocaleString()} <br />
+              <span className={headerStyles['total-value']}>Wartość całkowita: {totalValue} zł</span>
+            </p>
+
+            <div className={headerStyles['tender-actions']}>
+              <button
+                type="button"
+                className={`${headerStyles['action-btn']} ${headerStyles['action-btn--save']}`}
+                onClick={() => onSave(localTender)}
+              >
+                Zapisz
+              </button>
+              <button
+                type="button"
+                className={headerStyles['canceledit-btn']}
+                onClick={onCancelEdit}
+              >
+                Anuluj
+              </button>
+            </div>
+          </div>
+        ) : (
+          <>
+            <h2>{localTender.name}</h2>
+            <p>
+              <span className="info-label">Klient:</span> {localTender.client}
+            </p>
+            <p>
+              <span className="info-label">Status: </span>
+              <span className={`status-label ${getStatusClass(localTender.status)}`}>
+                {localTender.status === "won"
+                  ? "Wygrany"
+                  : localTender.status === "lost"
+                    ? "Przegrany"
+                    : "Nierozstrzygnięty"}
+              </span>
+            </p>
+            {localTender.implementation_link && (
+              <p>
+                <span className="info-label">Link do realizacji: </span>
+                <a
+                  href={localTender.implementation_link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Link
+                </a>
+              </p>
+            )}
+            <p className={headerStyles.dates}>
+              Utworzono: {new Date(localTender.created_at).toLocaleString()} <br />
+              Zaktualizowano: {new Date(localTender.updated_at).toLocaleString()} <br />
+              <span className={headerStyles['total-value']}>Wartość całkowita: {totalValue} zł</span>
+            </p>
+
+            <div className={headerStyles['tender-actions']}>
+              <button
+                className={headerStyles['delete-tender-btn']}
+                onClick={() => onToggleActive(localTender.id)}
+              >
+                Usuń przetarg
+              </button>
+              <button
+                className={headerStyles['edit-tender-btn']}
+                onClick={() => onEditClick(localTender.id)}
+              >
+                Edytuj przetarg
+              </button>
+            </div>
+          </>
         )}
-        <p className="dates">
-          Utworzono: {new Date(localEntry.created_at).toLocaleString()} <br />
-          Zaktualizowano: {new Date(localEntry.updated_at).toLocaleString()} <br />
-          <span className="total-value">
-            Wartość całkowita: {totalValue} zł
-          </span>
-        </p>
-        <div className="tender-actions">
-          <button
-            className="delete-tender-btn action-btn"
-            onClick={() => onToggleActive(localEntry.id)}
-          >
-            Usuń przetarg
-          </button>
-        </div>
       </div>
+
+
 
       <h3 className="entries-title">Developerzy:</h3>
       <div className="entries">
-        {localEntry.entries.length === 0 ? (
+        {localTender.entries.length === 0 ? (
           <p className="no-entries">Brak zgłoszeń dla tego przetargu.</p>
         ) : (
-          [...localEntry.entries]
+          [...localTender.entries]
             .sort((a, b) => {
               if (!selectedCompany) return 0;
               if (a.company === selectedCompany && b.company !== selectedCompany) return -1;

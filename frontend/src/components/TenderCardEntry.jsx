@@ -186,27 +186,31 @@ export default function TenderCardEntry({ subEntry, selectedCompany, onUpdate })
         )}
       </div>
 
-      <div className="entry-actions">
+      <div className={styles['entry-actions']}>
         {isEditing ? (
-          <button
-            className="action-btn action-btn--save"
-            onClick={handleSave}
-          >
-            Zapisz
-          </button>
+          <>
+            <button
+              className={`${styles['action-btn']} ${styles['action-btn--save']}`}
+              onClick={handleSave}
+            >
+              Zapisz
+            </button>
+            <button
+              className={`${styles['action-btn']} ${styles['canceledit-btn']}`}
+              onClick={handleCancel}
+            >
+              Anuluj
+            </button>
+          </>
         ) : (
-          <button className="action-btn action-btn--edit" onClick={() => setIsEditing(true)}>
-            Edytuj
-          </button>
-        )}
-        {isEditing ? (
-          <button className="canceledit-btn action-btn " onClick={handleCancel}>
-            Anuluj
-          </button>
-        ) : (
-          <button className="delete-btn action-btn" onClick={() => handleEntryDelete(subEntry.id)}>
-            Usuń
-          </button>
+          <>
+            <button className={`${styles['action-btn']} ${styles['action-btn--edit']}`} onClick={() => setIsEditing(true)}>
+              Edytuj
+            </button>
+            <button className={`${styles['action-btn']} ${styles['delete-btn']}`} onClick={() => handleEntryDelete(subEntry.id)}>
+              Usuń
+            </button>
+          </>
         )}
       </div>
     </div>
