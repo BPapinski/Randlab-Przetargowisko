@@ -1,23 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { AuthFetch } from '../utils/AuthFetch';
 import '../pages/styles/TenderListStyles.css';
 import TenderCard from './TenderCard';
 
-export default function TenderList({ tenders, error, onTenderUpdate, selectedCompany, companies }) {
-  const [localTenders, setLocalTenders] = useState(tenders);
+export default function TenderList({ tenders, error, selectedCompany, companies, onUpdateTender, onToggleActive }) {
 
-  useEffect(() => {
-    setLocalTenders(tenders); 
-  }, [tenders]);
-
+    
   const handleToggleActive = async (tenderId) => {
     const confirmed = window.confirm('Czy na pewno chcesz dezaktywować ten przetarg?');
     if (!confirmed) return;
-
-    const updatedTenders = localTenders.map(tender =>
-      tender.id === tenderId ? { ...tender, is_active: false } : tender
-    );
-    setLocalTenders(updatedTenders);
 
     try {
       const response = await AuthFetch(`/api/tender/${tenderId}/toggle-active/`, {
@@ -27,38 +18,25 @@ export default function TenderList({ tenders, error, onTenderUpdate, selectedCom
 
       const data = await response.json();
       if (!data.success) {
-        setLocalTenders(localTenders);
         alert('Wystąpił błąd podczas zmiany statusu przetargu.');
       } else {
-        if (onTenderUpdate) onTenderUpdate();
+        // Ta linia powoduje odświeżenie strony i jest poprawna.
+        // onToggleActive to prop, który jest przekazywany z IndexPage.
+        if (onToggleActive) onToggleActive(); 
       }
     } catch {
-      setLocalTenders(localTenders);
       alert('Wystąpił błąd podczas zmiany statusu przetargu.');
     }
   };
 
-  // nowa funkcja do aktualizacji wpisu w lokalnym stanie
-  const handleUpdateEntry = (updatedEntry, tenderId) => {
-    setLocalTenders((prevTenders) =>
-      prevTenders.map((tender) => {
-        if (tender.id !== tenderId) return tender;
-        return {
-          ...tender,
-          entries: tender.entries.map((entry) =>
-            entry.id === updatedEntry.id ? updatedEntry : entry
-          ),
-        };
-      })
-    );
-  };
+  
 
-  const activeTenders = localTenders.filter(tender => tender.is_active);
+  const activeTenders = tenders.filter(tender => tender.is_active);
 
   if (error) return <p className="error">{error}</p>;
   if (activeTenders.length === 0 && !error) return <p className="no-results">Brak przetargów do wyświetlenia.</p>;
 
-  return (
+ return (
     <>
       {activeTenders.map((entry) => (
         <TenderCard
@@ -66,7 +44,7 @@ export default function TenderList({ tenders, error, onTenderUpdate, selectedCom
           entry={entry}
           selectedCompany={selectedCompany}
           onToggleActive={handleToggleActive}
-          onUpdateEntry={handleUpdateEntry} // <- przekazujemy callback
+          onUpdateTender={onUpdateTender} // Prop, który przekazuje funkcję do aktualizacji stanu
           companies={companies}
         />
       ))}

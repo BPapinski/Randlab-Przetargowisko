@@ -3,23 +3,8 @@ import { useEffect, useState } from "react";
 import { BarChart3, Trophy, XCircle, HelpCircle, DollarSign, Users, Building2 } from "lucide-react";
 import './styles/TenderStatsSidebar.css';
 
-export default function TenderStatsSidebar() {
-  const [stats, setStats] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetch("http://127.0.0.1:8000/api/stats/tender-stats/")
-      .then((res) => res.json())
-      .then((data) => {
-        setStats(data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error("Błąd pobierania statystyk:", err);
-        setLoading(false);
-      });
-  }, []);
-
+export default function TenderStatsSidebar({ stats, loading }) {
+  
   if (loading) {
     return (
       <aside className="tender-stats-sidebar">

@@ -44,6 +44,9 @@ export default function IndexPage() {
   const [searchInput, setSearchInput] = useState(urlSearchTerm);
   const debouncedSearch = useDebounce(searchInput, 500);
 
+  const [stats, setStats] = useState(null);
+  const [statsLoading, setStatsLoading] = useState(true);
+
   useEffect(() => {
     if (debouncedSearch !== urlSearchTerm) {
       updateUrl({ search: debouncedSearch, page: 1, page_size: tendersPerPage });
@@ -121,6 +124,66 @@ export default function IndexPage() {
     };
     fetchData();
   }, []);
+
+  const fetchStats = useCallback(async () => {
+    setStatsLoading(true);
+    try {
+      const statsRes = await AuthFetch("/api/stats/tender-stats/");
+      if (!statsRes.ok) {
+        throw new Error("Błąd podczas pobierania statystyk.");
+      }
+      const statsData = await statsRes.json();
+      setStats(statsData);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setStatsLoading(false);
+    }
+  }, []);
+
+  const fetchTenders = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    const params = new URLSearchParams(location.search);
+    const apiUrl = `/api/tenders/?${params.toString()}`;
+    try {
+      const tendersRes = await AuthFetch(apiUrl);
+      if (tendersRes.status === 401) {
+        navigate("/login");
+        return;
+      }
+      if (!tendersRes.ok) {
+        throw new Error("Błąd podczas pobierania przetargów.");
+      }
+      const tendersData = await tendersRes.json();
+      setTenders(tendersData.results || []);
+      setTotalPages(Math.ceil(tendersData.count / tendersPerPage));
+    } catch (err) {
+      setError("Nie udało się pobrać danych.");
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [location.search, navigate, tendersPerPage]);
+
+  const fetchAllData = useCallback(() => {
+    fetchTenders();
+    fetchStats();
+  }, [fetchTenders, fetchStats]);
+
+  useEffect(() => {
+    fetchAllData();
+  }, [fetchAllData]);
+
+  const handleUpdateTender = useCallback((updatedTender) => {
+    setTenders(prevTenders =>
+      prevTenders.map(tender =>
+        tender.id === updatedTender.id ? updatedTender : tender
+      )
+    );
+    // Odświeżamy tylko statystyki po lokalnej aktualizacji przetargu
+    fetchStats();
+  }, [fetchStats]);
 
   const [sortOrder, setSortOrder] = useState(() => {
     const ordering = params.get("ordering") || "-created_at";
@@ -214,40 +277,6 @@ export default function IndexPage() {
     });
   };
 
-  const fetchTenders = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
-
-    const params = new URLSearchParams(location.search);
-    const currentPage = parseInt(params.get("page"), 10) || 1;
-    const tendersPerPage = parseInt(params.get("page_size"), 10) || 10;
-
-    const apiUrl = `/api/tenders/?${params.toString()}`;
-
-    try {
-      const res = await AuthFetch(apiUrl);
-      if (res.status === 401) {
-        navigate("/login");
-        return;
-      }
-      if (!res.ok) {
-        throw new Error("Błąd podczas pobierania przetargów.");
-      }
-
-      const data = await res.json();
-      setTenders(data.results || []);
-      setTotalPages(Math.ceil(data.count / tendersPerPage));
-    } catch (err) {
-      setError("Nie udało się pobrać przetargów.");
-    } finally {
-      setIsLoading(false);
-    }
-  }, [location.search, navigate]);
-
-  useEffect(() => {
-    fetchTenders();
-  }, [fetchTenders]);
-
   return (
     <>
       <Header searchTerm={searchInput} onSearchChange={handleSearchChange} onLogoClick={handleLogoClick} />
@@ -292,6 +321,8 @@ export default function IndexPage() {
                 error={error}
                 selectedCompany={selectedCompany}
                 companies={companies}
+                onUpdateTender={handleUpdateTender}
+                onToggleActive={fetchAllData}
               />
             )}
             {!isLoading && totalPages > 1 && (
@@ -314,7 +345,7 @@ export default function IndexPage() {
             )}
           </main>
           <div className="flex">
-            <TenderStatsSidebar />
+            <TenderStatsSidebar stats={stats} loading={statsLoading}/>
           </div>
         </div>
       </div>
