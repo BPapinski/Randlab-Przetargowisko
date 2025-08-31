@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import "./styles/indexStyles.css";
 import Header from "../components/Header";
 import TenderList from "../components/TenderList";
+import FilterSidebar from "../components/FilterSidebar";
 import { AuthFetch } from "../utils/AuthFetch";
 import { useDebounce } from "../hooks/useDebounce";
 import Pagination from '@mui/material/Pagination';
@@ -18,7 +19,6 @@ export default function IndexPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Nowe stany dla filtrów
   const [companies, setCompanies] = useState([]);
   const [selectedCompany, setSelectedCompany] = useState("");
   const [selectedClient, setSelectedClient] = useState("");
@@ -29,14 +29,12 @@ export default function IndexPage() {
   const [clients, setClients] = useState([]);
   const [statusFilter, setStatusFilter] = useState("");
 
-
   const [tempPriceFrom, setTempPriceFrom] = useState("");
   const [tempPriceTo, setTempPriceTo] = useState("");
   const debouncedClient = useDebounce(client, 500);
- const debouncedPriceFrom = useDebounce(tempPriceFrom, 500);
-const debouncedPriceTo = useDebounce(tempPriceTo, 500);
+  const debouncedPriceFrom = useDebounce(tempPriceFrom, 500);
+  const debouncedPriceTo = useDebounce(tempPriceTo, 500);
 
-  // Parametry z URL
   const params = new URLSearchParams(location.search);
   const currentPage = parseInt(params.get("page"), 10) || 1;
   const tendersPerPage = parseInt(params.get("page_size"), 10) || 10;
@@ -68,18 +66,16 @@ const debouncedPriceTo = useDebounce(tempPriceTo, 500);
     }))
   ];
 
-  // Synchronizacja stanu filtrów z URL (przy wejściu na stronę lub zmianie URL)
   useEffect(() => {
     setSelectedCompany(params.get("company") || "");
     setPriceFrom(params.get("price_from") || "");
     setPriceTo(params.get("price_to") || "");
     setStatus(params.get("status") || "");
     setClient(params.get("client") || "");
-
   }, [location.search]);
 
   const resetFilters = () => {
-    setSortOrder(''); 
+    setSortOrder('');
     setStatusFilter('');
     setTempPriceFrom('');
     setTempPriceTo('');
@@ -97,7 +93,7 @@ const debouncedPriceTo = useDebounce(tempPriceTo, 500);
       price_from: '',
       price_to: '',
       status: '',
-      ordering: '', 
+      ordering: '',
     });
   };
 
@@ -105,7 +101,6 @@ const debouncedPriceTo = useDebounce(tempPriceTo, 500);
     resetFilters();
     navigate('/');
   };
-
 
   useEffect(() => {
     const fetchData = async () => {
@@ -118,7 +113,6 @@ const debouncedPriceTo = useDebounce(tempPriceTo, 500);
         const clientsData = await clientsRes.json();
         setCompanies(companiesData);
         setClients(clientsData);
-
       } catch (error) {
         console.error("Failed to fetch data:", error);
         setCompanies([]);
@@ -127,9 +121,6 @@ const debouncedPriceTo = useDebounce(tempPriceTo, 500);
     };
     fetchData();
   }, []);
-
-
-
 
   const [sortOrder, setSortOrder] = useState(() => {
     const ordering = params.get("ordering") || "-created_at";
@@ -163,6 +154,7 @@ const debouncedPriceTo = useDebounce(tempPriceTo, 500);
   const handleSearchChange = (event) => {
     setSearchInput(event.target.value);
   };
+
   const handleTendersPerPageChange = (event) => {
     updateUrl({ page: 1, page_size: Number(event.target.value) });
   };
@@ -177,19 +169,15 @@ const debouncedPriceTo = useDebounce(tempPriceTo, 500);
       price_desc: "-price",
     };
     const selectedSort = event.target.value;
-    setSortOrder(selectedSort); // <-- teraz mamy stan do resetu
+    setSortOrder(selectedSort);
     updateUrl({ ordering: sortMap[selectedSort], page: 1 });
   };
-
-
-
 
   const handleCompanyChange = (selectedOption) => {
     if (!selectedOption) {
       setSelectedCompany(null);
       updateUrl({ company: null, page: 1 });
-    }
-    else {
+    } else {
       updateUrl({ company: selectedOption.value, page: 1 });
       setSelectedCompany(selectedOption ? selectedOption.value : null);
     }
@@ -199,39 +187,34 @@ const debouncedPriceTo = useDebounce(tempPriceTo, 500);
     if (!selectedOption) {
       setSelectedClient(null);
       updateUrl({ client: null, page: 1 });
-    }
-    else {
+    } else {
       updateUrl({ client: selectedOption.value, page: 1 });
       setSelectedClient(selectedOption ? selectedOption.value : null);
     }
   };
 
-
-
   const handlePriceFromChange = (e) => {
     setPriceFrom(e.target.value);
     updateUrl({ price_from: e.target.value, page: 1 });
   };
+
   const handlePriceToChange = (e) => {
     setPriceTo(e.target.value);
     updateUrl({ price_to: e.target.value, page: 1 });
   };
 
   useEffect(() => {
-  updateUrl({
-    price_from: debouncedPriceFrom,
-    price_to: debouncedPriceTo,
-    page: 1,
-  });
-}, [debouncedPriceFrom, debouncedPriceTo]);
+    updateUrl({
+      price_from: debouncedPriceFrom,
+      price_to: debouncedPriceTo,
+      page: 1,
+    });
+  }, [debouncedPriceFrom, debouncedPriceTo]);
 
-  // Synchronizacja temp z URL
   useEffect(() => {
     setTempPriceFrom(priceFrom);
     setTempPriceTo(priceTo);
   }, [priceFrom, priceTo]);
-
-
 
   const handleSearchFilters = () => {
     updateUrl({
@@ -283,69 +266,27 @@ const debouncedPriceTo = useDebounce(tempPriceTo, 500);
     fetchTenders();
   }, [fetchTenders]);
 
-
   return (
     <>
-
-      <Header searchTerm={searchInput} onSearchChange={handleSearchChange} onLogoClick={handleLogoClick}/>
-
-
+      <Header searchTerm={searchInput} onSearchChange={handleSearchChange} onLogoClick={handleLogoClick} />
       <div className="container">
         <div className="content-wrapper">
-          <aside className="sidebar left-sidebar">
-            <h3>Sortuj według</h3>
-            <select value={sortOrder} onChange={handleSortChange}>
-              <option value="">Domyślnie</option>
-              <option value="date_asc">Data utworzenia rosnąco</option>
-              <option value="date_desc">Data utworzenia malejąco</option>
-              <option value="updated_asc">Data aktualizacji rosnąco</option>
-              <option value="updated_desc">Data aktualizacji malejąco</option>
-              <option value="price_asc">Cena rosnąco</option>
-              <option value="price_desc">Cena malejąco</option>
-            </select>
-            <hr style={{ margin: "1rem 0", border: "none", borderTop: "1px solid #ddd" }} />
-            <h4>Zakres cenowy</h4>
-            <div className="range-inputs">
-              <input
-                type="number"
-                placeholder="Cena od"
-                value={tempPriceFrom}
-                onChange={e => setTempPriceFrom(e.target.value)}
-              />
-              <input
-                type="number"
-                placeholder="Cena do"
-                value={tempPriceTo}
-                onChange={e => setTempPriceTo(e.target.value)}
-              />
-            </div>
-            <h4>Klient</h4>
-            <Select
-              options={clientOptions}
-              placeholder="Wybierz klienta..."
-              isClearable
-              value={clientOptions.find(option => option.value === selectedClient) || null}
-              onChange={handleClientChange}
-            />
-
-            <h4>Firma uczestnicząca</h4>
-            <Select
-              options={companyOptions}
-              onChange={handleCompanyChange}
-              placeholder="Wybierz firmę..."
-              value={companyOptions.find(option => option.value === selectedCompany) || null}
-              isClearable // Dodaje przycisk do czyszczenia pola
-            />
-
-            <h4>Status</h4>
-            <select value={statusFilter} onChange={handleStatusChange}>
-              <option value="">Wszystkie</option>
-              <option value="won">Wygrane</option>
-              <option value="lost">Przegrane</option>
-              <option value="unresolved">Nierozstrzygnięte</option>
-            </select>
-          </aside>
-
+          <FilterSidebar
+            sortOrder={sortOrder}
+            handleSortChange={handleSortChange}
+            tempPriceFrom={tempPriceFrom}
+            setTempPriceFrom={setTempPriceFrom}
+            tempPriceTo={tempPriceTo}
+            setTempPriceTo={setTempPriceTo}
+            clientOptions={clientOptions}
+            selectedClient={selectedClient}
+            handleClientChange={handleClientChange}
+            companyOptions={companyOptions}
+            selectedCompany={selectedCompany}
+            handleCompanyChange={handleCompanyChange}
+            statusFilter={statusFilter}
+            handleStatusChange={handleStatusChange}
+          />
           <main className="tender-content">
             <div className="pagination-controls">
               <label htmlFor="tenders-per-page">Pokaż:</label>
@@ -362,7 +303,6 @@ const debouncedPriceTo = useDebounce(tempPriceTo, 500);
               </select>
               <span>przetargów na stronę</span>
             </div>
-
             {isLoading && <p>Ładowanie przetargów...</p>}
             {!isLoading && (
               <TenderList
@@ -372,7 +312,6 @@ const debouncedPriceTo = useDebounce(tempPriceTo, 500);
                 companies={companies}
               />
             )}
-
             {!isLoading && totalPages > 1 && (
               <div className="pagination">
                 <Pagination
@@ -392,13 +331,9 @@ const debouncedPriceTo = useDebounce(tempPriceTo, 500);
               </div>
             )}
           </main>
-
-
           <div className="flex">
-            {/* inne elementy strony */}
             <TenderStatsSidebar />
           </div>
-
         </div>
       </div>
     </>
