@@ -11,7 +11,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-$(_c^fz3j2cs*m3&(s7cz1*-tt31nqrqyzaq-91rp9=+20bg=t"
+SECRET_KEY = (
+    "django-insecure-$(_c^fz3j2cs*m3&(s7cz1*-tt31nqrqyzaq-91rp9=+20bg=t"
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -26,6 +28,7 @@ INSTALLED_APPS = [
     "users",
     "tenders",
     "aliases",
+    "app_statistics",
     # additional apps
     "jazzmin",
     # default apps
@@ -131,7 +134,9 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS": "tenders.pagination.CustomPagination",
     "PAGE_SIZE": 10,
-    "DEFAULT_AUTHENTICATION_CLASSES": ("rest_framework_simplejwt.authentication.JWTAuthentication",),
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ),
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.AllowAny",
     ],

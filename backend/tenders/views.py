@@ -10,7 +10,11 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import Tender, TenderEntry
-from .serializers import TenderCreateSerializer, TenderEntrySerializer, TenderSerializer
+from .serializers import (
+    TenderCreateSerializer,
+    TenderEntrySerializer,
+    TenderSerializer,
+)
 
 
 class TenderListAPIView(generics.ListAPIView):
@@ -22,7 +26,10 @@ class TenderListAPIView(generics.ListAPIView):
 
     def get_queryset(self):
         qs = Tender.objects.annotate(
-            price=Coalesce(Sum("entries__total_price"), Value(0, output_field=DecimalField()))
+            price=Coalesce(
+                Sum("entries__total_price"),
+                Value(0, output_field=DecimalField()),
+            )
         ).prefetch_related("entries")
         params = self.request.query_params
 
@@ -69,7 +76,9 @@ class TenderCreateView(generics.CreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
 
-class TenderEntryRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+class TenderEntryRetrieveUpdateDestroyView(
+    generics.RetrieveUpdateDestroyAPIView
+):
     queryset = TenderEntry.objects.all()
     serializer_class = TenderEntrySerializer
 
@@ -93,7 +102,9 @@ def toggle_tender_active(request, tender_id):
 
 class CompanyListView(APIView):
     def get(self, request):
-        companies = TenderEntry.objects.values_list("company", flat=True).distinct()
+        companies = TenderEntry.objects.values_list(
+            "company", flat=True
+        ).distinct()
         return Response(companies)
 
 

@@ -1,6 +1,10 @@
 # W pliku views.py
 from rest_framework import generics, permissions, status
-from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.decorators import (
+    api_view,
+    authentication_classes,
+    permission_classes,
+)
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.authentication import JWTAuthentication
@@ -8,7 +12,11 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from tenders.models import TenderEntry
 
 from .models import Alias, AliasGroup
-from .serializers import AliasGroupSerializer, AliasSerializer, TenderEntrySerializer
+from .serializers import (
+    AliasGroupSerializer,
+    AliasSerializer,
+    TenderEntrySerializer,
+)
 from .utils import get_tender_entries_for_alias_group
 
 
@@ -35,7 +43,10 @@ def tender_entries_by_standard_position(request):
             )
 
     else:
-        return Response({"error": "Missing position parameter."}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(
+            {"error": "Missing position parameter."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
 
     serializer = TenderEntrySerializer(entries, many=True)
     return Response(serializer.data)
@@ -72,8 +83,12 @@ class TenderEntryList(generics.ListAPIView):
         elif position_param:
             try:
                 alias_group = AliasGroup.objects.get(name=position_param)
-                aliases_in_group = alias_group.aliases.values_list("alias_name", flat=True)
-                return TenderEntry.objects.filter(position__in=aliases_in_group)
+                aliases_in_group = alias_group.aliases.values_list(
+                    "alias_name", flat=True
+                )
+                return TenderEntry.objects.filter(
+                    position__in=aliases_in_group
+                )
             except AliasGroup.DoesNotExist:
                 return TenderEntry.objects.none()
 
@@ -104,7 +119,9 @@ def create_alias_view(request):
 
     if not alias_group_name or not entry_position:
         return Response(
-            {"error": "Brak wymaganych danych: 'alias_group_name' lub 'entry_position'."},
+            {
+                "error": "Brak wymaganych danych: 'alias_group_name' lub 'entry_position'."
+            },
             status=status.HTTP_400_BAD_REQUEST,
         )
 
@@ -123,7 +140,9 @@ def create_alias_view(request):
         )
 
     # Utworzenie nowego aliasu i przypisanie go do grupy
-    alias = Alias.objects.create(alias_group=alias_group, alias_name=entry_position)
+    alias = Alias.objects.create(
+        alias_group=alias_group, alias_name=entry_position
+    )
 
     return Response(
         {

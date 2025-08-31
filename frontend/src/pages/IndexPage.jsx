@@ -336,7 +336,9 @@ export default function IndexPage() {
           </main>
 
           <aside className="sidebar right-sidebar">
-            <p style={{ margin: 0 }}>Panel boczny</p>
+            <p style={{ margin: 0 }}>Tu wyświetlić statystyki: ilość przetargów ogólnie, ilość wygranych przetargów, ilość przegranych przetargów, średnia wartość przetargu, ilość unikalnych developerów, ilość firm z którymi współpracowaano
+              jakies ladne ikonki do tego
+            </p>
           </aside>
         </div>
       </div>

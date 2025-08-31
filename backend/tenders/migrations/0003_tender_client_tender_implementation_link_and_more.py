@@ -13,7 +13,9 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="tender",
             name="client",
-            field=models.CharField(default="Unknown", max_length=255, verbose_name="Client"),
+            field=models.CharField(
+                default="Unknown", max_length=255, verbose_name="Client"
+            ),
         ),
         migrations.AddField(
             model_name="tender",
