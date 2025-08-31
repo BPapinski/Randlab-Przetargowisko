@@ -117,15 +117,21 @@ def toggle_tender_active(request, tender_id):
 
 class CompanyListView(APIView):
     def get(self, request):
-        companies = TenderEntry.objects.values_list(
-            "company", flat=True
-        ).distinct()
+        companies = (
+            TenderEntry.objects.filter(tender__is_active=True)
+            .values_list("company", flat=True)
+            .distinct()
+        )
         return Response(companies)
 
 
 class UniqueClientListView(APIView):
     def get(self, request):
-        clients = Tender.objects.values_list("client", flat=True).distinct()
+        clients = (
+            Tender.objects.filter(is_active=True)
+            .values_list("client", flat=True)
+            .distinct()
+        )
         return Response(clients)
 
 
