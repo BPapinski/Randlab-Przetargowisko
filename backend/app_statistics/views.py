@@ -8,15 +8,22 @@ from tenders.models import Tender, TenderEntry
 
 class TenderStatsAPIView(APIView):
     def get(self, request):
-        total_tenders = Tender.objects.count()
-        won_tenders = Tender.objects.filter(status="won").count()
-        lost_tenders = Tender.objects.filter(status="lost").count()
-        unresolved_tenders = Tender.objects.filter(status="unresolved").count()
+        # ✅ tylko aktywne przetargi
+        active_tenders = Tender.objects.filter(is_active=True)
+
+        total_tenders = active_tenders.count()
+        won_tenders = active_tenders.filter(status="won").count()
+        lost_tenders = active_tenders.filter(status="lost").count()
+        unresolved_tenders = active_tenders.filter(status="unresolved").count()
+
         unique_developer_companies = (
-            TenderEntry.objects.values("company").distinct().count()
+            TenderEntry.objects.filter(tender__is_active=True)
+            .values("company")
+            .distinct()
+            .count()
         )
 
-        avg_tender_value = Tender.objects.annotate(
+        avg_tender_value = active_tenders.annotate(
             total_value=Sum("entries__total_price")
         ).aggregate(avg_value=Avg("total_value", output_field=FloatField()))[
             "avg_value"
@@ -26,10 +33,13 @@ class TenderStatsAPIView(APIView):
         )
 
         unique_developers = (
-            TenderEntry.objects.values("company").distinct().count()
+            TenderEntry.objects.filter(tender__is_active=True)
+            .values("company")
+            .distinct()
+            .count()
         )
 
-        unique_clients = Tender.objects.values("client").distinct().count()
+        unique_clients = active_tenders.values("client").distinct().count()
 
         data = {
             "total_tenders": total_tenders,
