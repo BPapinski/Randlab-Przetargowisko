@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import TenderCardEntry from "./TenderCardEntry";
 import styles from "./styles/TenderEntryForm.module.css";
 import headerStyles from "./styles/TenderCardStyles/TenderCardHeader.module.css"
+import { AuthFetch } from '../utils/AuthFetch';
 
 export default function TenderCard({ entry, selectedCompany, onToggleActive, onUpdateEntry, companies }) {
   const [localTender, setlocalTender] = useState(entry);
@@ -18,8 +19,9 @@ export default function TenderCard({ entry, selectedCompany, onToggleActive, onU
   const [companySuggestions, setCompanySuggestions] = useState([]);
   const [isSuggestionsVisible, setIsSuggestionsVisible] = useState(false);
 
+
   const onEditClick = (id) => {
-    setIsEditing(true);    
+    setIsEditing(true);
     const entryToEdit = localTender.entries.find((e) => e.id === id);
     if (entryToEdit) {
       setFormData({
@@ -166,11 +168,25 @@ export default function TenderCard({ entry, selectedCompany, onToggleActive, onU
     }
   };
 
-  const onSave = (localTender) => {
-    alert("Zapisano zmiany");
-    alert(localTender.client)
-    setIsEditing(false);
+  const onSave = async (localTender) => {
+    try {
+      const res = await AuthFetch(`/api/tenders/${localTender.id}/`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(localTender),
+      });
 
+      if (!res.ok) {
+        throw new Error("Wystąpił błąd podczas zapisywania przetargu.");
+      }
+
+      alert("Przetarg został zaktualizowany!");
+      setIsEditing(false);
+
+    } catch (err) {
+      console.error("Błąd zapisu:", err);
+      alert(err.message);
+    }
   };
 
   return (

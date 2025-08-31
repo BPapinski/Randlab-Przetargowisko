@@ -84,6 +84,13 @@ class TenderCreateView(generics.CreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
 
+class TenderUpdateAPIView(generics.UpdateAPIView):
+    queryset = Tender.objects.all()
+    serializer_class = TenderSerializer
+    permission_classes = [IsAuthenticated]
+    lookup_field = "id"
+
+
 class TenderEntryRetrieveUpdateDestroyView(
     generics.RetrieveUpdateDestroyAPIView
 ):
