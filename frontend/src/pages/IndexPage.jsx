@@ -116,8 +116,25 @@ export default function IndexPage() {
           AuthFetch("/api/companies/"),
           AuthFetch("/api/clients/"),
         ]);
-        setCompanies(await companiesRes.json());
-        setClients(await clientsRes.json());
+
+        const companiesData = await companiesRes.json();
+        const clientsData = await clientsRes.json();
+
+        // 🔽 Sortowanie alfabetyczne
+        const sortedCompanies = companiesData.sort((a, b) => {
+          const nameA = (typeof a === "string" ? a : a.name)?.toLowerCase();
+          const nameB = (typeof b === "string" ? b : b.name)?.toLowerCase();
+          return nameA.localeCompare(nameB);
+        });
+
+        const sortedClients = clientsData.sort((a, b) => {
+          const nameA = (typeof a === "string" ? a : a.name)?.toLowerCase();
+          const nameB = (typeof b === "string" ? b : b.name)?.toLowerCase();
+          return nameA.localeCompare(nameB);
+        });
+
+        setCompanies(sortedCompanies);
+        setClients(sortedClients);
       } catch (error) {
         console.error("Failed to fetch data:", error);
         setCompanies([]);
