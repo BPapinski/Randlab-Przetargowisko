@@ -16,7 +16,7 @@ import styles from '../pages/styles/Header.module.css';
 import { useAuth } from '../utils/AuthContext';
 
 
-export default function Header({ searchTerm, onSearchChange }) {
+export default function Header({ searchTerm, onSearchChange, onLogoClick  }) {
     const navigate = useNavigate();
     const { isLoggedIn, logout } = useAuth();
 
@@ -30,10 +30,6 @@ export default function Header({ searchTerm, onSearchChange }) {
         await logout();
         navigate('/login');
     };
-
-    const handleLogoClick = () => {
-        navigate('/');
-    }
 
     const goToTenders = () => {
         navigate('/');
@@ -51,9 +47,11 @@ export default function Header({ searchTerm, onSearchChange }) {
         navigate('/alias-filter');
     };
 
+
+
     return (
         <header className={styles['main-header']}>
-            <div className={styles['header-left']} onClick={handleLogoClick}>
+            <div className={styles['header-left']} onClick={onLogoClick }>
                 <img src={RandlabLogo} alt="Randlab Logo" className={styles.logo} />
             </div>
 

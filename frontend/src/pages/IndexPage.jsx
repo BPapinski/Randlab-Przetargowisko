@@ -27,11 +27,14 @@ export default function IndexPage() {
   const [status, setStatus] = useState("");
   const [client, setClient] = useState("");
   const [clients, setClients] = useState([]);
+  const [statusFilter, setStatusFilter] = useState("");
 
 
   const [tempPriceFrom, setTempPriceFrom] = useState("");
   const [tempPriceTo, setTempPriceTo] = useState("");
   const debouncedClient = useDebounce(client, 500);
+ const debouncedPriceFrom = useDebounce(tempPriceFrom, 500);
+const debouncedPriceTo = useDebounce(tempPriceTo, 500);
 
   // Parametry z URL
   const params = new URLSearchParams(location.search);
@@ -58,12 +61,12 @@ export default function IndexPage() {
   ];
 
   const clientOptions = [
-  { value: null, label: 'Wszyscy klienci' },
-  ...clients.map(client => ({
-    value: client,
-    label: client,
-  }))
-];
+    { value: null, label: 'Wszyscy klienci' },
+    ...clients.map(client => ({
+      value: client,
+      label: client,
+    }))
+  ];
 
   // Synchronizacja stanu filtrów z URL (przy wejściu na stronę lub zmianie URL)
   useEffect(() => {
@@ -75,7 +78,35 @@ export default function IndexPage() {
 
   }, [location.search]);
 
-  // Pobieranie firm do selecta
+  const resetFilters = () => {
+    setSortOrder(''); 
+    setStatusFilter('');
+    setTempPriceFrom('');
+    setTempPriceTo('');
+    setSelectedClient(null);
+    setSelectedCompany(null);
+    setPriceFrom('');
+    setPriceTo('');
+    setStatus('');
+    setClient('');
+    updateUrl({
+      page: 1,
+      search: '',
+      company: null,
+      client: null,
+      price_from: '',
+      price_to: '',
+      status: '',
+      ordering: '', 
+    });
+  };
+
+  const handleLogoClick = () => {
+    resetFilters();
+    navigate('/');
+  };
+
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -100,15 +131,18 @@ export default function IndexPage() {
 
 
 
-  const reverseSortMap = {
-    created_at: "date_asc",
-    "-created_at": "date_desc",
-    updated_at: "updated_asc",
-    "-updated_at": "updated_desc",
-    price: "price_asc",
-    "-price": "price_desc",
-  };
-  const sortOrder = reverseSortMap[ordering] || "";
+  const [sortOrder, setSortOrder] = useState(() => {
+    const ordering = params.get("ordering") || "-created_at";
+    const reverseSortMap = {
+      created_at: "date_asc",
+      "-created_at": "date_desc",
+      updated_at: "updated_asc",
+      "-updated_at": "updated_desc",
+      price: "price_asc",
+      "-price": "price_desc",
+    };
+    return reverseSortMap[ordering] || "";
+  });
 
   const updateUrl = (newParams) => {
     const params = new URLSearchParams(location.search);
@@ -142,7 +176,9 @@ export default function IndexPage() {
       price_asc: "price",
       price_desc: "-price",
     };
-    updateUrl({ ordering: sortMap[event.target.value], page: 1 });
+    const selectedSort = event.target.value;
+    setSortOrder(selectedSort); // <-- teraz mamy stan do resetu
+    updateUrl({ ordering: sortMap[selectedSort], page: 1 });
   };
 
 
@@ -181,6 +217,13 @@ export default function IndexPage() {
     updateUrl({ price_to: e.target.value, page: 1 });
   };
 
+  useEffect(() => {
+  updateUrl({
+    price_from: debouncedPriceFrom,
+    price_to: debouncedPriceTo,
+    page: 1,
+  });
+}, [debouncedPriceFrom, debouncedPriceTo]);
 
   // Synchronizacja temp z URL
   useEffect(() => {
@@ -194,6 +237,14 @@ export default function IndexPage() {
     updateUrl({
       price_from: tempPriceFrom,
       price_to: tempPriceTo,
+      page: 1,
+    });
+  };
+
+  const handleStatusChange = (event) => {
+    setStatusFilter(event.target.value);
+    updateUrl({
+      status: event.target.value,
       page: 1,
     });
   };
@@ -236,7 +287,7 @@ export default function IndexPage() {
   return (
     <>
 
-      <Header searchTerm={searchInput} onSearchChange={handleSearchChange} />
+      <Header searchTerm={searchInput} onSearchChange={handleSearchChange} onLogoClick={handleLogoClick}/>
 
 
       <div className="container">
@@ -273,7 +324,8 @@ export default function IndexPage() {
               options={clientOptions}
               placeholder="Wybierz klienta..."
               isClearable
-              onChange={handleClientChange} 
+              value={clientOptions.find(option => option.value === selectedClient) || null}
+              onChange={handleClientChange}
             />
 
             <h4>Firma uczestnicząca</h4>
@@ -281,12 +333,17 @@ export default function IndexPage() {
               options={companyOptions}
               onChange={handleCompanyChange}
               placeholder="Wybierz firmę..."
+              value={companyOptions.find(option => option.value === selectedCompany) || null}
               isClearable // Dodaje przycisk do czyszczenia pola
             />
 
-            <button className="filters-submit-btn" onClick={handleSearchFilters} style={{ marginTop: "0.5rem" }}>
-              Szukaj
-            </button>
+            <h4>Status</h4>
+            <select value={statusFilter} onChange={handleStatusChange}>
+              <option value="">Wszystkie</option>
+              <option value="won">Wygrane</option>
+              <option value="lost">Przegrane</option>
+              <option value="unresolved">Nierozstrzygnięte</option>
+            </select>
           </aside>
 
           <main className="tender-content">
@@ -336,12 +393,12 @@ export default function IndexPage() {
             )}
           </main>
 
-          
-            <div className="flex">
+
+          <div className="flex">
             {/* inne elementy strony */}
             <TenderStatsSidebar />
           </div>
-          
+
         </div>
       </div>
     </>

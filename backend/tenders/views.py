@@ -67,6 +67,11 @@ class TenderListAPIView(generics.ListAPIView):
                 | Q(entries__company__icontains=search)
             )
 
+        status = self.request.query_params.get("status")
+
+        if status in dict(Tender.STATUS_CHOICES).keys():
+            qs = qs.filter(status=status)
+
         return qs.distinct()
 
 
