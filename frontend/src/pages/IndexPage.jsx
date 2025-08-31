@@ -7,6 +7,7 @@ import { AuthFetch } from "../utils/AuthFetch";
 import { useDebounce } from "../hooks/useDebounce";
 import Pagination from '@mui/material/Pagination';
 import Select from 'react-select';
+import TenderStatsSidebar from "../components/TenderStatsSidebar";
 
 export default function IndexPage() {
   const location = useLocation();
@@ -275,7 +276,7 @@ export default function IndexPage() {
               onChange={handleClientChange} 
             />
 
-            <h4>Firma</h4>
+            <h4>Firma uczestnicząca</h4>
             <Select
               options={companyOptions}
               onChange={handleCompanyChange}
@@ -335,11 +336,12 @@ export default function IndexPage() {
             )}
           </main>
 
-          <aside className="sidebar right-sidebar">
-            <p style={{ margin: 0 }}>Tu wyświetlić statystyki: ilość przetargów ogólnie, ilość wygranych przetargów, ilość przegranych przetargów, średnia wartość przetargu, ilość unikalnych developerów, ilość firm z którymi współpracowaano
-              jakies ladne ikonki do tego
-            </p>
-          </aside>
+          
+            <div className="flex">
+            {/* inne elementy strony */}
+            <TenderStatsSidebar />
+          </div>
+          
         </div>
       </div>
     </>

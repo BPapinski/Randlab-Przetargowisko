@@ -12,6 +12,9 @@ class TenderStatsAPIView(APIView):
         won_tenders = Tender.objects.filter(status="won").count()
         lost_tenders = Tender.objects.filter(status="lost").count()
         unresolved_tenders = Tender.objects.filter(status="unresolved").count()
+        unique_developer_companies = (
+            TenderEntry.objects.values("company").distinct().count()
+        )
 
         avg_tender_value = Tender.objects.annotate(
             total_value=Sum("entries__total_price")
@@ -36,6 +39,7 @@ class TenderStatsAPIView(APIView):
             "avg_tender_value": float(avg_tender_value),
             "unique_developers": unique_developers,
             "unique_clients": unique_clients,
+            "unique_developer_companies": unique_developer_companies,
         }
 
         return Response(data, status=status.HTTP_200_OK)
