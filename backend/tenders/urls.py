@@ -6,6 +6,7 @@ from .views import (
     TenderCreateView,
     TenderEntryRetrieveUpdateDestroyView,
     TenderListAPIView,
+    TenderUpdateAPIView,
     UniqueClientListView,
     add_tender_entry,
     toggle_tender_active,
@@ -26,5 +27,14 @@ urlpatterns = [
         TenderEntryRetrieveUpdateDestroyView.as_view(),
         name="tender-entry-detail",
     ),
-    path("tender/<int:tender_id>/entries/", add_tender_entry, name="add-tender-entry"),
+    path(
+        "tender/<int:tender_id>/entries/",
+        add_tender_entry,
+        name="add-tender-entry",
+    ),
+    path(
+        "tenders/<int:id>/",
+        TenderUpdateAPIView.as_view(),
+        name="tender-update",
+    ),
 ]
