@@ -40,6 +40,7 @@ body {
     border-radius: 8px;
     box-sizing: border-box;
     height: auto;
+    align-self: flex-start;
 }
 
 .sidebar h3,
