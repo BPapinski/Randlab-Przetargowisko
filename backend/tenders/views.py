@@ -31,6 +31,9 @@ class TenderListAPIView(generics.ListAPIView):
                 Value(0, output_field=DecimalField()),
             )
         ).prefetch_related("entries")
+
+        qs = qs.filter(is_active=True)
+
         params = self.request.query_params
 
         client = params.get("client")
