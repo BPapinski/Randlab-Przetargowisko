@@ -1,110 +1,114 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import Pagination from "@mui/material/Pagination";
+
 import "./styles/indexStyles.css";
 import Header from "../components/Header";
 import TenderList from "../components/TenderList";
 import FilterSidebar from "../components/FilterSidebar";
-import { AuthFetch } from "../utils/AuthFetch";
-import { useDebounce } from "../hooks/useDebounce";
-import Pagination from '@mui/material/Pagination';
-import Select from 'react-select';
 import TenderStatsSidebar from "../components/TenderStatsSidebar";
 
+import { AuthFetch } from "../utils/AuthFetch";
+import { useDebounce } from "../hooks/useDebounce";
+
 export default function IndexPage() {
+  // --- Routing & URL params ---
   const location = useLocation();
   const navigate = useNavigate();
-
-  const [tenders, setTenders] = useState([]);
-  const [error, setError] = useState(null);
-  const [totalPages, setTotalPages] = useState(1);
-  const [isLoading, setIsLoading] = useState(false);
-
-  const [companies, setCompanies] = useState([]);
-  const [selectedCompany, setSelectedCompany] = useState("");
-  const [selectedClient, setSelectedClient] = useState("");
-  const [priceFrom, setPriceFrom] = useState("");
-  const [priceTo, setPriceTo] = useState("");
-  const [status, setStatus] = useState("");
-  const [client, setClient] = useState("");
-  const [clients, setClients] = useState([]);
-  const [statusFilter, setStatusFilter] = useState("");
-
-  const [tempPriceFrom, setTempPriceFrom] = useState("");
-  const [tempPriceTo, setTempPriceTo] = useState("");
-  const debouncedClient = useDebounce(client, 500);
-  const debouncedPriceFrom = useDebounce(tempPriceFrom, 500);
-  const debouncedPriceTo = useDebounce(tempPriceTo, 500);
-
   const params = new URLSearchParams(location.search);
+
   const currentPage = parseInt(params.get("page"), 10) || 1;
   const tendersPerPage = parseInt(params.get("page_size"), 10) || 10;
   const urlSearchTerm = params.get("search") || "";
   const ordering = params.get("ordering") || "-date";
 
-  const [searchInput, setSearchInput] = useState(urlSearchTerm);
-  const debouncedSearch = useDebounce(searchInput, 500);
+  // --- Global state ---
+  const [tenders, setTenders] = useState([]);
+  const [companies, setCompanies] = useState([]);
+  const [clients, setClients] = useState([]);
+  const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [totalPages, setTotalPages] = useState(1);
 
   const [stats, setStats] = useState(null);
   const [statsLoading, setStatsLoading] = useState(true);
 
+  // --- Filters state ---
+  const [searchInput, setSearchInput] = useState(urlSearchTerm);
+  const debouncedSearch = useDebounce(searchInput, 500);
+
+  const [selectedCompany, setSelectedCompany] = useState("");
+  const [selectedClient, setSelectedClient] = useState("");
+
+  const [tempPriceFrom, setTempPriceFrom] = useState("");
+  const [tempPriceTo, setTempPriceTo] = useState("");
+  const debouncedPriceFrom = useDebounce(tempPriceFrom, 500);
+  const debouncedPriceTo = useDebounce(tempPriceTo, 500);
+
+  const [statusFilter, setStatusFilter] = useState("");
+
+  const [sortOrder, setSortOrder] = useState(() => {
+    const reverseSortMap = {
+      created_at: "date_asc",
+      "-created_at": "date_desc",
+      updated_at: "updated_asc",
+      "-updated_at": "updated_desc",
+      price: "price_asc",
+      "-price": "price_desc",
+    };
+    return reverseSortMap[ordering] || "";
+  });
+
+  // --- Options for selects ---
+  const companyOptions = [
+    { value: null, label: "Wszystkie firmy" },
+    ...companies.map((company) => ({ value: company, label: company })),
+  ];
+
+  const clientOptions = [
+    { value: null, label: "Wszyscy klienci" },
+    ...clients.map((client) => ({ value: client, label: client })),
+  ];
+
+  // --- URL sync ---
+  const updateUrl = (newParams) => {
+    const params = new URLSearchParams(location.search);
+    Object.entries(newParams).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== "") {
+        params.set(key, value);
+      } else {
+        params.delete(key);
+      }
+    });
+    navigate({ search: params.toString() });
+  };
+
+  // --- Effects: sync filters from URL ---
+  useEffect(() => {
+    setSelectedCompany(params.get("company") || "");
+    setSelectedClient(params.get("client") || "");
+    setTempPriceFrom(params.get("price_from") || "");
+    setTempPriceTo(params.get("price_to") || "");
+    setStatusFilter(params.get("status") || "");
+  }, [location.search]);
+
+  // --- Effects: debounce search ---
   useEffect(() => {
     if (debouncedSearch !== urlSearchTerm) {
       updateUrl({ search: debouncedSearch, page: 1, page_size: tendersPerPage });
     }
   }, [debouncedSearch, urlSearchTerm, tendersPerPage]);
 
-  const companyOptions = [
-    { value: null, label: 'Wszystkie firmy' },
-    ...companies.map(company => ({
-      value: company,
-      label: company,
-    }))
-  ];
-
-  const clientOptions = [
-    { value: null, label: 'Wszyscy klienci' },
-    ...clients.map(client => ({
-      value: client,
-      label: client,
-    }))
-  ];
-
+  // --- Effects: debounce prices ---
   useEffect(() => {
-    setSelectedCompany(params.get("company") || "");
-    setPriceFrom(params.get("price_from") || "");
-    setPriceTo(params.get("price_to") || "");
-    setStatus(params.get("status") || "");
-    setClient(params.get("client") || "");
-  }, [location.search]);
-
-  const resetFilters = () => {
-    setSortOrder('');
-    setStatusFilter('');
-    setTempPriceFrom('');
-    setTempPriceTo('');
-    setSelectedClient(null);
-    setSelectedCompany(null);
-    setPriceFrom('');
-    setPriceTo('');
-    setStatus('');
-    setClient('');
     updateUrl({
+      price_from: debouncedPriceFrom,
+      price_to: debouncedPriceTo,
       page: 1,
-      search: '',
-      company: null,
-      client: null,
-      price_from: '',
-      price_to: '',
-      status: '',
-      ordering: '',
     });
-  };
+  }, [debouncedPriceFrom, debouncedPriceTo]);
 
-  const handleLogoClick = () => {
-    resetFilters();
-    navigate('/');
-  };
-
+  // --- Fetching ---
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -112,10 +116,8 @@ export default function IndexPage() {
           AuthFetch("/api/companies/"),
           AuthFetch("/api/clients/"),
         ]);
-        const companiesData = await companiesRes.json();
-        const clientsData = await clientsRes.json();
-        setCompanies(companiesData);
-        setClients(clientsData);
+        setCompanies(await companiesRes.json());
+        setClients(await clientsRes.json());
       } catch (error) {
         console.error("Failed to fetch data:", error);
         setCompanies([]);
@@ -129,11 +131,8 @@ export default function IndexPage() {
     setStatsLoading(true);
     try {
       const statsRes = await AuthFetch("/api/stats/tender-stats/");
-      if (!statsRes.ok) {
-        throw new Error("Błąd podczas pobierania statystyk.");
-      }
-      const statsData = await statsRes.json();
-      setStats(statsData);
+      if (!statsRes.ok) throw new Error("Błąd podczas pobierania statystyk.");
+      setStats(await statsRes.json());
     } catch (err) {
       console.error(err);
     } finally {
@@ -145,19 +144,13 @@ export default function IndexPage() {
     setIsLoading(true);
     setError(null);
     const params = new URLSearchParams(location.search);
-    const apiUrl = `/api/tenders/?${params.toString()}`;
     try {
-      const tendersRes = await AuthFetch(apiUrl);
-      if (tendersRes.status === 401) {
-        navigate("/login");
-        return;
-      }
-      if (!tendersRes.ok) {
-        throw new Error("Błąd podczas pobierania przetargów.");
-      }
-      const tendersData = await tendersRes.json();
-      setTenders(tendersData.results || []);
-      setTotalPages(Math.ceil(tendersData.count / tendersPerPage));
+      const tendersRes = await AuthFetch(`/api/tenders/?${params.toString()}`);
+      if (tendersRes.status === 401) return navigate("/login");
+      if (!tendersRes.ok) throw new Error("Błąd podczas pobierania przetargów.");
+      const data = await tendersRes.json();
+      setTenders(data.results || []);
+      setTotalPages(Math.ceil(data.count / tendersPerPage));
     } catch (err) {
       setError("Nie udało się pobrać danych.");
       console.error(err);
@@ -175,54 +168,47 @@ export default function IndexPage() {
     fetchAllData();
   }, [fetchAllData]);
 
-  const handleUpdateTender = useCallback((updatedTender) => {
-    setTenders(prevTenders =>
-      prevTenders.map(tender =>
-        tender.id === updatedTender.id ? updatedTender : tender
-      )
-    );
-    // Odświeżamy tylko statystyki po lokalnej aktualizacji przetargu
-    fetchStats();
-  }, [fetchStats]);
+  // --- Handlers ---
+  const handleUpdateTender = useCallback(
+    (updatedTender) => {
+      setTenders((prev) =>
+        prev.map((t) => (t.id === updatedTender.id ? updatedTender : t))
+      );
+      fetchStats();
+    },
+    [fetchStats]
+  );
 
-  const [sortOrder, setSortOrder] = useState(() => {
-    const ordering = params.get("ordering") || "-created_at";
-    const reverseSortMap = {
-      created_at: "date_asc",
-      "-created_at": "date_desc",
-      updated_at: "updated_asc",
-      "-updated_at": "updated_desc",
-      price: "price_asc",
-      "-price": "price_desc",
-    };
-    return reverseSortMap[ordering] || "";
-  });
+  const handleLogoClick = () => {
+    resetFilters();
+    navigate("/");
+  };
 
-  const updateUrl = (newParams) => {
-    const params = new URLSearchParams(location.search);
-    Object.entries(newParams).forEach(([key, value]) => {
-      if (value !== undefined && value !== null && value !== "") {
-        params.set(key, value);
-      } else {
-        params.delete(key);
-      }
+  const resetFilters = () => {
+    setSortOrder("");
+    setStatusFilter("");
+    setTempPriceFrom("");
+    setTempPriceTo("");
+    setSelectedClient(null);
+    setSelectedCompany(null);
+    updateUrl({
+      page: 1,
+      search: "",
+      company: null,
+      client: null,
+      price_from: "",
+      price_to: "",
+      status: "",
+      ordering: "",
     });
-    navigate({ search: params.toString() });
   };
 
-  const handlePageChange = (page) => {
-    updateUrl({ page, page_size: tendersPerPage });
-  };
+  const handlePageChange = (page) => updateUrl({ page, page_size: tendersPerPage });
+  const handleSearchChange = (e) => setSearchInput(e.target.value);
+  const handleTendersPerPageChange = (e) =>
+    updateUrl({ page: 1, page_size: Number(e.target.value) });
 
-  const handleSearchChange = (event) => {
-    setSearchInput(event.target.value);
-  };
-
-  const handleTendersPerPageChange = (event) => {
-    updateUrl({ page: 1, page_size: Number(event.target.value) });
-  };
-
-  const handleSortChange = (event) => {
+  const handleSortChange = (e) => {
     const sortMap = {
       date_asc: "created_at",
       date_desc: "-created_at",
@@ -231,55 +217,33 @@ export default function IndexPage() {
       price_asc: "price",
       price_desc: "-price",
     };
-    const selectedSort = event.target.value;
-    setSortOrder(selectedSort);
-    updateUrl({ ordering: sortMap[selectedSort], page: 1 });
+    setSortOrder(e.target.value);
+    updateUrl({ ordering: sortMap[e.target.value], page: 1 });
   };
 
-  const handleCompanyChange = (selectedOption) => {
-    if (!selectedOption) {
-      setSelectedCompany(null);
-      updateUrl({ company: null, page: 1 });
-    } else {
-      updateUrl({ company: selectedOption.value, page: 1 });
-      setSelectedCompany(selectedOption ? selectedOption.value : null);
-    }
+  const handleCompanyChange = (opt) => {
+    setSelectedCompany(opt ? opt.value : null);
+    updateUrl({ company: opt ? opt.value : null, page: 1 });
   };
 
-  const handleClientChange = (selectedOption) => {
-    if (!selectedOption) {
-      setSelectedClient(null);
-      updateUrl({ client: null, page: 1 });
-    } else {
-      updateUrl({ client: selectedOption.value, page: 1 });
-      setSelectedClient(selectedOption ? selectedOption.value : null);
-    }
+  const handleClientChange = (opt) => {
+    setSelectedClient(opt ? opt.value : null);
+    updateUrl({ client: opt ? opt.value : null, page: 1 });
   };
 
-  useEffect(() => {
-    updateUrl({
-      price_from: debouncedPriceFrom,
-      price_to: debouncedPriceTo,
-      page: 1,
-    });
-  }, [debouncedPriceFrom, debouncedPriceTo]);
-
-  useEffect(() => {
-    setTempPriceFrom(priceFrom);
-    setTempPriceTo(priceTo);
-  }, [priceFrom, priceTo]);
-
-  const handleStatusChange = (event) => {
-    setStatusFilter(event.target.value);
-    updateUrl({
-      status: event.target.value,
-      page: 1,
-    });
+  const handleStatusChange = (e) => {
+    setStatusFilter(e.target.value);
+    updateUrl({ status: e.target.value, page: 1 });
   };
 
+  // --- Render ---
   return (
     <>
-      <Header searchTerm={searchInput} onSearchChange={handleSearchChange} onLogoClick={handleLogoClick} />
+      <Header
+        searchTerm={searchInput}
+        onSearchChange={handleSearchChange}
+        onLogoClick={handleLogoClick}
+      />
       <div className="container">
         <div className="content-wrapper">
           <FilterSidebar
@@ -314,7 +278,9 @@ export default function IndexPage() {
               </select>
               <span>przetargów na stronę</span>
             </div>
+
             {isLoading && <p>Ładowanie przetargów...</p>}
+
             {!isLoading && (
               <TenderList
                 tenders={tenders}
@@ -325,6 +291,7 @@ export default function IndexPage() {
                 onToggleActive={fetchAllData}
               />
             )}
+
             {!isLoading && totalPages > 1 && (
               <div className="pagination">
                 <Pagination
@@ -339,14 +306,13 @@ export default function IndexPage() {
                   shape="rounded"
                   siblingCount={1}
                   boundaryCount={1}
-                  sx={{ marginTop: '1rem' }}
+                  sx={{ marginTop: "1rem" }}
                 />
               </div>
             )}
           </main>
-          <div className="flex">
-            <TenderStatsSidebar stats={stats} loading={statsLoading}/>
-          </div>
+
+          <TenderStatsSidebar stats={stats} loading={statsLoading} />
         </div>
       </div>
     </>

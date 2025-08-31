@@ -28,12 +28,17 @@ export default function TenderCardEntry({ subEntry, selectedCompany, onUpdate })
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  
+
   const handleSave = async () => {
     try {
       const updatedEntry = {
         ...subEntry,
         ...formData,
-        total_price: totalPrice,
+        total_price: (
+        (parseFloat(formData.developer_price) || 0) *
+        (1 + (parseFloat(formData.margin) || 0) / 100)
+      ).toFixed(2),
       };
 
       delete updatedEntry.updated_at;
@@ -46,6 +51,8 @@ export default function TenderCardEntry({ subEntry, selectedCompany, onUpdate })
 
       if (!res.ok) throw new Error("Błąd podczas zapisywania zmian");
 
+      
+      setTotalPrice(updatedEntry.total_price);
       setIsEditing(false);
       if (onUpdate) onUpdate({ ...updatedEntry, updated_at: new Date().toISOString() });
     } catch (err) {
@@ -152,11 +159,11 @@ export default function TenderCardEntry({ subEntry, selectedCompany, onUpdate })
           </>
         ) : (
           <>
-            <p><strong>Stanowisko:</strong> {subEntry.position}</p>
-            <p><strong>Firma:</strong> {subEntry.company}</p>
-            <p><strong>Cena developera:</strong> {subEntry.developer_price} zł</p>
-            <p><strong>Marża:</strong> {subEntry.margin}%</p>
-            <p><strong>Cena końcowa:</strong> {subEntry.total_price} zł</p>
+            <p><strong>Stanowisko:</strong> {formData.position}</p>
+            <p><strong>Firma:</strong> {formData.company}</p>
+            <p><strong>Cena developera:</strong> {formData.developer_price} zł</p>
+            <p><strong>Marża:</strong> {formData.margin}%</p>
+            <p><strong>Cena końcowa:</strong> {totalPrice} zł</p>
             {expandedDescription ? (
               <>
                 <strong>
@@ -167,7 +174,7 @@ export default function TenderCardEntry({ subEntry, selectedCompany, onUpdate })
                     Zwiń ▲
                   </span>
                 </strong>
-                <p>{subEntry.description || "Brak dodatkowego opisu."}</p>
+                <p>{formData.description || "Brak dodatkowego opisu."}</p>
               </>
             ) : (
               <>

@@ -5,7 +5,7 @@ import styles from "./styles/TenderEntryForm.module.css";
 import headerStyles from "./styles/TenderCardStyles/TenderCardHeader.module.css"
 import { AuthFetch } from '../utils/AuthFetch';
 
-export default function TenderCard({ entry, selectedCompany, onToggleActive, companies, onUpdateTender }) { // Dodaj onUpdateTender do propsów
+export default function TenderCard({ entry, selectedCompany, onToggleActive, companies, onUpdateTender }) {
     const [localTender, setlocalTender] = useState(entry);
     const [totalValue, setTotalValue] = useState(entry.price);
     const [showForm, setShowForm] = useState(false);
@@ -19,6 +19,10 @@ export default function TenderCard({ entry, selectedCompany, onToggleActive, com
     });
     const [companySuggestions, setCompanySuggestions] = useState([]);
     const [isSuggestionsVisible, setIsSuggestionsVisible] = useState(false);
+
+    const localTotalValue = localTender.entries
+  .reduce((acc, e) => acc + parseFloat(e.total_price || 0), 0)
+  .toFixed(2);
 
 
     const onEditClick = (id) => {
@@ -56,10 +60,7 @@ export default function TenderCard({ entry, selectedCompany, onToggleActive, com
         setTotalValue(sum.toFixed(2));
     }, [localTender.entries]);
 
-    // Ta funkcja jest niepotrzebna i powinna zostać usunięta
-    // const handleUpdateEntry = (updatedSubEntry) => { ... }
-
-
+    
     const getStatusClass = (status) => {
         switch (status) {
             case "won":
@@ -177,6 +178,34 @@ export default function TenderCard({ entry, selectedCompany, onToggleActive, com
         }
     };
 
+    const handleEntryUpdate = (updatedEntry) => {
+  setlocalTender((prev) => {
+    let newEntries;
+
+    if (updatedEntry.deleted) {
+      newEntries = prev.entries.filter(e => e.id !== updatedEntry.id);
+    } else {
+      newEntries = prev.entries.map(e =>
+        e.id === updatedEntry.id ? updatedEntry : e
+      );
+    }
+
+    const updatedTender = {
+      ...prev,
+      entries: newEntries,
+      updated_at: new Date().toISOString(),
+    };
+
+    // 🔔 wywołaj callback do rodzica
+    if (onUpdateTender) {
+      onUpdateTender(updatedTender);
+    }
+
+    return updatedTender;
+  });
+};
+
+
     return (
         <div key={localTender.id} className="tender-card">
             <div className={headerStyles['tender-header']}>
@@ -241,7 +270,7 @@ export default function TenderCard({ entry, selectedCompany, onToggleActive, com
                         <p className={headerStyles.dates}>
                             Utworzono: {new Date(localTender.created_at).toLocaleString()} <br />
                             Zaktualizowano: {new Date(localTender.updated_at).toLocaleString()} <br />
-                            <span className={headerStyles['total-value']}>Wartość całkowita: {totalValue} zł</span>
+                            <span className={headerStyles['total-value']}>Wartość całkowita: {localTotalValue} zł</span>
                         </p>
 
                         <div className={headerStyles['tender-actions']}>
@@ -262,7 +291,7 @@ export default function TenderCard({ entry, selectedCompany, onToggleActive, com
                         </div>
                     </div>
                 ) : (
-                    <div className={headerStyles['tender-header']}>
+                    <div>
                         <h2>{localTender.name}</h2>
                         <p><span className="info-label">Klient:</span> {localTender.client}</p>
                         <p><span className="info-label">Status: </span>
@@ -280,6 +309,7 @@ export default function TenderCard({ entry, selectedCompany, onToggleActive, com
                             Zaktualizowano: {new Date(localTender.updated_at).toLocaleString()}<br />
                             <span className={headerStyles['total-value']}>Wartość całkowita: {totalValue} zł</span>
                         </p>
+                        
                         <div className={headerStyles['tender-actions']}>
                             <button className={headerStyles['delete-tender-btn']} onClick={() => onToggleActive(localTender.id)}>Usuń przetarg</button>
                             <button className={headerStyles['edit-tender-btn']} onClick={() => onEditClick(localTender.id)}>Edytuj przetarg</button>
@@ -307,7 +337,7 @@ export default function TenderCard({ entry, selectedCompany, onToggleActive, com
                                 key={subEntry.id}
                                 subEntry={subEntry}
                                 selectedCompany={selectedCompany}
-                                onUpdate={onUpdateTender} // Przekaż onUpdateTender do podrzędnego komponentu
+                                onUpdate={handleEntryUpdate} // Przekaż onUpdateTender do podrzędnego komponentu
                             />
                         ))
                 )}
