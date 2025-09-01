@@ -1,3 +1,17 @@
+[tool.flake8]
+max-line-length = 79
+extend-ignore = "E501"
+exclude = [
+    ".venv",
+    "venv",
+    "node_modules",
+    "frontend",
+    "migrations",
+    "static",
+    "site-packages",
+    "backend/users/migrations"
+]
+
 [tool.black]
 line-length = 79
 target-version = ['py310']
