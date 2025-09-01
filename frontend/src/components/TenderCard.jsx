@@ -1,12 +1,11 @@
-// src/components/TenderCard.jsx
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import TenderCardEntry from "./TenderCardEntry";
 import styles from "./styles/TenderEntryForm.module.css";
-import headerStyles from "./styles/TenderCardStyles/TenderCardHeader.module.css"
+import headerStyles from "./styles/TenderCardStyles/TenderCardHeader.module.css";
 import { AuthFetch } from '../utils/AuthFetch';
 
 export default function TenderCard({ entry, selectedCompany, onToggleActive, companies, onUpdateTender }) {
-    const [localTender, setlocalTender] = useState(entry);
+    const [localTender, setLocalTender] = useState(entry);
     const [totalValue, setTotalValue] = useState(entry.price);
     const [showForm, setShowForm] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
@@ -19,11 +18,12 @@ export default function TenderCard({ entry, selectedCompany, onToggleActive, com
     });
     const [companySuggestions, setCompanySuggestions] = useState([]);
     const [isSuggestionsVisible, setIsSuggestionsVisible] = useState(false);
+    const [dragActive, setDragActive] = useState(false);
+    const fileInputRef = useRef(null);
 
     const localTotalValue = localTender.entries
-  .reduce((acc, e) => acc + parseFloat(e.total_price || 0), 0)
-  .toFixed(2);
-
+        .reduce((acc, e) => acc + parseFloat(e.total_price || 0), 0)
+        .toFixed(2);
 
     const onEditClick = (id) => {
         setIsEditing(true);
@@ -50,8 +50,6 @@ export default function TenderCard({ entry, selectedCompany, onToggleActive, com
         });
     };
 
-
-
     useEffect(() => {
         const sum = localTender.entries.reduce(
             (acc, e) => acc + parseFloat(e.total_price || 0),
@@ -60,7 +58,6 @@ export default function TenderCard({ entry, selectedCompany, onToggleActive, com
         setTotalValue(sum.toFixed(2));
     }, [localTender.entries]);
 
-    
     const getStatusClass = (status) => {
         switch (status) {
             case "won":
@@ -99,7 +96,7 @@ export default function TenderCard({ entry, selectedCompany, onToggleActive, com
     };
 
     const handleInputFocus = () => {
-        setCompanySuggestions(companies.filter(company => typeof company === 'string')); // Show all valid companies
+        setCompanySuggestions(companies.filter(company => typeof company === 'string'));
         setIsSuggestionsVisible(true);
     };
 
@@ -126,7 +123,7 @@ export default function TenderCard({ entry, selectedCompany, onToggleActive, com
 
             if (response.ok) {
                 const newEntry = await response.json();
-                setlocalTender({
+                setLocalTender({
                     ...localTender,
                     entries: [...localTender.entries, newEntry],
                     updated_at: new Date().toISOString(),
@@ -164,14 +161,10 @@ export default function TenderCard({ entry, selectedCompany, onToggleActive, com
             }
 
             const updatedTenderData = await res.json();
-
             if (onUpdateTender) {
                 onUpdateTender(updatedTenderData);
             }
-
-            //alert("Przetarg został zaktualizowany!");
             setIsEditing(false);
-
         } catch (err) {
             console.error("Błąd zapisu:", err);
             alert(err.message);
@@ -179,32 +172,88 @@ export default function TenderCard({ entry, selectedCompany, onToggleActive, com
     };
 
     const handleEntryUpdate = (updatedEntry) => {
-  setlocalTender((prev) => {
-    let newEntries;
+        setLocalTender((prev) => {
+            let newEntries;
+            if (updatedEntry.deleted) {
+                newEntries = prev.entries.filter(e => e.id !== updatedEntry.id);
+            } else {
+                newEntries = prev.entries.map(e =>
+                    e.id === updatedEntry.id ? updatedEntry : e
+                );
+            }
 
-    if (updatedEntry.deleted) {
-      newEntries = prev.entries.filter(e => e.id !== updatedEntry.id);
-    } else {
-      newEntries = prev.entries.map(e =>
-        e.id === updatedEntry.id ? updatedEntry : e
-      );
-    }
+            const updatedTender = {
+                ...prev,
+                entries: newEntries,
+                updated_at: new Date().toISOString(),
+            };
 
-    const updatedTender = {
-      ...prev,
-      entries: newEntries,
-      updated_at: new Date().toISOString(),
+            if (onUpdateTender) {
+                onUpdateTender(updatedTender);
+            }
+
+            return updatedTender;
+        });
     };
 
-    // 🔔 wywołaj callback do rodzica
-    if (onUpdateTender) {
-      onUpdateTender(updatedTender);
-    }
+    const handleDragOver = (e) => {
+        e.preventDefault();
+        setDragActive(true);
+    };
 
-    return updatedTender;
-  });
-};
+    const handleDragLeave = (e) => {
+        e.preventDefault();
+        setDragActive(false);
+    };
 
+    const handleDrop = async (e) => {
+        e.preventDefault();
+        setDragActive(false);
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            await handleFileUpload(files[0]);
+        }
+    };
+
+    const handleFileSelect = async (e) => {
+        const files = e.target.files;
+        if (files.length > 0) {
+            await handleFileUpload(files[0]);
+        }
+    };
+
+    const handleFileUpload = async (file) => {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+            const response = await AuthFetch(`/api/tenders/${localTender.id}/upload-file/`, {
+                method: "POST",
+                body: formData,
+            });
+
+            if (response.ok) {
+                const newFile = await response.json();
+                setLocalTender({
+                    ...localTender,
+                    uploaded_files: [...localTender.uploaded_files, newFile],
+                    updated_at: new Date().toISOString(),
+                });
+                if (onUpdateTender) {
+                    onUpdateTender({
+                        ...localTender,
+                        uploaded_files: [...localTender.uploaded_files, newFile],
+                    });
+                }
+            } else {
+                console.error("Failed to upload file:", response.statusText);
+                alert("Błąd podczas przesyłania pliku: " + response.statusText);
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            alert("Wystąpił błąd podczas przesyłania pliku: " + error.message);
+        }
+    };
 
     return (
         <div key={localTender.id} className="tender-card">
@@ -217,30 +266,28 @@ export default function TenderCard({ entry, selectedCompany, onToggleActive, com
                                 type="text"
                                 value={localTender.name}
                                 onChange={e =>
-                                    setlocalTender({ ...localTender, name: e.target.value })
+                                    setLocalTender({ ...localTender, name: e.target.value })
                                 }
                                 className={headerStyles['edit-input']}
                             />
                         </p>
-
                         <p>
                             <span className="info-label">Klient:</span>
                             <input
                                 type="text"
                                 value={localTender.client}
                                 onChange={e =>
-                                    setlocalTender({ ...localTender, client: e.target.value })
+                                    setLocalTender({ ...localTender, client: e.target.value })
                                 }
                                 className={headerStyles['edit-input']}
                             />
                         </p>
-
                         <p>
                             <span className="info-label">Status:</span>
                             <select
                                 value={localTender.status}
                                 onChange={e =>
-                                    setlocalTender({ ...localTender, status: e.target.value })
+                                    setLocalTender({ ...localTender, status: e.target.value })
                                 }
                                 className={headerStyles['edit-input']}
                             >
@@ -249,7 +296,6 @@ export default function TenderCard({ entry, selectedCompany, onToggleActive, com
                                 <option value="unresolved">Nierozstrzygnięty</option>
                             </select>
                         </p>
-
                         {localTender.implementation_link && (
                             <p>
                                 <span className="info-label">Link do realizacji:</span>
@@ -257,7 +303,7 @@ export default function TenderCard({ entry, selectedCompany, onToggleActive, com
                                     type="text"
                                     value={localTender.implementation_link || ""}
                                     onChange={e =>
-                                        setlocalTender({
+                                        setLocalTender({
                                             ...localTender,
                                             implementation_link: e.target.value
                                         })
@@ -266,13 +312,12 @@ export default function TenderCard({ entry, selectedCompany, onToggleActive, com
                                 />
                             </p>
                         )}
-
                         <p className={headerStyles.dates}>
                             Utworzono: {new Date(localTender.created_at).toLocaleString()} <br />
                             Zaktualizowano: {new Date(localTender.updated_at).toLocaleString()} <br />
                             <span className={headerStyles['total-value']}>Wartość całkowita: {localTotalValue} zł</span>
                         </p>
-
+                        
                         <div className={headerStyles['tender-actions']}>
                             <button
                                 type="button"
@@ -309,7 +354,6 @@ export default function TenderCard({ entry, selectedCompany, onToggleActive, com
                             Zaktualizowano: {new Date(localTender.updated_at).toLocaleString()}<br />
                             <span className={headerStyles['total-value']}>Wartość całkowita: {totalValue} zł</span>
                         </p>
-                        
                         <div className={headerStyles['tender-actions']}>
                             <button className={headerStyles['delete-tender-btn']} onClick={() => onToggleActive(localTender.id)}>Usuń przetarg</button>
                             <button className={headerStyles['edit-tender-btn']} onClick={() => onEditClick(localTender.id)}>Edytuj przetarg</button>
@@ -317,8 +361,6 @@ export default function TenderCard({ entry, selectedCompany, onToggleActive, com
                     </div>
                 )}
             </div>
-
-
 
             <h3 className="entries-title">Developerzy:</h3>
             <div className="entries">
@@ -337,9 +379,94 @@ export default function TenderCard({ entry, selectedCompany, onToggleActive, com
                                 key={subEntry.id}
                                 subEntry={subEntry}
                                 selectedCompany={selectedCompany}
-                                onUpdate={handleEntryUpdate} // Przekaż onUpdateTender do podrzędnego komponentu
+                                onUpdate={handleEntryUpdate}
                             />
                         ))
+                )}
+            </div>
+
+            <h3 className="files-title">Pliki:</h3>
+                {isEditing ?<div
+                            className={headerStyles['file-upload-section']}
+                            onDragOver={handleDragOver}
+                            onDragLeave={handleDragLeave}
+                            onDrop={handleDrop}
+                            style={{
+                                border: dragActive ? '2px dashed #3498DB' : '2px dashed #BDC3C7',
+                                borderRadius: '6px',
+                                padding: '1rem',
+                                textAlign: 'center',
+                                backgroundColor: dragActive ? '#f0f8ff' : '#f9f9f9',
+                                marginTop: '1rem',
+                                cursor: 'pointer'
+                            }}
+                            onClick={() => fileInputRef.current.click()}
+                        >
+                            <input
+                                type="file"
+                                ref={fileInputRef}
+                                style={{ display: 'none' }}
+                                onChange={handleFileSelect}
+                            />
+                            <p style={{ color: '#2C3E50', margin: '0', fontSize: '0.9rem' }}>
+                                {dragActive ? 'Upuść plik tutaj' : 'Przeciągnij i upuść plik lub kliknij, aby wybrać'}
+                            </p>
+                        </div> : <></>}
+            
+
+
+            <div className="files-section" style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', marginTop: '1rem' }}>
+                {localTender.uploaded_files.length === 0 ? (
+                    <p className="no-files">Brak plików dla tego przetargu.</p>
+                ) : (
+                    localTender.uploaded_files.map((file) => (
+                        <div
+                            key={file.id}
+                            className={headerStyles['file-tile']}
+                            style={{
+                                backgroundColor: '#f9f9f9',
+                                border: '1px solid #BDC3C7',
+                                borderRadius: '6px',
+                                padding: '1rem',
+                                width: '200px',
+                                textAlign: 'center',
+                                boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
+                                transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+                            }}
+                            onMouseOver={(e) => {
+                                e.currentTarget.style.transform = 'translateY(-2px)';
+                                e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.15)';
+                            }}
+                            onMouseOut={(e) => {
+                                e.currentTarget.style.transform = 'translateY(0)';
+                                e.currentTarget.style.boxShadow = '0 2px 6px rgba(0,0,0,0.1)';
+                            }}
+                        >
+                            <a
+                                href={file.file}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style={{
+                                    textDecoration: 'none',
+                                    color: '#3498DB',
+                                    fontWeight: 'bold',
+                                    wordBreak: 'break-word',
+                                    display: 'block',
+                                    marginBottom: '0.5rem',
+                                    fontSize: '0.9rem'
+                                }}
+                            >
+                                {file.file.split('/').pop()}
+                            </a>
+                            <p style={{
+                                fontSize: '0.8rem',
+                                color: '#7F8C8D',
+                                margin: '0'
+                            }}>
+                                Wgrano: {new Date(file.uploaded_at).toLocaleString()}
+                            </p>
+                        </div>
+                    ))
                 )}
             </div>
 
