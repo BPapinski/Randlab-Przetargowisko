@@ -2,7 +2,7 @@ from django import forms
 from django.contrib import admin
 from django.db.models import Sum
 
-from .models import Tender, TenderEntry
+from .models import Tender, TenderEntry, UploadedFile
 
 
 class TenderEntryInlineForm(forms.ModelForm):
@@ -12,7 +12,9 @@ class TenderEntryInlineForm(forms.ModelForm):
 
     def save(self, commit=True):
         instance = super().save(commit=False)
-        instance.total_price = instance.developer_price * (1 + instance.margin / 100)
+        instance.total_price = instance.developer_price * (
+            1 + instance.margin / 100
+        )
         if commit:
             instance.save()
         return instance
@@ -24,14 +26,25 @@ class TenderEntryInline(admin.TabularInline):
     extra = 1
     show_change_link = True
     readonly_fields = ["total_price"]
-    fields = ("position", "company", "developer_price", "margin", "total_price")
+    fields = (
+        "position",
+        "company",
+        "developer_price",
+        "margin",
+        "total_price",
+    )
     verbose_name = "Tender entry"
     verbose_name_plural = "Tender entries"
 
 
+class UploadedFileInline(admin.TabularInline):
+    model = UploadedFile
+    extra = 1
+
+
 @admin.register(Tender)
 class TenderAdmin(admin.ModelAdmin):
-    inlines = [TenderEntryInline]
+    inlines = [TenderEntryInline, UploadedFileInline]
     readonly_fields = ["total_tender_price_display"]
     list_display = (
         "id",

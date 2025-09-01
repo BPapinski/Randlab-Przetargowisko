@@ -1,3 +1,5 @@
+from django.conf import settings
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 from rest_framework_simplejwt.views import (  # TokenBlacklistView,
@@ -20,3 +22,8 @@ urlpatterns = [
     path("api/aliases/", include("aliases.urls")),
     path("api/stats/", include("app_statistics.urls")),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(
+        settings.MEDIA_URL, document_root=settings.MEDIA_ROOT
+    )

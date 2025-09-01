@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Tender, TenderEntry
+from .models import Tender, TenderEntry, UploadedFile
 
 
 class TenderEntrySerializer(serializers.ModelSerializer):
@@ -20,9 +20,16 @@ class TenderEntrySerializer(serializers.ModelSerializer):
         read_only_fields = ["id", "total_price", "created_at", "updated_at"]
 
 
+class UploadedFileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UploadedFile
+        fields = ["id", "file", "uploaded_at"]
+
+
 class TenderSerializer(serializers.ModelSerializer):
     entries = TenderEntrySerializer(many=True, read_only=True)
     price = serializers.FloatField(read_only=True)
+    uploaded_files = UploadedFileSerializer(many=True, read_only=True)
 
     class Meta:
         model = Tender
@@ -37,6 +44,7 @@ class TenderSerializer(serializers.ModelSerializer):
             "client",
             "status",
             "implementation_link",
+            "uploaded_files",
         ]
 
 
@@ -45,7 +53,14 @@ class TenderCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Tender
-        fields = ["id", "name", "entries", "client", "status", "implementation_link"]
+        fields = [
+            "id",
+            "name",
+            "entries",
+            "client",
+            "status",
+            "implementation_link",
+        ]
 
     def create(self, validated_data):
         entries_data = validated_data.pop("entries")

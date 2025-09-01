@@ -146,6 +146,8 @@ AUTH_USER_MODEL = "users.User"
 
 # JWT settings
 
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
 
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),

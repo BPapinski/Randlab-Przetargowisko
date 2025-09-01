@@ -2,6 +2,10 @@ from django.db import models
 from django.utils import timezone
 
 
+def tender_file_upload_to(instance, filename):
+    return f"tender_files/{instance.tender.id}/{filename}"
+
+
 class Tender(models.Model):
     STATUS_CHOICES = [
         ("won", "Won"),
@@ -19,14 +23,14 @@ class Tender(models.Model):
     client = models.CharField(
         max_length=255,
         verbose_name="Client",
-        default="Unknown",  # Wartość domyślna dla istniejących rekordów
+        default="Unknown",
     )
 
     implementation_link = models.URLField(
         max_length=200,
         blank=True,
         null=True,
-        default="",  # Wartość domyślna dla istniejących rekordów
+        default="",
     )
 
     created_at = models.DateTimeField(
@@ -45,6 +49,13 @@ class Tender(models.Model):
         )
 
     total_tender_price.short_description = "Total tender value"
+
+    def get_uploaded_files(self):
+        """Zwraca listę URL-i do plików powiązanych z przetargiem."""
+        return [
+            uploaded_file.file.url
+            for uploaded_file in self.uploaded_files.all()
+        ]
 
 
 class TenderEntry(models.Model):
@@ -82,3 +93,14 @@ class TenderEntry(models.Model):
 
     def __str__(self):
         return f"{self.position} – {self.company} ({self.total_price:.2f} zł)"
+
+
+class UploadedFile(models.Model):
+    tender = models.ForeignKey(
+        "Tender", on_delete=models.CASCADE, related_name="uploaded_files"
+    )
+    file = models.FileField(upload_to=tender_file_upload_to)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"File for Tender {self.tender.id}: {self.file.name}"
