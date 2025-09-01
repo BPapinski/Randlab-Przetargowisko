@@ -1,77 +1,70 @@
 # Randlab-Przetargowisko
 
-Aplikacja webowa typu full-stack wykorzystująca Django (backend) oraz React (frontend) z bazą danych PostgreSQL (wcześniej MSSQL).
+A full-stack web application for tender management, built with **Django** (backend), **React** (frontend), and **PostgreSQL** (database).
 
----
+## 🛠️ Technology Stack
 
-## 🛠️ Stack technologiczny
+- **Backend**: `Django`, `Django REST Framework`
+- **Frontend**: `React` (Create React App)
+- **Database**: `PostgreSQL` (managed in Docker)
+- **Other tools**:
+  - `psycopg2-binary`: PostgreSQL driver for Django
+  - `django-cors-headers`: Handles CORS
+  - `Jazzmin`: Enhances admin panel
 
-- **Backend:** Django, Django REST Framework  
-- **Frontend:** React (Create React App)  
-- **Baza danych:** PostgreSQL (zarządzana w Dockerze)  
-- **Inne:**  
-  - psycopg2-binary (obsługa PostgreSQL w Django)  
-  - django-cors-headers (obsługa CORS dla Reacta)  
-  - Jazzmin (usprawnienie panelu admina)  
+## 🚀 Key Features
 
----
+### Tender Management
+- **Adding**: Form to add tenders with *name*, *status*, *client*, and unlimited *developers* (position, company, price, margin).
+- **Attachments**: Add any number of attachments to tenders.
 
-## 🔧 Co zostało zrobione
+### Searching and Filtering
+- Search bar and filters to sort tenders by *price*, *client*, *company*, and *status*.
+- Position aliasing groups similar names (e.g., `Frontend Dev` and `Frontend Developer`) for simplified filtering and analysis.
 
-- Konfiguracja narzędzi wspierających jakość kodu:
-  - ✅ flake8 do analizy kodu  
-  - ✅ isort do automatycznego sortowania importów  
-  - ✅ black jako formatator kodu  
-  - ✅ integracja z pre-commit  
-- Migracja z MSSQL do PostgreSQL  
-- Uruchomienie projektu w kontenerach Docker:  
-  - ✅ Backend Django  
-  - ✅ Frontend React  
-  - ✅ Baza PostgreSQL w kontenerze z wolumenem danych  
-- Utworzenie i konfiguracja projektu (backend + frontend)  
-- Niestandardowy model użytkownika i REST API w Django  
-- Implementacja paginacji, JWT, uwierzytelniania i czarnej listy tokenów  
-- System słownika aliasów w frontendzie i backendzie  
-- Rozszerzenie panelu administracyjnego dla `TenderEntry` i `Tender`  
+### Data Visualization
+- Sidebar displays real-time stats:
+  - Total tenders
+  - Statuses (*won*/*lost*)
+  - Average value
+  - Unique developers
 
----
+### Authentication and Security
+- JWT-based user authentication with token blacklist for revoked tokens.
 
-## 🚀 Jak uruchomić projekt lokalnie (Docker)
+### Enhanced Admin Panel
+- `Jazzmin` library improves admin panel for managing `Tender` and `TenderEntry` models.
 
-1. **Uruchomienie kontenerów**
+## 🔧 Technical Solutions
+- **Code Quality**: `flake8`, `isort`, and `black` with pre-commit hooks for automated code validation/formatting.
+- **Migration**: Migrated from MSSQL to PostgreSQL.
+- **Containerization**: Runs in Docker containers (`Django` backend, `React` frontend, `PostgreSQL` database).
+- **API**: Custom user model with REST API supporting pagination.
+
+
+## 🚀 Running Locally (Docker)
+
+1. Start containers:
 ```bash
 docker-compose up -d
 ```
-2. **Sprawdzenie logów**
-```bash
-docker-compose logs -f backend   # backend Django
-docker-compose logs -f frontend  # frontend React
-docker-compose logs -f db        # baza PostgreSQL
-```
-3. **Dostęp do aplikacji**
+
+2. Access the application:
+
 Backend: http://localhost:8000/
 Frontend: http://localhost:3000/
-4. **Wejście do kontenerów (shell)**
-```bash
-docker-compose exec backend bash   # shell backend Django
-docker-compose exec frontend bash  # shell frontend React
-docker-compose exec db bash        # shell PostgreSQL
-```
-5. **Sprawdzenie połączenia Django z bazą**
-```bash
-docker-compose exec backend python manage.py dbshell
-```
-6. **Wykonanie migracji lub reset bazy**
+
+3. Run migrations:
 ```bash
 docker-compose exec backend python manage.py migrate
-docker-compose down -v  # usuwa kontenery i wolumeny bazy danych
 ```
-7. **Sprawdzenie działania frontend**
+4. Populate database with sample data:
 ```bash
-docker-compose exec frontend npm start
+docker-compose exec backend python populate.py
 ```
-
-8. **Uruchamianie skryptu do wypełniania bazy**
+5. Clean up environment
 ```bash
-docker exec -it django_app python populate.py
+docker-compose down -v
 ```
+[!NOTE]
+Ensure Docker is installed and running before executing the above commands.
