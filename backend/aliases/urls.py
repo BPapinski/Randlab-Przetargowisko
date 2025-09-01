@@ -9,7 +9,11 @@ urlpatterns = [
         name="tender_entries_by_standard_position",
     ),
     path("groups/", views.alias_group_list_names, name="alias_group_list"),
-    path("aliases/groups/", views.AliasGroupList.as_view(), name="alias-group-list"),
+    path(
+        "aliases/groups/",
+        views.AliasGroupList.as_view(),
+        name="alias-group-list",
+    ),
     path("getaliases/", views.AliasList, name="alias-create"),
     path(
         "aliases/tender-entries/",
