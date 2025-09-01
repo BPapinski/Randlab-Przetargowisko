@@ -9,11 +9,12 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .models import Tender, TenderEntry
+from .models import Tender, TenderEntry, UploadedFile
 from .serializers import (
     TenderCreateSerializer,
     TenderEntrySerializer,
     TenderSerializer,
+    UploadedFileSerializer,
 )
 
 
@@ -147,3 +148,14 @@ def add_tender_entry(request, tender_id):
         serializer.save(tender=tender)  # tender przekazujemy ręcznie
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UploadedFileCreateView(generics.CreateAPIView):
+    queryset = UploadedFile.objects.all()
+    serializer_class = UploadedFileSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def perform_create(self, serializer):
+        tender_id = self.kwargs.get("tender_id")
+        tender = Tender.objects.get(pk=tender_id)
+        serializer.save(tender=tender)

@@ -8,6 +8,7 @@ from .views import (
     TenderListAPIView,
     TenderUpdateAPIView,
     UniqueClientListView,
+    UploadedFileCreateView,
     add_tender_entry,
     toggle_tender_active,
 )
@@ -36,5 +37,10 @@ urlpatterns = [
         "tenders/<int:id>/",
         TenderUpdateAPIView.as_view(),
         name="tender-update",
+    ),
+    path(
+        "tenders/<int:tender_id>/upload-file/",
+        UploadedFileCreateView.as_view(),
+        name="tender-upload-file",
     ),
 ]

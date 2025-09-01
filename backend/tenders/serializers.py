@@ -68,3 +68,10 @@ class TenderCreateSerializer(serializers.ModelSerializer):
         for entry_data in entries_data:
             TenderEntry.objects.create(tender=tender, **entry_data)
         return tender
+
+
+class UploadedFileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UploadedFile
+        fields = ["id", "file", "uploaded_at", "tender"]
+        read_only_fields = ["id", "uploaded_at", "tender"]

@@ -23,5 +23,7 @@ db.sqlite3
 /frontend/build/
 /frontend/.env
 
+/backend/media/
+
 # Env files
 .env
