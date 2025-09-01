@@ -1,12 +1,10 @@
-import React, { useState, useRef } from 'react'; // Dodajemy useRef
+import React, { useState, useRef } from 'react';
 import { AuthFetch } from '../utils/AuthFetch';
 import styles from '../pages/styles/FormStyles.module.css';
 import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import CreatableSelect from 'react-select/creatable';
 
-
-// Komponent z ikoną Excela w formacie SVG
 const ExcelIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={styles.excelIcon}>
         <path d="M14 2H6a2 2 0 0 0-2 2v16c0 1.1.9 2 2 2h12a2 2 0 0 0 2-2V8l-6-6z" />
@@ -18,55 +16,54 @@ const ExcelIcon = () => (
 );
 
 function TenderForm() {
-    const [status, setStatus] = useState('unresolved'); // domyślny status
+    const [status, setStatus] = useState('unresolved'); 
     const [client, setClient] = useState('');
     const [implementationLink, setImplementationLink] = useState('');
     const [name, setName] = useState('');
     const [companies, setCompanies] = useState([]);
     const [clients, setClients] = useState([]);
     const [entries, setEntries] = useState([
-        { position: '', company: '', developer_price: '', margin: '', description: '' }, // Dodajemy 'description'
+        { position: '', company: '', developer_price: '', margin: '', description: '' },
     ]);
     const [message, setMessage] = useState(null);
     const navigate = useNavigate();
-    const [company, setCompany] = useState(null); // Nowy stan dla firmy
+    const [company, setCompany] = useState(null);
 
-    // Refy dla textarea, aby móc dynamicznie zmieniać ich wysokość
     const textareaRefs = useRef([]);
 
 
     const clientOptions = [
-    { value: null, label: 'Wszyscy klienci' },
-    ...clients.map(client => ({
-        value: client,
-        label: client,
-    }))
+        { value: null, label: 'Wszyscy klienci' },
+        ...clients.map(client => ({
+            value: client,
+            label: client,
+        }))
     ];
 
     const companyOptions = [
-    ...companies.map(company => ({
-        value: company,
-        label: company,
-    }))
+        ...companies.map(company => ({
+            value: company,
+            label: company,
+        }))
     ];
 
     useEffect(() => {
         const fetchData = async () => {
-          try {
-            const [companiesRes, clientsRes] = await Promise.all([
-              AuthFetch("/api/companies/"),
-              AuthFetch("/api/clients/"),
-            ]);
-            const companiesData = await companiesRes.json();
-            const clientsData = await clientsRes.json();
-            setCompanies(companiesData);
-            setClients(clientsData);
-    
-          } catch (error) {
-            console.error("Failed to fetch data:", error);
-            setCompanies([]);
-            setClients([]);
-          }
+            try {
+                const [companiesRes, clientsRes] = await Promise.all([
+                    AuthFetch("/api/companies/"),
+                    AuthFetch("/api/clients/"),
+                ]);
+                const companiesData = await companiesRes.json();
+                const clientsData = await clientsRes.json();
+                setCompanies(companiesData);
+                setClients(clientsData);
+
+            } catch (error) {
+                console.error("Failed to fetch data:", error);
+                setCompanies([]);
+                setClients([]);
+            }
         };
         fetchData();
     }, []);
@@ -91,7 +88,6 @@ function TenderForm() {
                 if (response.status === 401 || response.status === 400) {
                     console.log('Invalid or missing token, redirecting to /login');
                     navigate('/login');
-                    // return; // Niepotrzebne, navigate już przekierowuje
                 }
             } catch (error) {
                 console.error('Auth check error:', error);
@@ -102,14 +98,18 @@ function TenderForm() {
     }, [navigate]);
     const adjustTextareaHeight = (textarea) => {
         if (textarea) {
-            textarea.style.height = 'auto'; 
+            textarea.style.height = 'auto';
             textarea.style.height = textarea.scrollHeight + 'px';
         }
     };
 
     const handleEntryChange = (index, field, value) => {
         const updated = [...entries];
-        updated[index][field] = value;
+        if (field === 'company') {
+            updated[index][field] = value ? value.value : '';
+        } else {
+            updated[index][field] = value;
+        }
         setEntries(updated);
         if (field === 'description') {
             adjustTextareaHeight(textareaRefs.current[index]);
@@ -127,13 +127,13 @@ function TenderForm() {
     const addEntry = () => {
         setEntries([
             ...entries,
-            { position: '', company: '', developer_price: '', margin: '', description: '' }, 
+            { position: '', company: '', developer_price: '', margin: '', description: '' },
         ]);
         setTimeout(() => {
             const lastTextarea = textareaRefs.current[textareaRefs.current.length - 1];
             if (lastTextarea) {
                 lastTextarea.focus();
-                adjustTextareaHeight(lastTextarea); 
+                adjustTextareaHeight(lastTextarea);
             }
         }, 0);
     };
@@ -146,9 +146,9 @@ function TenderForm() {
 
     const handleClientChange = (selectedOption) => {
         if (selectedOption) {
-        setClient(selectedOption.value);
+            setClient(selectedOption.value);
         } else {
-        setClient(null);
+            setClient(null);
         }
     };
 
@@ -181,7 +181,7 @@ function TenderForm() {
                 setMessage('Przetarg został utworzony!');
                 setName('');
                 setClient('');
-                setImplementationLink(''); 
+                setImplementationLink('');
                 setStatus('unresolved');
                 setEntries([{ position: '', company: '', developer_price: '', margin: '', description: '' }]);
                 textareaRefs.current = [];
@@ -233,7 +233,7 @@ function TenderForm() {
                     </select>
                 </div>
 
-            
+
                 <div className={styles.fieldGroup}>
                     <label className={styles.label}>Link do implementacji (opcjonalny):</label>
                     <input
@@ -259,15 +259,15 @@ function TenderForm() {
                             </div>
                             <div className={styles.fieldGroup}>
                                 <label className={styles.label}>Firma:</label>
-                                
+
                                 <CreatableSelect
                                     options={companyOptions}
                                     placeholder="Wybierz/wpisz firme..."
                                     isClearable
-                                    onChange={handleCompanyChange}
+                                    onChange={(selectedOption) => handleEntryChange(index, 'company', selectedOption)}
                                     value={entry.company ? { value: entry.company, label: entry.company } : null}
                                 />
-                                
+
                             </div>
                             <div className={styles.fieldGroup}>
                                 <label className={styles.label}>Cena dewelopera:</label>
@@ -289,14 +289,14 @@ function TenderForm() {
                                     required
                                 />
                             </div>
-                            <div className={`${styles.fieldGroup} ${styles.descriptionField}`}> 
+                            <div className={`${styles.fieldGroup} ${styles.descriptionField}`}>
                                 <label className={styles.label}>Opis stanowiska:</label>
                                 <textarea
-                                    ref={el => (textareaRefs.current[index] = el)} 
-                                    value={entry.description} 
+                                    ref={el => (textareaRefs.current[index] = el)}
+                                    value={entry.description}
                                     onChange={(e) => handleEntryChange(index, 'description', e.target.value)}
-                                    className={styles.textareaAutosize} 
-                                    rows="1" 
+                                    className={styles.textareaAutosize}
+                                    rows="1"
                                     required
                                 />
                             </div>
