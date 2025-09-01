@@ -43,8 +43,8 @@ const translateError = (message) => {
         'A tender with this name already exists.': 'Przetarg o tej nazwie już istnieje.',
         'Ensure that there are no more than 4 digits before the decimal point.': 'Wartość musi mieć maksymalnie 4 cyfry przed przecinkiem.',
         'Ensure this value is greater than or equal to 0.': 'Wartość musi być większa lub równa 0.',
-        'Ensure that there are no more than 12 digits in total.':'Wartość może mieć maksymalnie 12 cyfr.',
-        'Ensure that there are no more than 6 digits in total.':'Wartość może mieć maksymalnie 6 cyfr.',
+        'Ensure that there are no more than 12 digits in total.': 'Wartość może mieć maksymalnie 12 cyfr.',
+        'Ensure that there are no more than 6 digits in total.': 'Wartość może mieć maksymalnie 6 cyfr.',
     };
     return translations[message] || message;
 };
@@ -234,16 +234,47 @@ function TenderForm() {
         alert("Funkcjonalność importu z Excela zostanie dodana wkrótce!");
     };
 
+    function validateURL(url) {
+        if (!url || typeof url !== 'string') {
+            return null;
+        }
+
+        // Próba walidacji oryginalnego URL
+        try {
+            const validUrl = new URL(url);
+            return validUrl.href;
+        } catch (e) {
+            // Jeśli walidacja się nie powiodła, spróbuj dodać protokół
+            try {
+                const tempUrl = `https://${url}`;
+                const validUrl = new URL(tempUrl);
+                return validUrl.href;
+            } catch (e) {
+                // Jeśli obie próby się nie powiodły, zwróc null
+                return null;
+            }
+        }
+    }
+
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setErrors([]);
-        
+
+        const formattedImplementationLink = validateURL(implementationLink);
+
+        if (implementationLink && formattedImplementationLink === false) {
+            setErrors(['Link do implementacji: Wprowadź poprawny adres URL, np. www.google.com lub https://google.com']);
+            return; // Przerwij wysyłanie formularza
+        }
+
+
         try {
             const payload = {
                 name,
                 status,
                 client,
-                implementation_link: implementationLink,
+                implementation_link: formattedImplementationLink,
                 entries: entries.map((entry) => ({
                     ...entry,
                     developer_price: parseFloat(entry.developer_price),
@@ -345,9 +376,12 @@ function TenderForm() {
                 <div className={styles.fieldGroup}>
                     <label className={styles.label}>Link do implementacji (opcjonalny):</label>
                     <input
-                        type="url"
+                        type="text"
                         value={implementationLink}
                         onChange={(e) => setImplementationLink(e.target.value)}
+                        onInvalid={(e) => e.target.setCustomValidity('Wprowadź poprawny adres URL, np. www.google.com lub https://google.com')}
+                        onInput={(e) => e.target.setCustomValidity('')}
+                        pattern="(https?:\/\/.+)|(www\..+)|(.+\..+)"
                         className={styles.input}
                     />
                 </div>
