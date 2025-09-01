@@ -16,7 +16,7 @@ const ExcelIcon = () => (
 );
 
 function TenderForm() {
-    const [status, setStatus] = useState('unresolved'); 
+    const [status, setStatus] = useState('unresolved');
     const [client, setClient] = useState('');
     const [implementationLink, setImplementationLink] = useState('');
     const [name, setName] = useState('');
@@ -26,9 +26,9 @@ function TenderForm() {
         { position: '', company: '', developer_price: '', margin: '', description: '' },
     ]);
     const [message, setMessage] = useState(null);
+    const [files, setFiles] = useState([]);
     const navigate = useNavigate();
     const [company, setCompany] = useState(null);
-
     const textareaRefs = useRef([]);
 
 
@@ -144,6 +144,17 @@ function TenderForm() {
         textareaRefs.current.splice(index, 1);
     };
 
+    const handleFileChange = (e) => {
+        setFiles([...files, ...Array.from(e.target.files)]);
+    };
+
+    const handleDrop = (e) => {
+        e.preventDefault();
+        setFiles([...files, ...Array.from(e.dataTransfer.files)]);
+    };
+
+    const handleDragOver = (e) => e.preventDefault();
+
     const handleClientChange = (selectedOption) => {
         if (selectedOption) {
             setClient(selectedOption.value);
@@ -177,17 +188,37 @@ function TenderForm() {
                 body: JSON.stringify(payload),
             });
 
+            if (!response.ok) {
+                const data = await response.json();
+                setMessage(`Błąd: ${data.detail || 'Nie udało się zapisać przetargu.'}`);
+                return;
+            }
+
+
+            const tenderData = await response.json();
+            const tenderId = tenderData.id;
+
+            if (files.length > 0) {
+                for (const file of files) {
+                    const formData = new FormData();
+                    formData.append('file', file);
+                    await AuthFetch(`/api/tenders/${tenderId}/upload-file/`, {
+                        method: 'POST',
+                        body: formData
+                    });
+                }
+            }
+
+
             if (response.ok) {
                 setMessage('Przetarg został utworzony!');
                 setName('');
                 setClient('');
+                setFiles([])
                 setImplementationLink('');
                 setStatus('unresolved');
                 setEntries([{ position: '', company: '', developer_price: '', margin: '', description: '' }]);
                 textareaRefs.current = [];
-            } else {
-                const data = await response.json();
-                setMessage(`Błąd: ${data.detail || 'Nie udało się zapisać przetargu.'}`);
             }
         } catch (error) {
             console.error(error);
@@ -316,6 +347,29 @@ function TenderForm() {
                         Dodaj pozycję
                     </button>
                 </div>
+
+                <div className={styles.fieldGroup}>
+                    <label className={styles.label}>Dodaj pliki (opcjonalnie):</label>
+                    <div
+                        className={styles.fileDropArea}
+                        onDrop={handleDrop}
+                        onDragOver={handleDragOver}
+                    >
+                        Przeciągnij i upuść pliki tutaj lub kliknij, aby wybrać
+                        <input
+                            type="file"
+                            multiple
+                            onChange={handleFileChange}
+                            className={styles.fileInput}
+                        />
+                    </div>
+                    {files.length > 0 && (
+                        <ul className={styles.fileList}>
+                            {files.map((file, idx) => <li key={idx}>{file.name}</li>)}
+                        </ul>
+                    )}
+                </div>
+
 
                 <div className={styles.submitActions}>
                     <button type="submit" className={styles.submitBtn}>
