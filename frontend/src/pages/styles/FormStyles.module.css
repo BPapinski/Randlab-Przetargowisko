@@ -44,7 +44,6 @@
   background-color: #FFFFFF;
 }
 
-/* Nowy styl dla textarea, który będzie automatycznie dopasowywał wysokość */
 .textareaAutosize {
   width: 100%;
   padding: 0.5rem 0.75rem;
@@ -53,10 +52,10 @@
   background-color: #ECF0F1;
   color: #2C3E50;
   box-sizing: border-box;
-  resize: none; /* Wyłączamy domyślne resize */
-  overflow: hidden; /* Ukrywamy scrollbar */
-  min-height: 50px; /* Minimalna wysokość, aby była większa niż input */
-  line-height: 1.5; /* Dla lepszego czytania */
+  resize: none;
+  overflow: hidden;
+  min-height: 50px;
+  line-height: 1.5;
 }
 
 .textareaAutosize:focus {
@@ -82,7 +81,6 @@
   width: fit-content;
   margin-left: auto;
 }
-
 
 .addBtn {
   background-color: #3498DB;
@@ -119,9 +117,8 @@
   margin-bottom: 1rem;
 }
 
-/* Dodajemy ten styl, aby pole opisu zajmowało więcej miejsca */
 .descriptionField {
-    grid-column: 1 / -1; /* Rozciągnij na całą szerokość siatki */
+    grid-column: 1 / -1;
 }
 
 .entryFields .fieldGroup {
@@ -178,3 +175,101 @@
     height: 20px;
 }
 
+/* Nowe style dla pola dodawania plików */
+.fileDropArea {
+    border: 2px dashed #BDC3C7;
+    border-radius: 8px;
+    padding: 2rem;
+    text-align: center;
+    color: #7F8C8D;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.fileDropArea:hover {
+    border-color: #3498DB;
+    background-color: #F8F9FA;
+    color: #3498DB;
+}
+
+/* NOWY STYL DLA PODŚWIETLENIA */
+.fileDropAreaActive {
+    border-color: #3498DB;
+    background-color: #e8f5fd; /* Bardziej subtelny kolor tła */
+    color: #3498DB;
+    box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.2); /* Delikatna poświata */
+}
+
+.fileInput {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.fileList {
+    list-style: none;
+    padding: 0;
+    margin-top: 1rem;
+}
+
+.fileList li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem;
+    background-color: #ECF0F1;
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
+    color: #34495E;
+    font-weight: 500;
+}
+
+.removeFileBtn {
+    background: none;
+    border: none;
+    color: #E74C3C;
+    cursor: pointer;
+    margin-left: 1rem;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s ease;
+}
+
+.removeFileBtn:hover {
+    color: #C0392B;
+}
+
+.removeFileBtn svg {
+    width: 16px;
+    height: 16px;
+}
+
+.errorList {
+    list-style: none;
+    padding: 0;
+    margin-top: 1.5rem;
+    text-align: left;
+}
+
+.errorMessage {
+    background-color: #F8D7DA;
+    color: #721C24;
+    border: 1px solid #F5C6CB;
+    border-radius: 4px;
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.errorMessage:first-child {
+    font-weight: bold;
+}

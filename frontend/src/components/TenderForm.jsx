@@ -15,6 +15,64 @@ const ExcelIcon = () => (
     </svg>
 );
 
+const FileXIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+        <polyline points="14 2 14 8 20 8" />
+        <line x1="16" y1="16" x2="8" y2="8" />
+        <line x1="8" y1="16" x2="16" y2="8" />
+    </svg>
+);
+
+const fieldNames = {
+    name: 'Nazwa przetargu',
+    client: 'Klient',
+    implementation_link: 'Link do implementacji',
+    position: 'Pozycja',
+    company: 'Firma',
+    developer_price: 'Cena dewelopera',
+    margin: 'Marża',
+    description: 'Opis stanowiska',
+};
+
+const translateError = (message) => {
+    const translations = {
+        'This field may not be blank.': 'To pole nie może być puste.',
+        'This field is required.': 'To pole jest wymagane.',
+        'Enter a valid URL.': 'Wprowadź poprawny adres URL.',
+        'A tender with this name already exists.': 'Przetarg o tej nazwie już istnieje.',
+        'Ensure that there are no more than 4 digits before the decimal point.': 'Wartość musi mieć maksymalnie 4 cyfry przed przecinkiem.',
+        'Ensure this value is greater than or equal to 0.': 'Wartość musi być większa lub równa 0.',
+        'Ensure that there are no more than 12 digits in total.':'Wartość może mieć maksymalnie 12 cyfr.',
+        'Ensure that there are no more than 6 digits in total.':'Wartość może mieć maksymalnie 6 cyfr.',
+    };
+    return translations[message] || message;
+};
+
+const formatErrors = (errorObject, prefix = '') => {
+    let formattedErrors = [];
+    if (typeof errorObject === 'string') {
+        formattedErrors.push(prefix ? `${prefix}: ${translateError(errorObject)}` : translateError(errorObject));
+    } else if (Array.isArray(errorObject)) {
+        errorObject.forEach((item, index) => {
+            formattedErrors = formattedErrors.concat(formatErrors(item, prefix || `Pozycja ${index + 1}`));
+        });
+    } else if (typeof errorObject === 'object') {
+        Object.keys(errorObject).forEach(key => {
+            const fieldName = fieldNames[key] || key;
+            if (key === 'non_field_errors') {
+                formattedErrors = formattedErrors.concat(formatErrors(errorObject[key], 'Błąd ogólny'));
+            } else if (key === 'entries') {
+                formattedErrors = formattedErrors.concat(formatErrors(errorObject[key], `Pozycja`));
+            } else {
+                const newPrefix = prefix ? `${prefix}: ${fieldName}` : fieldName;
+                formattedErrors = formattedErrors.concat(formatErrors(errorObject[key], newPrefix));
+            }
+        });
+    }
+    return formattedErrors;
+};
+
 function TenderForm() {
     const [status, setStatus] = useState('unresolved');
     const [client, setClient] = useState('');
@@ -25,12 +83,12 @@ function TenderForm() {
     const [entries, setEntries] = useState([
         { position: '', company: '', developer_price: '', margin: '', description: '' },
     ]);
-    const [message, setMessage] = useState(null);
+    const [errors, setErrors] = useState([]);
     const [files, setFiles] = useState([]);
+    const [isDragOver, setIsDragOver] = useState(false);
     const navigate = useNavigate();
-    const [company, setCompany] = useState(null);
     const textareaRefs = useRef([]);
-
+    const fileInputRef = useRef(null);
 
     const clientOptions = [
         { value: null, label: 'Wszyscy klienci' },
@@ -58,7 +116,6 @@ function TenderForm() {
                 const clientsData = await clientsRes.json();
                 setCompanies(companiesData);
                 setClients(clientsData);
-
             } catch (error) {
                 console.error("Failed to fetch data:", error);
                 setCompanies([]);
@@ -68,13 +125,11 @@ function TenderForm() {
         fetchData();
     }, []);
 
-
     useEffect(() => {
         const checkAuth = async () => {
             try {
                 const token = localStorage.getItem('access_token');
                 if (!token) {
-                    console.log('No token found, redirecting to /login');
                     navigate('/login');
                     return;
                 }
@@ -86,7 +141,6 @@ function TenderForm() {
                 });
 
                 if (response.status === 401 || response.status === 400) {
-                    console.log('Invalid or missing token, redirecting to /login');
                     navigate('/login');
                 }
             } catch (error) {
@@ -96,6 +150,7 @@ function TenderForm() {
         };
         checkAuth();
     }, [navigate]);
+
     const adjustTextareaHeight = (textarea) => {
         if (textarea) {
             textarea.style.height = 'auto';
@@ -113,14 +168,6 @@ function TenderForm() {
         setEntries(updated);
         if (field === 'description') {
             adjustTextareaHeight(textareaRefs.current[index]);
-        }
-    };
-
-    const handleCompanyChange = (selectedOption) => {
-        if (selectedOption) {
-            setCompany(selectedOption.value);
-        } else {
-            setCompany(null);
         }
     };
 
@@ -145,15 +192,35 @@ function TenderForm() {
     };
 
     const handleFileChange = (e) => {
-        setFiles([...files, ...Array.from(e.target.files)]);
+        const selectedFiles = Array.from(e.target.files);
+        setFiles(prevFiles => [...prevFiles, ...selectedFiles]);
+    };
+
+    const handleRemoveFile = (fileToRemove) => {
+        setFiles(prevFiles => prevFiles.filter(file => file !== fileToRemove));
     };
 
     const handleDrop = (e) => {
         e.preventDefault();
-        setFiles([...files, ...Array.from(e.dataTransfer.files)]);
+        setIsDragOver(false);
+        const droppedFiles = Array.from(e.dataTransfer.files);
+        setFiles(prevFiles => [...prevFiles, ...droppedFiles]);
     };
 
-    const handleDragOver = (e) => e.preventDefault();
+    const handleDragOver = (e) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'copy';
+    };
+
+    const handleDragEnter = (e) => {
+        e.preventDefault();
+        setIsDragOver(true);
+    };
+
+    const handleDragLeave = (e) => {
+        e.preventDefault();
+        setIsDragOver(false);
+    };
 
     const handleClientChange = (selectedOption) => {
         if (selectedOption) {
@@ -169,6 +236,8 @@ function TenderForm() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setErrors([]);
+        
         try {
             const payload = {
                 name,
@@ -190,10 +259,10 @@ function TenderForm() {
 
             if (!response.ok) {
                 const data = await response.json();
-                setMessage(`Błąd: ${data.detail || 'Nie udało się zapisać przetargu.'}`);
+                const formattedErrors = formatErrors(data);
+                setErrors(formattedErrors);
                 return;
             }
-
 
             const tenderData = await response.json();
             const tenderId = tenderData.id;
@@ -209,12 +278,11 @@ function TenderForm() {
                 }
             }
 
-
             if (response.ok) {
-                setMessage('Przetarg został utworzony!');
+                setErrors(['Przetarg został utworzony!']);
                 setName('');
                 setClient('');
-                setFiles([])
+                setFiles([]);
                 setImplementationLink('');
                 setStatus('unresolved');
                 setEntries([{ position: '', company: '', developer_price: '', margin: '', description: '' }]);
@@ -222,7 +290,7 @@ function TenderForm() {
             }
         } catch (error) {
             console.error(error);
-            setMessage('Wystąpił błąd sieci.');
+            setErrors(['Wystąpił błąd sieci.']);
         }
     };
 
@@ -249,6 +317,16 @@ function TenderForm() {
                         onChange={handleClientChange}
                         value={client ? { value: client, label: client } : null}
                     />
+                    {/* Ukryte pole input dla walidacji przeglądarki */}
+                    <input
+                        type="text"
+                        tabIndex={-1}
+                        autoComplete="off"
+                        style={{ opacity: 0, height: 0, padding: 0, border: 'none' }}
+                        value={client || ''}
+                        required
+                        readOnly
+                    />
                 </div>
                 <div className={styles.fieldGroup}>
                     <label className={styles.label}>Status:</label>
@@ -263,7 +341,6 @@ function TenderForm() {
                         <option value="lost">Przegrany</option>
                     </select>
                 </div>
-
 
                 <div className={styles.fieldGroup}>
                     <label className={styles.label}>Link do implementacji (opcjonalny):</label>
@@ -290,7 +367,6 @@ function TenderForm() {
                             </div>
                             <div className={styles.fieldGroup}>
                                 <label className={styles.label}>Firma:</label>
-
                                 <CreatableSelect
                                     options={companyOptions}
                                     placeholder="Wybierz/wpisz firme..."
@@ -298,7 +374,15 @@ function TenderForm() {
                                     onChange={(selectedOption) => handleEntryChange(index, 'company', selectedOption)}
                                     value={entry.company ? { value: entry.company, label: entry.company } : null}
                                 />
-
+                                <input
+                                    type="text"
+                                    tabIndex={-1}
+                                    autoComplete="off"
+                                    style={{ opacity: 0, height: 0, padding: 0, border: 'none' }}
+                                    value={entry.company || ''}
+                                    required
+                                    readOnly
+                                />
                             </div>
                             <div className={styles.fieldGroup}>
                                 <label className={styles.label}>Cena dewelopera:</label>
@@ -351,12 +435,15 @@ function TenderForm() {
                 <div className={styles.fieldGroup}>
                     <label className={styles.label}>Dodaj pliki (opcjonalnie):</label>
                     <div
-                        className={styles.fileDropArea}
+                        className={`${styles.fileDropArea} ${isDragOver ? styles.fileDropAreaActive : ''}`}
                         onDrop={handleDrop}
                         onDragOver={handleDragOver}
+                        onDragEnter={handleDragEnter}
+                        onDragLeave={handleDragLeave}
                     >
                         Przeciągnij i upuść pliki tutaj lub kliknij, aby wybrać
                         <input
+                            ref={fileInputRef}
                             type="file"
                             multiple
                             onChange={handleFileChange}
@@ -365,11 +452,24 @@ function TenderForm() {
                     </div>
                     {files.length > 0 && (
                         <ul className={styles.fileList}>
-                            {files.map((file, idx) => <li key={idx}>{file.name}</li>)}
+                            {files.map((file, idx) => (
+                                <li key={idx}>
+                                    {file.name}
+                                    <button
+                                        type="button"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleRemoveFile(file);
+                                        }}
+                                        className={styles.removeFileBtn}
+                                    >
+                                        <FileXIcon />
+                                    </button>
+                                </li>
+                            ))}
                         </ul>
                     )}
                 </div>
-
 
                 <div className={styles.submitActions}>
                     <button type="submit" className={styles.submitBtn}>
@@ -381,7 +481,15 @@ function TenderForm() {
                     </button>
                 </div>
 
-                {message && <div className={styles.message}>{message}</div>}
+                {errors.length > 0 && (
+                    <ul className={styles.errorList}>
+                        {errors.map((error, index) => (
+                            <li key={index} className={styles.errorMessage}>
+                                {error}
+                            </li>
+                        ))}
+                    </ul>
+                )}
             </form>
         </div>
     );
