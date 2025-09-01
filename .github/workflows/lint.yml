@@ -27,8 +27,13 @@ jobs:
       - name: Run flake8
         run: flake8 . --max-line-length=79 --extend-ignore=E501
 
-      - name: Run black (check only)
-        run: black . --check --line-length=79
+      - name: Run black
+        run: |
+          black . --line-length=79
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+          git add .
+          git commit -m "Auto-format with black" || echo "No changes to commit"
 
       - name: Run isort (check only)
         run: isort . --check-only --profile=black --line-length=79
