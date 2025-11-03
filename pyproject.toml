@@ -1,28 +1,20 @@
-[tool.flake8]
-max-line-length = 79
-extend-ignore = "E501"
-exclude = [
-    ".venv",
-    "venv",
-    "node_modules",
-    "frontend",
-    "migrations",
-    "static",
-    "site-packages",
-    "backend/users/migrations"
-]
+[tool.poetry]
+name = "randlab-przetargowisko" 
+version = "0.1.0"
+description = "Randlab's przetargowisko project"
+authors = ["bartosz.papinski00@gmail.com"]
+readme = "README.md"
+package-mode = false
 
-[tool.black]
-line-length = 79
-target-version = ['py310']
-include = '\.pyi?$'
-exclude = '(\.venv|venv|node_modules|frontend|static|build|dist|migrations)/'
+[tool.poetry.dependencies]
+python = "^3.10" 
 
-[tool.isort]
-profile = "black"
-line_length = 79
-multi_line_output = 3
-include_trailing_comma = true
-known_first_party = ["backend", "users", "tenders", "aliases"]
-known_third_party = ["django", "rest_framework", "corsheaders", "jazzmin"]
-skip = [".venv", "venv", "node_modules", "frontend", "migrations", "static"]
+
+[tool.poetry.group.dev.dependencies]
+pre-commit = "^3.7.0"
+ruff = "^0.4.5"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

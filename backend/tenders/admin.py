@@ -12,9 +12,7 @@ class TenderEntryInlineForm(forms.ModelForm):
 
     def save(self, commit=True):
         instance = super().save(commit=False)
-        instance.total_price = instance.developer_price * (
-            1 + instance.margin / 100
-        )
+        instance.total_price = instance.developer_price * (1 + instance.margin / 100)
         if commit:
             instance.save()
         return instance

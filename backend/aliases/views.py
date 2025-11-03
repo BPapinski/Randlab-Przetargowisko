@@ -86,9 +86,7 @@ class TenderEntryList(generics.ListAPIView):
                 aliases_in_group = alias_group.aliases.values_list(
                     "alias_name", flat=True
                 )
-                return TenderEntry.objects.filter(
-                    position__in=aliases_in_group
-                )
+                return TenderEntry.objects.filter(position__in=aliases_in_group)
             except AliasGroup.DoesNotExist:
                 return TenderEntry.objects.none()
 
@@ -96,7 +94,6 @@ class TenderEntryList(generics.ListAPIView):
 
 
 class AliasGroupList(generics.ListCreateAPIView):
-
     permission_classes = [permissions.IsAuthenticated]
     queryset = AliasGroup.objects.all()
     serializer_class = AliasGroupSerializer
@@ -140,9 +137,7 @@ def create_alias_view(request):
         )
 
     # Utworzenie nowego aliasu i przypisanie go do grupy
-    alias = Alias.objects.create(
-        alias_group=alias_group, alias_name=entry_position
-    )
+    alias = Alias.objects.create(alias_group=alias_group, alias_name=entry_position)
 
     return Response(
         {

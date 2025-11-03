@@ -92,9 +92,7 @@ class TenderUpdateAPIView(generics.UpdateAPIView):
     lookup_field = "id"
 
 
-class TenderEntryRetrieveUpdateDestroyView(
-    generics.RetrieveUpdateDestroyAPIView
-):
+class TenderEntryRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     queryset = TenderEntry.objects.all()
     serializer_class = TenderEntrySerializer
 

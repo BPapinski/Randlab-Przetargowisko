@@ -28,9 +28,7 @@ class TenderStatsAPIView(APIView):
         ).aggregate(avg_value=Avg("total_value", output_field=FloatField()))[
             "avg_value"
         ]
-        avg_tender_value = (
-            round(avg_tender_value, 2) if avg_tender_value else 0
-        )
+        avg_tender_value = round(avg_tender_value, 2) if avg_tender_value else 0
 
         unique_developers = (
             TenderEntry.objects.filter(tender__is_active=True)

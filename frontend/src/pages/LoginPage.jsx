@@ -14,8 +14,8 @@ export default function LoginPage() {
     const navigate = useNavigate();
     const { performLogin, isLoggedIn } = useAuth();
 
-    const [email, setEmail] = useState("admin@email.com");
-    const [password, setPassword] = useState("admin");
+    const [email, setEmail] = useState("admin");
+    const [password, setPassword] = useState("password");
     const [error, setError] = useState("");
     const [isLoading, setIsLoading] = useState(false);
 
@@ -49,9 +49,9 @@ export default function LoginPage() {
                     <form onSubmit={handleSubmit} className={styles.loginForm}>
                         {error && <div className={styles.errorMessage}>{error}</div>}
                         <div className={styles.formGroup}>
-                            <label htmlFor="email">Adres email</label>
+                            <label>Nazwa użytkownika</label>
                             <input
-                                type="email"
+                                type="text"
                                 id="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}

@@ -1,20 +1,26 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { API_BASE_URL } from './config';
+import { INNOWISE_API_BASE_URL } from './config';
 
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
-
+    const [isLoading, setIsLoading] = useState(true);
     useEffect(() => {
-        const accessToken = localStorage.getItem('access_token');
-        if (accessToken) {
-            setIsLoggedIn(true);
+        try {
+            const token = localStorage.getItem('access_token');
+            if (token) {
+                setIsLoggedIn(true);
+            }
+        } catch (e) {
+            console.error("Nie udało się sprawdzić tokenu", e);
         }
+        setIsLoading(false);
     }, []);
 
 
-        
+
     const login = (accessToken, refreshToken) => {
         localStorage.setItem('access_token', accessToken);
         localStorage.setItem('refresh_token', refreshToken);
@@ -23,21 +29,40 @@ export const AuthProvider = ({ children }) => {
 
     const performLogin = async (email, password) => {
         try {
-            const response = await fetch(`${API_BASE_URL}/api/token/`, {
-                method: "POST",
+            const formBody = new URLSearchParams({
+                username: email, 
+                password: password,
+            }).toString();
+
+            const response = await fetch(`${INNOWISE_API_BASE_URL}/auth/login/`, {
+                method: 'POST',
                 headers: {
-                    "Content-Type": "application/json",
+                    'Content-Type': 'application/x-www-form-urlencoded',
                 },
-                body: JSON.stringify({ email, password }),
+                body: formBody,
             });
 
             if (!response.ok) {
-                throw new Error("Nieprawidłowy email lub hasło.");
+                let errorData = { detail: "Unknown login error." };
+                
+                try {
+                    errorData = await response.json();
+                } catch (e) {
+                    console.error("Error: Server returned a non-JSON error body.", response.status);
+                }
+                
+                throw new Error(errorData.detail || `Server Error: Status ${response.status}`);
             }
 
             const data = await response.json();
-            login(data.access, data.refresh);
+
+            alert("Login successful!");
+            
+            login(data.access_token, data.refresh_token);
+
         } catch (err) {
+            console.error("Error during login:", err); 
+            
             throw err; 
         }
     };
@@ -48,7 +73,6 @@ export const AuthProvider = ({ children }) => {
 
         if (refreshToken) {
             try {
-                // Wysłanie tokenu do serwera w celu unieważnienia
                 await fetch(`${API_BASE_URL}/api/logout/`, {
                     method: 'POST',
                     headers: {
@@ -57,19 +81,17 @@ export const AuthProvider = ({ children }) => {
                     body: JSON.stringify({ refresh_token: refreshToken }),
                 });
             } catch (error) {
-                // Nawet jeśli serwer zwróci błąd, nadal chcemy wylogować użytkownika
                 console.error('Logout failed on the server:', error);
             }
         }
 
-        // Czyszczenie tokenów po stronie klienta
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');
         setIsLoggedIn(false);
     };
 
     return (
-        <AuthContext.Provider value={{ isLoggedIn, performLogin, logout}}>
+        <AuthContext.Provider value={{ isLoggedIn, login, logout, isLoading, performLogin}}>
             {children}
         </AuthContext.Provider>
     );

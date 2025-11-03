@@ -1,4 +1,4 @@
-import { API_BASE_URL } from './config';
+import { API_BASE_URL, INNOWISE_API_BASE_URL } from './config';
 
 const refreshAccessToken = async () => {
     const refreshToken = localStorage.getItem('refresh_token');
@@ -8,12 +8,18 @@ const refreshAccessToken = async () => {
     }
 
     try {
-        const response = await fetch(`${API_BASE_URL}/api/token/refresh/`, {
+        const bodyPayload = { 
+            refresh_token: refreshToken, 
+        };
+        
+        const response = await fetch(`${INNOWISE_API_BASE_URL}/auth/refresh-token`, {
             method: 'POST',
             headers: {
+                // POPRAWKA: Ten endpoint oczekuje JSON
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ refresh: refreshToken }),
+            // POPRAWKA: Wyślij JSON
+            body: JSON.stringify(bodyPayload),
         });
 
         if (!response.ok) {
@@ -21,8 +27,11 @@ const refreshAccessToken = async () => {
         }
 
         const data = await response.json();
-        localStorage.setItem('access_token', data.access);
-        return data.access;
+        localStorage.setItem('access_token', data.access_token);
+        if (data.refresh) {
+            localStorage.setItem('refresh_token', data.refresh_token);
+        }
+        return data.access_token;
     } catch (error) {
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');
@@ -31,7 +40,7 @@ const refreshAccessToken = async () => {
     }
 };
 
-// Centralna funkcja do wysyłania zapytań z obsługą autoryzacji
+// function used to make authorized fetch requests
 export const AuthFetch = async (url, options = {}) => {
     let accessToken = localStorage.getItem('access_token');
 
