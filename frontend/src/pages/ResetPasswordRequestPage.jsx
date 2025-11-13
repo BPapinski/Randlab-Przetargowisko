@@ -4,17 +4,45 @@ import Header from "../components/Header";
 import "./styles/indexStyles.css";
 import styles from "./styles/ResetPasswordRequest.module.css";
 import { useAuth } from "../utils/AuthContext";
+import { INNOWISE_API_BASE_URL } from "../utils/config";
 
-const simulateApiRequest = (email) => {
-    console.log(`Sending reset request for: ${email}`);
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            resolve({ success: true });
-        }, 1500);
-    });
+const requestPasswordReset = async (email) => {
+    try {
+        const formBody = new URLSearchParams({
+            email: email, 
+        }).toString();
+
+        const response = await fetch(`${INNOWISE_API_BASE_URL}/reset/password-reset/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email }),
+        });
+
+        if (!response.ok) {
+            let errorData = { detail: "Unknown reset password error." };
+            
+            try {
+                errorData = await response.json();
+            } catch (e) {
+                console.error("Error: Server returned a non-JSON error body.", response.status);
+            }
+            
+            throw new Error(errorData.detail || `Server Error: Status ${response.status}`);
+        }
+
+        const data = await response.json();
+        return data;
+
+    } catch (err) {
+        console.error("Error during reset password request:", err); 
+        
+        throw err; 
+    }
 };
 
-export default function ResetPasswordRequest() {
+export default function ResetPasswordRequestPage() {
     const navigate = useNavigate();
     const { isLoggedIn } = useAuth();
 
@@ -36,7 +64,7 @@ export default function ResetPasswordRequest() {
         setSuccessMessage("");
 
         try {
-            await simulateApiRequest(email);
+            await requestPasswordReset(email);
             setSuccessMessage(
                 "Jeśli konto powiązane z tym adresem e-mail istnieje, instrukcje resetowania hasła zostały wysłane."
             );

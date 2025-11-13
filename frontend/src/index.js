@@ -6,7 +6,7 @@ import IndexPage from './pages/IndexPage';
 import LoginPage from './pages/LoginPage';
 import TenderFormPage from './pages/TenderFormPage';
 import AliasFilterPage from './pages/AliasFilterPage';
-import ResetPasswordRequest from './pages/ResetPasswordRequest';
+import ResetPasswordRequestPage from './pages/ResetPasswordRequestPage';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
@@ -17,7 +17,7 @@ root.render(
         <Routes>
           <Route path="/" element={<IndexPage />} />
           <Route path="/login" element={<LoginPage />} />
-          <Route path="/reset-password-request" element={<ResetPasswordRequest />} />
+          <Route path="/reset-password-request" element={<ResetPasswordRequestPage/>} />
           <Route path="/tenders/new" element={<TenderFormPage />} />
           <Route path="/alias-filter" element={<AliasFilterPage />} />
         </Routes>
