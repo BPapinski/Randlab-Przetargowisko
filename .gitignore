@@ -1,9 +1,11 @@
 # Python
 venv/
+.venv/
 __pycache__/
 *.py[cod]
 *.sqlite3
 *.log
+
 
 # Django
 *.pot
@@ -27,3 +29,5 @@ db.sqlite3
 
 # Env files
 .env
+
+/migrations/

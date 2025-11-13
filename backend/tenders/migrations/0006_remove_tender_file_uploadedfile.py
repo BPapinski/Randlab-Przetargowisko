@@ -6,7 +6,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("tenders", "0005_tender_file"),
     ]
@@ -30,9 +29,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "file",
-                    models.FileField(
-                        upload_to=tenders.models.tender_file_upload_to
-                    ),
+                    models.FileField(upload_to=tenders.models.tender_file_upload_to),
                 ),
                 ("uploaded_at", models.DateTimeField(auto_now_add=True)),
                 (

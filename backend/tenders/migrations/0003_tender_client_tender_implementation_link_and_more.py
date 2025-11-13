@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("tenders", "0002_tender_is_active_alter_tender_created_at_and_more"),
     ]

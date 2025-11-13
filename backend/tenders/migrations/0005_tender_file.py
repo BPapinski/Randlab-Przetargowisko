@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("tenders", "0004_tenderentry_description"),
     ]
@@ -13,8 +12,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="tender",
             name="file",
-            field=models.FileField(
-                blank=True, null=True, upload_to="tender_files/"
-            ),
+            field=models.FileField(blank=True, null=True, upload_to="tender_files/"),
         ),
     ]
