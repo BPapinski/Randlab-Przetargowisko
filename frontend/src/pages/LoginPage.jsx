@@ -1,11 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faLock, faEnvelope, faSpinner } from '@fortawesome/free-solid-svg-icons';
+import { useNavigate, Link } from "react-router-dom";
 import Header from "../components/Header";
 import "./styles/indexStyles.css";
 import styles from "./styles/LoginPage.module.css";
-import { API_BASE_URL } from '../utils/config';
 import { useAuth } from "../utils/AuthContext";
 
 
@@ -74,6 +71,11 @@ export default function LoginPage() {
                             Zaloguj się
                         </button>
                     </form>
+                    <div className={styles.resetLinkContainer}>
+                        <Link to="/reset-password-request" className={styles.resetPasswordLink}>
+                            Nie pamiętasz hasła?
+                        </Link>
+                    </div>
                 </div>
             </div>
         </>
