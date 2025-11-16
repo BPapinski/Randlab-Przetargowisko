@@ -7,6 +7,7 @@ import LoginPage from './pages/LoginPage';
 import TenderFormPage from './pages/TenderFormPage';
 import AliasFilterPage from './pages/AliasFilterPage';
 import ResetPasswordRequestPage from './pages/ResetPasswordRequestPage';
+import ResetPasswordConfirmationPage from './pages/ResetPasswordConfirmationPage';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
@@ -20,6 +21,7 @@ root.render(
           <Route path="/reset-password-request" element={<ResetPasswordRequestPage/>} />
           <Route path="/tenders/new" element={<TenderFormPage />} />
           <Route path="/alias-filter" element={<AliasFilterPage />} />
+          <Route path="/reset-password-confirm" element={<ResetPasswordConfirmationPage />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
