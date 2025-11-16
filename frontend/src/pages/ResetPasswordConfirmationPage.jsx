@@ -9,7 +9,6 @@ export default function ResetPasswordConfirmationPage() {
     const [params] = useSearchParams();
     const user_id = params.get("user_id");
     const token = params.get("token");
-    const resetKey = params.get("key"); // jeśli używasz go do POST
 
     const [validKey, setValidKey] = useState(null);
     const [password, setPassword] = useState("");
@@ -36,7 +35,7 @@ export default function ResetPasswordConfirmationPage() {
 
     const confirmPasswordReset = async (key, password) => {
         const response = await fetch(
-            `${INNOWISE_API_BASE_URL}/reset/password-reset-confirm/`,
+            `${INNOWISE_API_BASE_URL}/reset/password-reset/password-reset-confirm/`,
             {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -80,7 +79,7 @@ export default function ResetPasswordConfirmationPage() {
 
         try {
             setLoading(true);
-            await confirmPasswordReset(resetKey, password);
+            await confirmPasswordReset(token, password);
             setSuccess("Hasło zmienione pomyślnie. Możesz się zalogować.");
             setPassword("");
             setPassword2("");
