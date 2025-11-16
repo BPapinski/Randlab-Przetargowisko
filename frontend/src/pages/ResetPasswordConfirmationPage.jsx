@@ -4,49 +4,69 @@ import Header from "../components/Header";
 import styles from "./styles/ResetPasswordConfirmation.module.css";
 import { INNOWISE_API_BASE_URL } from "../utils/config";
 
-const validateResetKey = async (key) => {
-    await new Promise((res) => setTimeout(res, 500));
-    return key && key.length > 10;
-};
-
-const confirmPasswordReset = async (key, password) => {
-    const response = await fetch(`${INNOWISE_API_BASE_URL}/reset/password-reset-confirm/`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ key, new_password: password }),
-    });
-
-    if (!response.ok) {
-        let errorData = {};
-        try {
-            errorData = await response.json();
-        } catch { }
-        throw new Error(errorData.detail || "Błąd podczas zmiany hasła.");
-    }
-};
-
 export default function ResetPasswordConfirmationPage() {
     const navigate = useNavigate();
     const [params] = useSearchParams();
-    const resetKey = params.get("key");
+    const user_id = params.get("user_id");
+    const token = params.get("token");
+    const resetKey = params.get("key"); // jeśli używasz go do POST
 
     const [validKey, setValidKey] = useState(null);
     const [password, setPassword] = useState("");
     const [password2, setPassword2] = useState("");
-
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
     const [loading, setLoading] = useState(false);
 
+    const validateResetKey = async () => {
+        if (!user_id || !token) return false;
+
+        try {
+            const response = await fetch(
+                `${INNOWISE_API_BASE_URL}/reset/password-reset/validate?user_id=${user_id}&token=${token}`
+            );
+            if (!response.ok) return false;
+            await response.json();
+            return true;
+        } catch (err) {
+            console.error("Token validation error:", err);
+            return false;
+        }
+    };
+
+    const confirmPasswordReset = async (key, password) => {
+        const response = await fetch(
+            `${INNOWISE_API_BASE_URL}/reset/password-reset-confirm/`,
+            {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ key, new_password: password }),
+            }
+        );
+
+        if (!response.ok) {
+            let errorData = {};
+            try {
+                errorData = await response.json();
+            } catch {}
+            throw new Error(errorData.detail || "Błąd podczas zmiany hasła.");
+        }
+    };
+
     useEffect(() => {
         const verifyKey = async () => {
             setLoading(true);
-            const isValid = await validateResetKey(resetKey);
+            const isValid = await validateResetKey();
             setValidKey(isValid);
             setLoading(false);
+            if (!isValid) {
+                alert("Klucz resetu jest nieprawidłowy lub wygasł.");
+            } else {
+                alert("Klucz resetu jest prawidłowy. Możesz ustawić nowe hasło.");
+            }
         };
         verifyKey();
-    }, [resetKey]);
+    }, [user_id, token]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -80,7 +100,7 @@ export default function ResetPasswordConfirmationPage() {
 
                     {loading && <p>Ładowanie...</p>}
 
-                    {validKey === false || resetKey === null ? (
+                    {validKey === false || !user_id || !token ? (
                         <div className={styles.errorMessage}>
                             Klucz resetu jest nieprawidłowy lub wygasł.
                         </div>
