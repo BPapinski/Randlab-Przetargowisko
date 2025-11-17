@@ -2,12 +2,11 @@
 from rest_framework import generics, permissions, status
 from rest_framework.decorators import (
     api_view,
-    authentication_classes,
     permission_classes,
 )
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework_simplejwt.authentication import JWTAuthentication
+
 
 from tenders.models import TenderEntry
 
@@ -23,16 +22,12 @@ from .utils import get_tender_entries_for_alias_group
 @api_view(["GET"])
 def tender_entries_by_standard_position(request):
     position = request.GET.get("position")
-    print(f"Received position: {position}")  # Debugging line
 
     if position == "None":
-        print("Position is None, fetching entries with no matching alias.")
         alias_names = list(Alias.objects.values_list("alias_name", flat=True))
         group_names = list(AliasGroup.objects.values_list("name", flat=True))
         all_known_names = alias_names + group_names
-
         entries = TenderEntry.objects.exclude(position__in=all_known_names)
-        print(f"Found {entries.count()} entries with no matching alias.")
     elif position:
         try:
             entries = get_tender_entries_for_alias_group(position)
@@ -53,7 +48,6 @@ def tender_entries_by_standard_position(request):
 
 
 @api_view(["GET"])
-@authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def alias_group_list_names(request):
     groups = AliasGroup.objects.all().values_list("name", flat=True)
@@ -100,15 +94,12 @@ class AliasGroupList(generics.ListCreateAPIView):
 
 
 class AliasCreate(generics.CreateAPIView):
-    """
-    Tworzenie nowego aliasu.
-    Endpoint: /api/aliases/aliases/
-    """
-
+    permission_classes = [permissions.IsAuthenticated]
     queryset = Alias.objects.all()
     serializer_class = AliasSerializer
 
 
+@permission_classes([IsAuthenticated])
 @api_view(["POST"])
 def create_alias_view(request):
     alias_group_name = request.data.get("alias_group_name")
@@ -117,31 +108,25 @@ def create_alias_view(request):
     if not alias_group_name or not entry_position:
         return Response(
             {
-                "error": "Brak wymaganych danych: 'alias_group_name' lub 'entry_position'."
+                "error": "No required data provided. 'alias_group_name' and 'entry_position' are required."
             },
             status=status.HTTP_400_BAD_REQUEST,
         )
-
-    # Sprawdzenie, czy AliasGroup o podanej nazwie już istnieje
     try:
         alias_group = AliasGroup.objects.get(name=alias_group_name)
     except AliasGroup.DoesNotExist:
-        # Jeśli nie istnieje, utwórz nową grupę
         alias_group = AliasGroup.objects.create(name=alias_group_name)
 
-    # Sprawdzenie, czy alias o danej nazwie już istnieje
     if Alias.objects.filter(alias_name=entry_position).exists():
         return Response(
-            {"error": f"Alias o nazwie '{entry_position}' już istnieje."},
+            {"error": f"alias named '{entry_position}' already exists."},
             status=status.HTTP_409_CONFLICT,
         )
-
-    # Utworzenie nowego aliasu i przypisanie go do grupy
     alias = Alias.objects.create(alias_group=alias_group, alias_name=entry_position)
 
     return Response(
         {
-            "success": f"Alias '{alias.alias_name}' został przypisany do grupy '{alias_group.name}'.",
+            "success": f"Alias '{alias.alias_name}' has been assigned to group '{alias_group.name}'.",
             "alias_id": alias.id,
             "alias_group_id": alias_group.id,
         },

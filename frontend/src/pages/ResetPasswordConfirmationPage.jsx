@@ -58,11 +58,6 @@ export default function ResetPasswordConfirmationPage() {
             const isValid = await validateResetKey();
             setValidKey(isValid);
             setLoading(false);
-            if (!isValid) {
-                alert("Klucz resetu jest nieprawidłowy lub wygasł.");
-            } else {
-                alert("Klucz resetu jest prawidłowy. Możesz ustawić nowe hasło.");
-            }
         };
         verifyKey();
     }, [user_id, token]);
