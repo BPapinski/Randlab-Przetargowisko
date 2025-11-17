@@ -55,9 +55,6 @@ export const AuthProvider = ({ children }) => {
             }
 
             const data = await response.json();
-
-            alert("Login successful!");
-            
             login(data.access_token, data.refresh_token);
 
         } catch (err) {

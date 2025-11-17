@@ -46,13 +46,14 @@ export default function LoginPage() {
                     <form onSubmit={handleSubmit} className={styles.loginForm}>
                         {error && <div className={styles.errorMessage}>{error}</div>}
                         <div className={styles.formGroup}>
-                            <label>Nazwa użytkownika</label>
+                            <label>Nazwa użytkownika, numer telefonu lub email</label>
                             <input
                                 type="text"
                                 id="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 required
+                                placeholder="Wpisz nazwę użytkownika, numer telefonu lub email"
                             />
                         </div>
 
@@ -64,6 +65,7 @@ export default function LoginPage() {
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 required
+                                placeholder="Wpisz hasło"
                             />
                         </div>
 
